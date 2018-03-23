@@ -1,0 +1,449 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.21022</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{C41003C0-E945-4ECE-8020-2CBFE04B5B43}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Hanhua.Common</RootNamespace>
+    <AssemblyName>Hanhua</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <StartupObject>
+    </StartupObject>
+    <ApplicationIcon>Wii side view.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Ionic.Zip, Version=1.9.1.8, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=12.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" />
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="CompressTools\BaseComp.cs" />
+    <Compile Include="CompressTools\BaseCompTool.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CompressTools\BaseCompTool.Designer.cs">
+      <DependentUpon>BaseCompTool.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CompressTools\Bio0LzComp.cs" />
+    <Compile Include="CompressTools\BioCvRdxComp.cs" />
+    <Compile Include="CompressTools\MarioYay0Comp.cs" />
+    <Compile Include="CompressTools\MarioYaz0Comp.cs" />
+    <Compile Include="CompressTools\EternalDarknessSkArcComp.cs" />
+    <Compile Include="CompressTools\ViewtifulJoeRleComp.cs" />
+    <Compile Include="TextEditTools\Bio0Edit\Bio0CharInfo.cs" />
+    <Compile Include="TextEditTools\Bio0Edit\Bio0CnFontEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TextEditTools\Bio0Edit\Bio0CnFontEditor.Designer.cs">
+      <DependentUpon>Bio0CnFontEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TextEditTools\Bio0Edit\Bio0FontEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TextEditTools\Bio0Edit\Bio0FontEditor.Designer.cs">
+      <DependentUpon>Bio0FontEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TextEditTools\Bio0Edit\Bio0TextEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TextEditTools\Bio0Edit\Bio0TextEditor.Designer.cs">
+      <DependentUpon>Bio0TextEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TextEditTools\Bio1Edit\Bio1TextEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TextEditTools\Bio1Edit\Bio1TextEditor.Designer.cs">
+      <DependentUpon>Bio1TextEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TextEditTools\Bio2Edit\Bio2MovTxtEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TextEditTools\Bio2Edit\Bio2MovTxtEditor.Designer.cs">
+      <DependentUpon>Bio2MovTxtEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TextEditTools\Bio2Edit\Bio2TextEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TextEditTools\Bio2Edit\Bio2TextEditor.Designer.cs">
+      <DependentUpon>Bio2TextEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TextEditTools\Bio3Edit\Bio3TextEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TextEditTools\Bio3Edit\Bio3TextEditor.Designer.cs">
+      <DependentUpon>Bio3TextEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TextEditTools\Bio2Edit\BioAdtTool.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TextEditTools\Bio2Edit\BioAdtTool.Designer.cs">
+      <DependentUpon>BioAdtTool.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TextEditTools\BioCvEdit\BioCvAfsEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TextEditTools\BioCvEdit\BioCvAfsEditor.Designer.cs">
+      <DependentUpon>BioCvAfsEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TextEditTools\BioCvEdit\BioCvConfigTxtEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TextEditTools\BioCvEdit\BioCvConfigTxtEditor.Designer.cs">
+      <DependentUpon>BioCvConfigTxtEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TextEditTools\BioCvEdit\BioCvTextEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TextEditTools\BioCvEdit\BioCvTextEditor.Designer.cs">
+      <DependentUpon>BioCvTextEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TextEditTools\Bio1Edit\FontCharInfo.cs" />
+    <Compile Include="TextEditTools\BioCvEdit\BioCvTextAlignEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TextEditTools\BioCvEdit\BioCvTextAlignEdit.Designer.cs">
+      <DependentUpon>BioCvTextAlignEdit.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TextEditTools\TalesOfSymphonia\TalesOfSymphoniaTextEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TextEditTools\TalesOfSymphonia\TalesOfSymphoniaTextEditor.Designer.cs">
+      <DependentUpon>TalesOfSymphoniaTextEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TextEditTools\ViewtifulJoe\ViewtifulJoePicEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TextEditTools\ViewtifulJoe\ViewtifulJoePicEditor.Designer.cs">
+      <DependentUpon>ViewtifulJoePicEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TextEditTools\ViewtifulJoe\ViewtifulJoeTextEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TextEditTools\ViewtifulJoe\ViewtifulJoeTextEditor.Designer.cs">
+      <DependentUpon>ViewtifulJoeTextEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FontEditTools\FontBase.cs" />
+    <Compile Include="FontEditTools\FontType.cs" />
+    <Compile Include="ImgEditTools\ImgEditorAdt.cs" />
+    <Compile Include="ImgEditTools\ImgEditorPvr.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ImgEditTools\ImgEditorTim2.cs" />
+    <Compile Include="ImgEditTools\ImgEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ImgEditTools\ImgEditor.Designer.cs">
+      <DependentUpon>ImgEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ImgEditTools\ImgEditorBase.cs" />
+    <Compile Include="ImgEditTools\ImgEditorGvr.cs" />
+    <Compile Include="ImgEditTools\ImgEditorJpg.cs" />
+    <Compile Include="ImgEditTools\ImgEditorTim.cs" />
+    <Compile Include="ImgEditTools\ImgEditorTpl.cs" />
+    <Compile Include="ImgEditTools\ImgType.cs" />
+    <Compile Include="ImgEditTools\ImgEditorMhp.cs" />
+    <Compile Include="TextSearchTools\BinTypeSearch.cs" />
+    <Compile Include="TextSearchTools\CharWidthTypeSearch.cs" />
+    <Compile Include="TextSearchTools\DiffTwoByteTypeSearch.cs" />
+    <Compile Include="TextSearchTools\DiffOneByteTypeSearch.cs" />
+    <Compile Include="TextSearchTools\SearchBase.cs" />
+    <Compile Include="TextSearchTools\SearchTools.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TextSearchTools\SearchTools.Designer.cs">
+      <DependentUpon>SearchTools.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FontEditTools\NgcFontEditer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FontEditTools\NgcFontEditer.Designer.cs">
+      <DependentUpon>NgcFontEditer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FontEditTools\NgcFontInfo.cs" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="CompressTools\BaseCompTool.resx">
+      <DependentUpon>BaseCompTool.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TextEditTools\Bio0Edit\Bio0CnFontEditor.resx">
+      <DependentUpon>Bio0CnFontEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TextEditTools\Bio0Edit\Bio0FontEditor.resx">
+      <DependentUpon>Bio0FontEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TextEditTools\Bio0Edit\Bio0TextEditor.resx">
+      <DependentUpon>Bio0TextEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TextEditTools\Bio1Edit\Bio1TextEditor.resx">
+      <DependentUpon>Bio1TextEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TextEditTools\Bio2Edit\Bio2MovTxtEditor.resx">
+      <DependentUpon>Bio2MovTxtEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TextEditTools\Bio2Edit\Bio2TextEditor.resx">
+      <DependentUpon>Bio2TextEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TextEditTools\Bio3Edit\Bio3TextEditor.resx">
+      <DependentUpon>Bio3TextEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TextEditTools\Bio2Edit\BioAdtTool.resx">
+      <DependentUpon>BioAdtTool.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TextEditTools\BioCvEdit\BioCvAfsEditor.resx">
+      <DependentUpon>BioCvAfsEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TextEditTools\BioCvEdit\BioCvConfigTxtEditor.resx">
+      <DependentUpon>BioCvConfigTxtEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TextEditTools\BioCvEdit\BioCvTextEditor.resx">
+      <DependentUpon>BioCvTextEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TextEditTools\BioCvEdit\BioCvTextAlignEdit.resx">
+      <DependentUpon>BioCvTextAlignEdit.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TextEditTools\TalesOfSymphonia\TalesOfSymphoniaTextEditor.resx">
+      <DependentUpon>TalesOfSymphoniaTextEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TextEditTools\ViewtifulJoe\ViewtifulJoePicEditor.resx">
+      <DependentUpon>ViewtifulJoePicEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TextEditTools\ViewtifulJoe\ViewtifulJoeTextEditor.resx">
+      <DependentUpon>ViewtifulJoeTextEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ImgEditTools\ImgEditor.resx">
+      <DependentUpon>ImgEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TextSearchTools\SearchTools.resx">
+      <DependentUpon>SearchTools.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FontEditTools\NgcFontEditer.resx">
+      <DependentUpon>NgcFontEditer.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TextSearchTools\SingleFileResult.resx">
+      <DependentUpon>SingleFileResult.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StartMenu.resx">
+      <DependentUpon>StartMenu.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FileViewer\SzsViewer.resx">
+      <DependentUpon>SzsViewer.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FileViewer\ImageViewer.resx">
+      <DependentUpon>ImageViewer.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ImgEditTools\SampleImgCreater.resx">
+      <DependentUpon>SampleImgCreater.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TextEditTools\Bio1Edit\Bio1FontEditor.resx">
+      <DependentUpon>Bio1FontEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FileViewer\UcImageEditor.resx">
+      <DependentUpon>UcImageEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TextEditTools\TxtresEdit\TresEditer.resx">
+      <DependentUpon>TresEditer.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FontEditTools\WiiFontEditer.resx">
+      <DependentUpon>WiiFontEditer.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="FontEditTools\FontInfo.resx">
+      <DependentUpon>FontInfo.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <Compile Include="TextSearchTools\ResultLine.cs" />
+    <Compile Include="TextSearchTools\SearchType.cs" />
+    <Compile Include="TextSearchTools\SingleFileResult.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TextSearchTools\SingleFileResult.Designer.cs">
+      <DependentUpon>SingleFileResult.cs</DependentUpon>
+    </Compile>
+    <Compile Include="StartMenu.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StartMenu.Designer.cs">
+      <DependentUpon>StartMenu.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FileViewer\SzsViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FileViewer\SzsViewer.Designer.cs">
+      <DependentUpon>SzsViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TextSearchTools\TextTypeSearch.cs" />
+    <Compile Include="TextSearchTools\WiiFontTypeSearch.cs" />
+    <Compile Include="TextSearchTools\NgcFontTypeSearch.cs" />
+    <Compile Include="ImgEditTools\SampleImgCreater.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ImgEditTools\SampleImgCreater.Designer.cs">
+      <DependentUpon>SampleImgCreater.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ImgEditTools\TplFileManager.cs" />
+    <Compile Include="FileViewer\ImageViewer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FileViewer\ImageViewer.Designer.cs">
+      <DependentUpon>ImageViewer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TextEditTools\Bio1Edit\Bio1FontEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TextEditTools\Bio1Edit\Bio1FontEditor.Designer.cs">
+      <DependentUpon>Bio1FontEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FileViewer\UcImageEditor.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="FileViewer\UcImageEditor.Designer.cs">
+      <DependentUpon>UcImageEditor.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TextEditTools\TxtresEdit\TresEditer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TextEditTools\TxtresEdit\TresEditer.Designer.cs">
+      <DependentUpon>TresEditer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FontEditTools\WiiFontEditer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FontEditTools\WiiFontEditer.Designer.cs">
+      <DependentUpon>WiiFontEditer.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FontEditTools\FontInfo.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FontEditTools\FontInfo.Designer.cs">
+      <DependentUpon>FontInfo.cs</DependentUpon>
+    </Compile>
+    <Compile Include="FontEditTools\WiiFontInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="TextSearchTools\Shift-JisEncode.xml" />
+    <Content Include="Wii side view.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="VBIDE">
+      <Guid>{0002E157-0000-0000-C000-000000000046}</Guid>
+      <VersionMajor>5</VersionMajor>
+      <VersionMinor>3</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+    </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{006DCF31-D7F3-4AD3-8037-6BC11FD1AA34}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FraGag.Compression.Prs\FraGag.Compression.Prs.csproj">
+      <Project>{EC8BB2B3-1975-41B9-8D59-3A6403271112}</Project>
+      <Name>FraGag.Compression.Prs</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\IsoTools\IsoTools.csproj">
+      <Project>{218343D5-EF4C-4E09-BA7B-F7EC7793CB2D}</Project>
+      <Name>IsoTools</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PuyoTools.Modules\PuyoTools.Modules.csproj">
+      <Project>{E5D36FFB-A89F-4F4D-928C-87FC863B4C6C}</Project>
+      <Name>PuyoTools.Modules</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\VrSharp\VrSharp.csproj">
+      <Project>{A8E274F4-0D8E-4EAB-A5B2-7B40BC922534}</Project>
+      <Name>VrSharp</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
