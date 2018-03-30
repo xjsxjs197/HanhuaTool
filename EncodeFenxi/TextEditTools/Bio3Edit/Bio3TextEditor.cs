@@ -1659,7 +1659,7 @@ namespace Hanhua.TextEditTools.Bio3Edit
                 byte[] byNgcData = File.ReadAllBytes(ngcCnFile);
 
                 // 根据Ps日文文本数据，查找日文Ngc中的文本数据
-                int txtStartPos = this.GetTextStartPos(File.ReadAllBytes(ngcCnFile.Replace("Cn", "Jp")), byJpData);
+                int txtStartPos = this.GetTextStartPos(File.ReadAllBytes(ngcCnFile.Replace("Bio3Cn", "Bio3Jp")), byJpData);
                 if (txtStartPos > -1)
                 {
                     // 将中文数据写入Ngc数据
