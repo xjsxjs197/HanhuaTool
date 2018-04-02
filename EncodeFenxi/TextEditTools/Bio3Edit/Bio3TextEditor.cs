@@ -551,6 +551,7 @@ namespace Hanhua.TextEditTools.Bio3Edit
         private void btnCopyFromPs_Click(object sender, EventArgs e)
         {
             this.Do(this.CopyPsToNgc);
+            //this.Do(this.CheckPsCnJpDiffPos);
         }
 
         #endregion
@@ -1005,6 +1006,79 @@ namespace Hanhua.TextEditTools.Bio3Edit
         #region " 私有方法 "
 
         /// <summary>
+        /// 检查Ps中、日文的差异位置
+        /// </summary>
+        private void CheckPsCnJpDiffPos()
+        {
+            // 取得需要Copy的文件
+            List<FilePosInfo> needCopyFilesRdt = new List<FilePosInfo>();
+            needCopyFilesRdt.AddRange(this.LoadFiles(this.baseFolder + @"\PsTextAddr.txt"));
+            if (needCopyFilesRdt.Count == 0)
+            {
+                MessageBox.Show("路径错误，没有找到需要Copy的文件！");
+                return;
+            }
+
+            // 显示进度条
+            this.ResetProcessBar(needCopyFilesRdt.Count);
+
+            List<string> newAddrInfo = new List<string>();
+
+            // 开始循环所有的日文rdt文件
+            for (int i = 1; i <= 7; i++)
+            {
+                List<FilePosInfo> copyFiles = needCopyFilesRdt.Where(p => p.File.IndexOf("r" + i) != -1).ToList();
+                foreach (FilePosInfo fileInfo in copyFiles)
+                {
+                    newAddrInfo.Add(fileInfo.File);
+                    int startPos = 0;
+                    int endPos = 0;
+
+                    // 取得各个文件名
+                    string fileName = @"\" + Util.TrimFileNo(fileInfo.File);
+                    string jpFile = this.baseFolder + @"\PsBio3Jp\CD_DATA\STAGE" + i + fileName + ".ard";
+                    string cnFile = this.baseFolder + @"\PsBio3Cn\CD_DATA\STAGE" + i + fileName + ".ard";
+
+                    if (File.Exists(jpFile)
+                        && File.Exists(cnFile))
+                    {
+                        // 取得文本数据
+                        byte[] byJpData = File.ReadAllBytes(jpFile);
+                        byte[] byCnData = File.ReadAllBytes(cnFile);
+
+                        for (int j = 0; j < byJpData.Length; j++)
+                        {
+                            if (byJpData[j] != byCnData[j])
+                            {
+                                startPos = j;
+                                break;
+                            }
+                        }
+
+                        for (int j = byJpData.Length - 1; j >= 0; j--)
+                        {
+                            if (byJpData[j] != byCnData[j])
+                            {
+                                endPos = j;
+                                break;
+                            }
+                        }
+
+                        newAddrInfo.Add(startPos.ToString("x") + " " + endPos.ToString("x"));
+                    }
+
+                    // 更新进度条
+                    this.ProcessBarStep();
+                }
+            }
+
+            // 隐藏进度条
+            this.CloseProcessBar();
+
+            File.WriteAllLines(this.baseFolder + @"\PsTextDiffAddr.txt", newAddrInfo.ToArray(), Encoding.UTF8);
+        }
+
+        /// <summary>
         /// 设置当前Ps区域状态
         /// </summary>
         /// <param name="isPs"></param>
@@ -1304,7 +1378,14 @@ namespace Hanhua.TextEditTools.Bio3Edit
 
                     textEndPos++;
                 }
-                sb.Append(this.DecodeText(byData, fontCharPage, entryList[entryList.Count - 1], textEndPos)).Append("\n");
+                if (entryList.Count > 0)
+                {
+                    sb.Append(this.DecodeText(byData, fontCharPage, entryList[entryList.Count - 1], textEndPos)).Append("\n");
+                }
+                else 
+                {
+                    sb.Append(this.DecodeText(byData, fontCharPage, txtStartPos, textEndPos)).Append("\n");
+                }
 
                 return sb.ToString();
             }
@@ -1553,7 +1634,7 @@ namespace Hanhua.TextEditTools.Bio3Edit
             List<FilePosInfo> needCopyFilesBin = new List<FilePosInfo>();
             List<FilePosInfo> needCopyFilesRdt = new List<FilePosInfo>();
             needCopyFilesBin.AddRange(this.LoadFiles(this.baseFolder + @"\PsBinAddr.txt"));
-            needCopyFilesRdt.AddRange(this.LoadFiles(this.baseFolder + @"\PsTextAddr.txt"));
+            needCopyFilesRdt.AddRange(this.LoadFiles(this.baseFolder + @"\PsTextDiffAddr.txt"));
             if (needCopyFilesBin.Count == 0 || needCopyFilesRdt.Count == 0)
             {
                 MessageBox.Show("路径错误，没有找到需要Copy的文件！");
