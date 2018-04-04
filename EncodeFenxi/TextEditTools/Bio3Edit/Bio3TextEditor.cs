@@ -199,7 +199,7 @@ namespace Hanhua.TextEditTools.Bio3Edit
 "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y",
 "Z", "+", "╱", "-", "'", "―", "・", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k",
 "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "一", "上", "下",
-"个", "中", "为", "么", "义", "之", "九", "也", "买", "忘", "人", "什", "从", "他", "们", "价", "会", "但",
+"个", "中", "为", "么", "义", "之", "九", "也", "买", "亡", "人", "什", "从", "他", "们", "价", "会", "但",
 "作", "出", "切", "制", "动", "卡", "原", "反", "取", "古", "吉", "后", "哈", "回", "天", "奏", "始", "存",
 "它", "安", "定", "导", "将", "尔", "尼", "己", "市", "布", "开", "弱", "必", "我", "所", "抗", "拉", "按",
 "换", "控", "操", "敢", "数", "文", "斯", "无", "且", "时", "是", "普", "最", "月", "有", "本", "机", "束",
@@ -223,7 +223,7 @@ namespace Hanhua.TextEditTools.Bio3Edit
 "忙", "快", "怪", "情", "惜", "想", "憾", "户", "找", "招", "拥", "持", "挡", "援", "摆", "撕", "攻", "故",
 "整", "早", "昼", "晚", "曾", "杀", "杯", "杰", "板", "框", "桌", "欢", "此", "死", "汽", "泡", "活", "侵",
 "涌", "清", "滚", "漆", "灵", "炉", "热", "牢", "狗", "玩", "珠", "瑞", "瓶", "痕", "登", "盒", "省", "看",
-"碎", "禁", "离", "穿", "窗", "等", "箱", "纸", "练", "纸", "绑", "绳", "美", "聘", "肠", "胁", "脏", "脑",
+"碎", "禁", "离", "移", "穿", "窗", "等", "箱", "纸", "练", "绑", "绳", "美", "聘", "肠", "胁", "脏", "脑",
 "节", "菲", "落", "蒸", "虐", "衣", "觉", "训", "议", "货", "贯", "贴", "资", "赛", "赶", "起", "路", "迎",
 "远", "迟", "迦", "迹", "递", "速", "遥", "那", "邮", "酒", "钉", "销", "闭", "闸", "队", "随", "障", "集",
 "零", "静", "颗", "风", "食", "饮", "饿", "馆", "魂", "齐", "龙", "慢", "", "", "", "", "", ""
@@ -241,13 +241,13 @@ namespace Hanhua.TextEditTools.Bio3Edit
 "台", "号", "司", "合", "同", "吗", "否", "启", "呈", "告", "员", "周", "命", "和", "品", "哪", "商", "喷",
 "器", "噩", "四", "园", "图", "圆", "圈", "在", "地", "场", "型", "城", "培", "堂", "塑", "填", "墓", "士",
 "处", "备", "复", "外", "多", "大", "失", "头", "夹", "夺", "好", "如", "姆", "威", "子", "孔", "字", "宅",
-"完", "宝", "容", "室", "家", "容", "密", "察", "对", "封", "射", "小", "少", "就", "局", "属", "山", "嵌",
+"完", "宝", "客", "室", "家", "容", "密", "察", "对", "封", "射", "小", "少", "就", "局", "属", "山", "嵌",
 "工", "左", "已", "巷", "帕", "带", "常", "库", "应", "店", "废", "度", "座", "庭", "异", "弃", "式", "张",
 "弹", "强", "当", "录", "形", "径", "很", "得", "德", "徽", "忆", "忘", "态", "急", "性", "恐", "恢", "息",
 "患", "惧", "意", "感", "愿", "戏", "成", "或", "战", "截", "房", "手", "才", "打", "扔", "托", "扣", "扳",
 "技", "把", "报", "抵", "押", "拆", "拔", "拜", "择", "拿", "挂", "指", "据", "掉", "掌", "排", "接", "提",
 "插", "握", "携", "支", "收", "改", "放", "效", "救", "散", "料", "断", "新", "方", "旁", "旋", "日", "旧",
-"明", "晶", "曜", "曲", "更", "服", "木", "未", "术", "机", "条", "来", "极", "构", "林", "果", "枪", "架",
+"明", "晶", "曜", "曲", "更", "服", "木", "未", "术", "材", "条", "来", "极", "构", "林", "果", "枪", "架",
 "柄", "某", "染", "柜", "查", "标", "栓", "样", "格", "案", "梦", "梯", "械", "检", "棒", "植", "楼", "榴"
         };
 
@@ -258,15 +258,15 @@ namespace Hanhua.TextEditTools.Bio3Edit
  "模", "撬", "欧", "步", "武", "殊", "毒", "比", "毫", "氮", "水", "池", "油", "治", "洗", "浓", "涂", "液",
 "混", "添", "温", "游", "源", "满", "火", "炎", "炮", "炸", "点", "烧", "然", "照", "燃", "爆", "爬", "片",
 "版", "牌", "物", "特", "状", "现", "珀", "珍", "班", "理", "琥", "瓦", "生", "用", "由", "电", "疗", "疫",
-"病", "白", "皮", "监", "盖", "盘", "目", "相", "真", "着", "瞄", "知", "短", "石", "码", "硫", "确", "碟",
+"病", "白", "皮", "监", "盖", "盘", "目", "相", "真", "着", "瞄", "知", "短", "石", "码", "硫", "硬", "碟",
 "磁", "示", "礼", "神", "种", "秘", "空", "突", "竞", "章", "端", "签", "简", "管", "箭", "类", "粉", "系",
 "素", "紧", "级", "线", "组", "经", "络", "绝", "统", "继", "续", "绿", "缆", "老", "者", "联", "肯", "胶",
 "膛", "色", "艺", "芒", "苗", "草", "药", "获", "藏", "虽", "螺", "街", "裁", "装", "西", "要", "覆", "见",
 "视", "角", "解", "警", "计", "认", "让", "记", "许", "设", "识", "诊", "试", "话", "误", "说", "请", "读",
 "调", "贝", "败", "质", "贵", "赐", "走", "足", "踪", "身", "车", "轴", "轻", "载", "输", "边", "达", "过",
-"运", "还", "进", "连", "追", "适", "选", "逊", "造", "道", "遗", "部", "配", "酸", "采", "里", "金", "针",
+"近", "还", "进", "连", "追", "适", "选", "逊", "造", "道", "遗", "部", "配", "酸", "采", "里", "金", "针",
 "钟", "钢", "钥", "钩", "钱", "铁", "铜", "银", "链", "锁", "锈", "错", "键", "镜", "长", "门", "闻", "防",
-"附", "限", "院", "险", "隐", "雕", "零", "需", "青", "面", "音", "项", "饰", "首", "马", "高", "麦", "麻",
+"附", "限", "院", "险", "隐", "雕", "雾", "需", "青", "面", "音", "项", "饰", "首", "马", "高", "麦", "麻",
 "黄", "黑", "齿", "表", "笔", "", "", "", "", "", "", "", "", "", "", "", "", "",
 "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
 "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
@@ -437,7 +437,7 @@ namespace Hanhua.TextEditTools.Bio3Edit
                 File.Copy(bio3Ngc + @"NgcBio3Cn\root\&&systemdata\Start.dol", bio3Ngc + @"NgcBio3Patch\root\&&systemdata\Start.dol", true);
 
                 // 复制其他文件
-                string[] copyFiles = File.ReadAllLines(bio3Ngc + @"NgcBio3Jp\NgcOtherFile.txt");
+                string[] copyFiles = File.ReadAllLines(bio3Ngc + @"NgcOtherFile.txt");
                 for (int i = 0; i < copyFiles.Length; i++)
                 {
                     string targetFile = bio3Ngc + @"NgcBio3Patch\" + copyFiles[i];
@@ -448,16 +448,16 @@ namespace Hanhua.TextEditTools.Bio3Edit
                     File.Copy(bio3Ngc + @"NgcBio3Cn\" + copyFiles[i], targetFile, true);
                 }
 
-                // 复制data_aj文件
-                copyFiles = File.ReadAllLines(bio3Ngc + @"NgcBio3Jp\NgcTextAddrAj.txt");
-                Directory.CreateDirectory(bio3Ngc + @"NgcBio3Patch\root\bio19\data_aj\rdt\");
-                for (int i = 0; i < copyFiles.Length; i += 2)
-                {
-                    File.Copy(bio3Ngc + @"NgcBio3Cn\root\bio19\data_aj\rdt\" + copyFiles[i] + ".rdt", bio3Ngc + @"NgcBio3Patch\root\bio19\data_aj\rdt\" + copyFiles[i] + ".rdt", true);
-                }
+                //// 复制data_aj文件
+                //copyFiles = File.ReadAllLines(bio3Ngc + @"NgcBio3Jp\NgcTextAddrAj.txt");
+                //Directory.CreateDirectory(bio3Ngc + @"NgcBio3Patch\root\bio19\data_aj\rdt\");
+                //for (int i = 0; i < copyFiles.Length; i += 2)
+                //{
+                //    File.Copy(bio3Ngc + @"NgcBio3Cn\root\bio19\data_aj\rdt\" + copyFiles[i] + ".rdt", bio3Ngc + @"NgcBio3Patch\root\bio19\data_aj\rdt\" + copyFiles[i] + ".rdt", true);
+                //}
 
                 // 复制data_j文件
-                copyFiles = File.ReadAllLines(bio3Ngc + @"NgcBio3Jp\NgcTextAddrj.txt");
+                copyFiles = File.ReadAllLines(bio3Ngc + @"NgcTextAddrj.txt");
                 Directory.CreateDirectory(bio3Ngc + @"NgcBio3Patch\root\bio19\data_j\rdt\");
                 for (int i = 0; i < copyFiles.Length; i += 2)
                 {
@@ -1611,11 +1611,11 @@ namespace Hanhua.TextEditTools.Bio3Edit
                     page[i] = charsEfF0[i];
                 }
 
-                page = new string[charsEfF0.Length - 256];
+                page = new string[charsEfF0.Length - 252];
                 fontCharPage.Add(0xF0, page);
-                for (int i = 256; i < charsEfF0.Length; i++)
+                for (int i = 252; i < charsEfF0.Length; i++)
                 {
-                    page[i - 256] = charsEfF0[i];
+                    page[i - 252] = charsEfF0[i];
                 }
             }
             catch (Exception me)
@@ -1656,6 +1656,8 @@ namespace Hanhua.TextEditTools.Bio3Edit
                 string jpFile = this.baseFolder + @"\PsBio3Jp\CD_DATA\BIN" + fileName + ".bin";
                 string cnFile = this.baseFolder + @"\PsBio3Cn\CD_DATA\BIN" + fileName + ".bin";
                 string ngcCnFile = this.baseFolder + @"\NgcBio3Cn\root\&&systemdata\Start.dol";
+                jpFile = jpFile.Replace(@"CD_DATA\BIN\SLPS_023.00.bin", @"SLPS_023.00");
+                cnFile = cnFile.Replace(@"CD_DATA\BIN\SLPS_023.00.bin", @"SLPS_023.00");
 
                 if (File.Exists(jpFile)
                     && File.Exists(cnFile)
@@ -1675,35 +1677,35 @@ namespace Hanhua.TextEditTools.Bio3Edit
             }
 
             // 开始循环所有的日文rdt文件
-            for (int i = 1; i <= 7; i++)
-            {
-                List<FilePosInfo> copyFiles = needCopyFilesRdt.Where(p => p.File.IndexOf("r" + i) != -1).ToList();
-                foreach (FilePosInfo fileInfo in copyFiles)
-                {
-                    // 取得各个文件名
-                    string fileName = @"\" + Util.TrimFileNo(fileInfo.File);
-                    string jpFile = this.baseFolder + @"\PsBio3Jp\CD_DATA\STAGE" + i + fileName + ".ard";
-                    string cnFile = this.baseFolder + @"\PsBio3Cn\CD_DATA\STAGE" + i + fileName + ".ard";
-                    string ngcFile1 = this.baseFolder + @"\NgcBio3Cn\root\bio19\data_j\rdt" + fileName + ".rdt";
-                    string ngcFile2 = this.baseFolder + @"\NgcBio3Cn\root\bio19\data_aj\rdt" + fileName + ".rdt";
+            //for (int i = 1; i <= 7; i++)
+            //{
+            //    List<FilePosInfo> copyFiles = needCopyFilesRdt.Where(p => p.File.IndexOf("r" + i) != -1).ToList();
+            //    foreach (FilePosInfo fileInfo in copyFiles)
+            //    {
+            //        // 取得各个文件名
+            //        string fileName = @"\" + Util.TrimFileNo(fileInfo.File);
+            //        string jpFile = this.baseFolder + @"\PsBio3Jp\CD_DATA\STAGE" + i + fileName + ".ard";
+            //        string cnFile = this.baseFolder + @"\PsBio3Cn\CD_DATA\STAGE" + i + fileName + ".ard";
+            //        string ngcFile1 = this.baseFolder + @"\NgcBio3Cn\root\bio19\data_j\rdt" + fileName + ".rdt";
+            //        string ngcFile2 = this.baseFolder + @"\NgcBio3Cn\root\bio19\data_aj\rdt" + fileName + ".rdt";
 
-                    if (File.Exists(jpFile)
-                        && File.Exists(cnFile))
-                    {
-                        // 取得文本数据
-                        byte[] byJpData = new byte[fileInfo.TextEnd - fileInfo.TextStart];
-                        byte[] byCnData = new byte[byJpData.Length];
-                        this.GetTextData(jpFile, cnFile, fileInfo.PosInfo, byJpData, byCnData);
+            //        if (File.Exists(jpFile)
+            //            && File.Exists(cnFile))
+            //        {
+            //            // 取得文本数据
+            //            byte[] byJpData = new byte[fileInfo.TextEnd - fileInfo.TextStart];
+            //            byte[] byCnData = new byte[byJpData.Length];
+            //            this.GetTextData(jpFile, cnFile, fileInfo.PosInfo, byJpData, byCnData);
 
-                        // 保存文本数据
-                        this.SaveTextData(ngcFile1, byJpData, byCnData, saveFaileFiles, fileInfo.File);
-                        this.SaveTextData(ngcFile2, byJpData, byCnData, saveFaileFiles, fileInfo.File);
-                    }
+            //            // 保存文本数据
+            //            this.SaveTextData(ngcFile1, byJpData, byCnData, saveFaileFiles, fileInfo.File);
+            //            this.SaveTextData(ngcFile2, byJpData, byCnData, saveFaileFiles, fileInfo.File);
+            //        }
 
-                    // 更新进度条
-                    this.ProcessBarStep();
-                }
-            }
+            //        // 更新进度条
+            //        this.ProcessBarStep();
+            //    }
+            //}
 
             // 隐藏进度条
             this.CloseProcessBar();
@@ -1721,7 +1723,7 @@ namespace Hanhua.TextEditTools.Bio3Edit
             this.baseFile = ngcCnFile;
             if (!this.SaveTextData(ngcCnFile, byJpData, byCnData))
             {
-                saveFaileFiles.Append(ngcCnFile + " : " + sortName).Append("\n");
+                saveFaileFiles.Append(ngcCnFile + " : " + sortName).Append("\r\n");
             }
         }
 
