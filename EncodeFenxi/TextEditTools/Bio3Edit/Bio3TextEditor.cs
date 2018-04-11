@@ -206,7 +206,7 @@ namespace Hanhua.TextEditTools.Bio3Edit
 "档", "次", "止", "正", "每", "没", "法", "洛", "浣", "消", "演", "灭", "熊", "的", "确", "符", "第", "米",
 "红", "终", "结", "置", "翻", "而", "胆", "能", "自", "致", "蓝", "行", "被", "评", "谅", "负", "责", "购",
 "转", "轮", "软", "返", "这", "退", "逃", "通", "都", "重", "量", "钮", "间", "阻", "除", "雷", "非", "页",
-"须", "记", "秒", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "",
+"须", "记", "秒", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "…",
 "ピ", "プ", "ペ", "ポ", "ァ", "ィ", "ゥ", "ェ", "ォ", "ャ", "ュ", "ョ", "ッ", "ヴ", "-", "―", "L2", "R2",
 "＆", "…", "[", "]", "L1", "R1", "△", "○", "☓", "☐", "■", "☓", "Ｓ", "Ｔ", "Ａ", "Ｒ", "使", "用",
 "通", "常", "火", "炎", "硫", "酸", "冷", "冻", "弹", "救", "急", "调", "查", "状", "况", "必", "要", "⁉"
@@ -301,7 +301,7 @@ namespace Hanhua.TextEditTools.Bio3Edit
  "两", "丧", "乎", "乐", "乱", "交", "代", "任", "伙", "伴", "何", "侵", "倒", "儿", "决", "划", "刚", "初",
 "别", "到", "副", "厢", "又", "变", "吧", "呃", "呢", "味", "呵", "呼", "啊", "嗯", "嘿", "团", "坏", "坚",
 "坛", "堵", "塌", "壁", "声", "夜", "太", "女", "尸", "尽", "屉", "巫", "干", "年", "弄", "律", "心", "忧",
-"快", "怀", "怎", "怪", "恶", "情", "惊", "想", "赵", "护", "抱", "抽", "担", "持", "挡", "振", "捉", "推",
+"快", "怀", "怎", "怪", "恶", "情", "惊", "想", "找", "护", "抱", "抽", "担", "持", "挡", "振", "捉", "推",
 "敌", "斗", "晕", "晚", "杀", "板", "柱", "根", "楚", "歉", "死", "气", "活", "清", "渗", "灯", "炉", "犹",
 "玩", "画", "略", "疑", "疼", "痛", "盒", "直", "看", "祭", "离", "移", "等", "答", "算", "精", "糕", "糟",
 "纸", "给", "美", "苦", "荣", "营", "落", "表", "觉", "论", "证", "该", "豫", "赶", "起", "路", "运", "迷",
@@ -313,7 +313,7 @@ namespace Hanhua.TextEditTools.Bio3Edit
         /// </summary>
         private string[] cnFontCharsEb4 = { 
  "Ⅰ", "Ⅱ", "Ⅲ", "丢", "丧", "乎", "亚", "仔", "仪", "任", "伍", "伙", "何", "供", "修", "储", "充", "克",
-"字", "净", "创", "别", "到", "务", "助", "午", "历", "变", "叛", "吃", "各", "名", "吧", "听", "吹", "咖",
+"兹", "净", "创", "别", "到", "务", "助", "午", "历", "变", "叛", "吃", "各", "名", "吧", "听", "吹", "咖",
 "啃", "啊", "啡", "因", "圾", "坏", "垃", "墙", "壁", "声", "太", "奇", "奥", "学", "实", "尸", "尽", "层",
 "居", "屠", "帘", "帮", "干", "平", "底", "建", "弗", "彻", "徒", "徽", "快", "怎", "怪", "总", "恩", "您",
 "情", "惊", "想", "慎", "持", "损", "推", "搜", "摆", "故", "施", "显", "暗", "杀", "杂", "杯", "杰", "板",
@@ -349,7 +349,7 @@ namespace Hanhua.TextEditTools.Bio3Edit
         /// 生化危机3字库8
         /// </summary>
         private string[] cnFontCharsEb7 = { 
- "临", "则", "到", "因", "域", "持", "晚", "欢", "此", "段", "清", "祝", "程", "脑", "规", "运", "醒"
+ "临", "则", "到", "因", "域", "持", "晚", "欢", "此", "段", "清", "祝", "程", "脑", "规", "迎", "运", "醒"
         };
 
         #endregion
@@ -391,8 +391,8 @@ namespace Hanhua.TextEditTools.Bio3Edit
             this.ResetHeight();
 
             this.gameName = "Bio3";
-            this.baseFolder = @"E:\Study\MySelfProject\Hanhua\TodoCn\Bio3";
-            //this.baseFolder = @"D:\game\iso\wii\生化危机3汉化";
+            //this.baseFolder = @"E:\Study\MySelfProject\Hanhua\TodoCn\Bio3";
+            this.baseFolder = @"F:\game\iso\wii\生化危机3汉化";
             
             this.SetPsLoadStatus(false);
 
@@ -1677,35 +1677,35 @@ namespace Hanhua.TextEditTools.Bio3Edit
             }
 
             // 开始循环所有的日文rdt文件
-            //for (int i = 1; i <= 7; i++)
-            //{
-            //    List<FilePosInfo> copyFiles = needCopyFilesRdt.Where(p => p.File.IndexOf("r" + i) != -1).ToList();
-            //    foreach (FilePosInfo fileInfo in copyFiles)
-            //    {
-            //        // 取得各个文件名
-            //        string fileName = @"\" + Util.TrimFileNo(fileInfo.File);
-            //        string jpFile = this.baseFolder + @"\PsBio3Jp\CD_DATA\STAGE" + i + fileName + ".ard";
-            //        string cnFile = this.baseFolder + @"\PsBio3Cn\CD_DATA\STAGE" + i + fileName + ".ard";
-            //        string ngcFile1 = this.baseFolder + @"\NgcBio3Cn\root\bio19\data_j\rdt" + fileName + ".rdt";
-            //        string ngcFile2 = this.baseFolder + @"\NgcBio3Cn\root\bio19\data_aj\rdt" + fileName + ".rdt";
+            for (int i = 1; i <= 7; i++)
+            {
+                List<FilePosInfo> copyFiles = needCopyFilesRdt.Where(p => p.File.IndexOf("r" + i) != -1).ToList();
+                foreach (FilePosInfo fileInfo in copyFiles)
+                {
+                    // 取得各个文件名
+                    string fileName = @"\" + Util.TrimFileNo(fileInfo.File);
+                    string jpFile = this.baseFolder + @"\PsBio3Jp\CD_DATA\STAGE" + i + fileName + ".ard";
+                    string cnFile = this.baseFolder + @"\PsBio3Cn\CD_DATA\STAGE" + i + fileName + ".ard";
+                    string ngcFile1 = this.baseFolder + @"\NgcBio3Cn\root\bio19\data_j\rdt" + fileName + ".rdt";
+                    string ngcFile2 = this.baseFolder + @"\NgcBio3Cn\root\bio19\data_aj\rdt" + fileName + ".rdt";
 
-            //        if (File.Exists(jpFile)
-            //            && File.Exists(cnFile))
-            //        {
-            //            // 取得文本数据
-            //            byte[] byJpData = new byte[fileInfo.TextEnd - fileInfo.TextStart];
-            //            byte[] byCnData = new byte[byJpData.Length];
-            //            this.GetTextData(jpFile, cnFile, fileInfo.PosInfo, byJpData, byCnData);
+                    if (File.Exists(jpFile)
+                        && File.Exists(cnFile))
+                    {
+                        // 取得文本数据
+                        byte[] byJpData = new byte[fileInfo.TextEnd - fileInfo.TextStart + 1];
+                        byte[] byCnData = new byte[byJpData.Length];
+                        this.GetTextData(jpFile, cnFile, fileInfo.PosInfo, byJpData, byCnData);
 
-            //            // 保存文本数据
-            //            this.SaveTextData(ngcFile1, byJpData, byCnData, saveFaileFiles, fileInfo.File);
-            //            this.SaveTextData(ngcFile2, byJpData, byCnData, saveFaileFiles, fileInfo.File);
-            //        }
+                        // 保存文本数据
+                        this.SaveTextData(ngcFile1, byJpData, byCnData, saveFaileFiles, fileInfo.File);
+                        this.SaveTextData(ngcFile2, byJpData, byCnData, saveFaileFiles, fileInfo.File);
+                    }
 
-            //        // 更新进度条
-            //        this.ProcessBarStep();
-            //    }
-            //}
+                    // 更新进度条
+                    this.ProcessBarStep();
+                }
+            }
 
             // 隐藏进度条
             this.CloseProcessBar();
