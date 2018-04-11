@@ -411,8 +411,7 @@ namespace Hanhua.TextEditTools.Bio3Edit
         {
             try
             {
-                //string temp = "れ下Xメ";
-                //string temp = "080";
+                //string temp = "以件休传以软";
                 //List<byte> byTest = new List<byte>();
                 //for (int i = 0; i < temp.Length; i++)
                 //{
@@ -434,7 +433,7 @@ namespace Hanhua.TextEditTools.Bio3Edit
                 //byte[] targetDol = new byte[2298368];
                 //Array.Copy(startDol, 0, targetDol, 0, targetDol.Length);
                 //File.WriteAllBytes(bio3Ngc + @"NgcBio3Patch\root\&&systemdata\Start.dol", targetDol);
-                File.Copy(bio3Ngc + @"NgcBio3Cn\root\&&systemdata\Start.dol", bio3Ngc + @"NgcBio3Patch\root\&&systemdata\Start.dol", true);
+                File.Copy(bio3Ngc + @"NgcBio3Cn\root\&&systemdata\Start.dol_Copy", bio3Ngc + @"NgcBio3Patch\root\&&systemdata\Start.dol", true);
 
                 // 复制其他文件
                 string[] copyFiles = File.ReadAllLines(bio3Ngc + @"NgcOtherFile.txt");
@@ -999,6 +998,44 @@ namespace Hanhua.TextEditTools.Bio3Edit
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// 保存存前的处理
+        /// </summary>
+        /// <param name="byCnData">要保存的数据</param>
+        /// <param name="fileInfo">当前文件信息</param>
+        protected override void BeforeSave(byte[] byCnData, FilePosInfo fileInfo)
+        {
+            // 修改Opening Enrty信息
+            if (fileInfo.TextEnd == 0x2051a4)
+            {
+                byte[] byCnDataCopy = new byte[byCnData.Length];
+                Array.Copy(byCnData, 0, byCnDataCopy, 0, byCnDataCopy.Length);
+
+                for (int i = 0; i < 8; i++)
+                {
+                    byCnDataCopy[0x22f480 + i] = byCnData[0x2051a4 + i];
+                }
+
+                byCnDataCopy[0x2051a4 + 0] = 0x80;
+                byCnDataCopy[0x2051a4 + 1] = 0x0D;
+                byCnDataCopy[0x2051a4 + 2] = 0x3F;
+                byCnDataCopy[0x2051a4 + 3] = 0x8C;
+                byCnDataCopy[0x2051a4 + 4] = 0x80;
+                byCnDataCopy[0x2051a4 + 5] = 0x0D;
+                byCnDataCopy[0x2051a4 + 6] = 0x3F;
+                byCnDataCopy[0x2051a4 + 7] = 0xA0;
+                byCnDataCopy[0x2051a4 + 8] = 0x80;
+                byCnDataCopy[0x2051a4 + 9] = 0x0D;
+
+                //string jpFileOld = fileInfo.File.Replace("start.dol", "start.dol_old");
+                //byte[] byJpOld = File.ReadAllBytes(jpFileOld);
+                //Array.Copy(byJpOld, 0x22f489, byCnDataCopy, 0x22f489, 0x50);
+
+                string cnCopyFile = fileInfo.File.Replace("NgcBio3Jp", "NgcBio3Cn").Replace("start.dol", "start.dol_Copy");
+                File.WriteAllBytes(cnCopyFile, byCnDataCopy);
+            }
         }
 
         #endregion
@@ -1677,35 +1714,35 @@ namespace Hanhua.TextEditTools.Bio3Edit
             }
 
             // 开始循环所有的日文rdt文件
-            for (int i = 1; i <= 7; i++)
-            {
-                List<FilePosInfo> copyFiles = needCopyFilesRdt.Where(p => p.File.IndexOf("r" + i) != -1).ToList();
-                foreach (FilePosInfo fileInfo in copyFiles)
-                {
-                    // 取得各个文件名
-                    string fileName = @"\" + Util.TrimFileNo(fileInfo.File);
-                    string jpFile = this.baseFolder + @"\PsBio3Jp\CD_DATA\STAGE" + i + fileName + ".ard";
-                    string cnFile = this.baseFolder + @"\PsBio3Cn\CD_DATA\STAGE" + i + fileName + ".ard";
-                    string ngcFile1 = this.baseFolder + @"\NgcBio3Cn\root\bio19\data_j\rdt" + fileName + ".rdt";
-                    string ngcFile2 = this.baseFolder + @"\NgcBio3Cn\root\bio19\data_aj\rdt" + fileName + ".rdt";
+            //for (int i = 1; i <= 7; i++)
+            //{
+            //    List<FilePosInfo> copyFiles = needCopyFilesRdt.Where(p => p.File.IndexOf("r" + i) != -1).ToList();
+            //    foreach (FilePosInfo fileInfo in copyFiles)
+            //    {
+            //        // 取得各个文件名
+            //        string fileName = @"\" + Util.TrimFileNo(fileInfo.File);
+            //        string jpFile = this.baseFolder + @"\PsBio3Jp\CD_DATA\STAGE" + i + fileName + ".ard";
+            //        string cnFile = this.baseFolder + @"\PsBio3Cn\CD_DATA\STAGE" + i + fileName + ".ard";
+            //        string ngcFile1 = this.baseFolder + @"\NgcBio3Cn\root\bio19\data_j\rdt" + fileName + ".rdt";
+            //        string ngcFile2 = this.baseFolder + @"\NgcBio3Cn\root\bio19\data_aj\rdt" + fileName + ".rdt";
 
-                    if (File.Exists(jpFile)
-                        && File.Exists(cnFile))
-                    {
-                        // 取得文本数据
-                        byte[] byJpData = new byte[fileInfo.TextEnd - fileInfo.TextStart + 1];
-                        byte[] byCnData = new byte[byJpData.Length];
-                        this.GetTextData(jpFile, cnFile, fileInfo.PosInfo, byJpData, byCnData);
+            //        if (File.Exists(jpFile)
+            //            && File.Exists(cnFile))
+            //        {
+            //            // 取得文本数据
+            //            byte[] byJpData = new byte[fileInfo.TextEnd - fileInfo.TextStart + 1];
+            //            byte[] byCnData = new byte[byJpData.Length];
+            //            this.GetTextData(jpFile, cnFile, fileInfo.PosInfo, byJpData, byCnData);
 
-                        // 保存文本数据
-                        this.SaveTextData(ngcFile1, byJpData, byCnData, saveFaileFiles, fileInfo.File);
-                        this.SaveTextData(ngcFile2, byJpData, byCnData, saveFaileFiles, fileInfo.File);
-                    }
+            //            // 保存文本数据
+            //            this.SaveTextData(ngcFile1, byJpData, byCnData, saveFaileFiles, fileInfo.File);
+            //            this.SaveTextData(ngcFile2, byJpData, byCnData, saveFaileFiles, fileInfo.File);
+            //        }
 
-                    // 更新进度条
-                    this.ProcessBarStep();
-                }
-            }
+            //        // 更新进度条
+            //        this.ProcessBarStep();
+            //    }
+            //}
 
             // 隐藏进度条
             this.CloseProcessBar();

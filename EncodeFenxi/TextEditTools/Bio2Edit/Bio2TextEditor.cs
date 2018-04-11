@@ -1017,13 +1017,6 @@ namespace Hanhua.TextEditTools.Bio2Edit
             this.impNotExist.Clear();
         }
 
-        /// <summary>
-        /// 保存成功后的处理
-        /// </summary>
-        protected override void AfterSave()
-        {
-        }
-
         #endregion
 
         #region " 私有方法 "
