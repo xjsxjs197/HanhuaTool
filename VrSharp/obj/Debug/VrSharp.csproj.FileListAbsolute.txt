@@ -340,3 +340,4 @@ E:\Study\MySelfProject\Hanhua\20171102\VrSharp\bin\Debug\Common.pdb
 E:\Study\MySelfProject\Hanhua\20171102\VrSharp\obj\Debug\ResolveAssemblyReference.cache
 E:\Study\MySelfProject\Hanhua\20171102\VrSharp\obj\Debug\VrSharp.dll
 E:\Study\MySelfProject\Hanhua\20171102\VrSharp\obj\Debug\VrSharp.pdb
+E:\Study\MySelfProject\Hanhua\HanhuaTool\HanhuaTool\VrSharp\bin\Debug\VrSharp.pdb
