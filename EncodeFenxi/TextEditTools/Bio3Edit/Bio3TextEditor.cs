@@ -830,6 +830,11 @@ namespace Hanhua.TextEditTools.Bio3Edit
         {
             if (this.chkNgcOption.Checked)
             {
+                if (this.currentFileInfo.TextStart == 0x20562a)
+                {
+                    return Encoding.GetEncoding("Shift-Jis").GetBytes(currentChar);
+                }
+
                 // 从Option字库中查找
                 KeyValuePair<int, string> fontCharInfo = this.cnOptionChars.FirstOrDefault(p => p.Value.Equals(currentChar));
                 if (fontCharInfo.Key != 0)
@@ -1155,6 +1160,15 @@ namespace Hanhua.TextEditTools.Bio3Edit
         private string LoadOptionText(byte[] byData, List<KeyValuePair<int, string>> fontChars, int startPos, int endPos)
         { 
             StringBuilder sb = new StringBuilder();
+
+            if (startPos == 0x20562a)
+            {
+                byte[] byOptionShiftJis = new byte[endPos - startPos + 1];
+                Array.Copy(byData, startPos, byOptionShiftJis, 0, byOptionShiftJis.Length);
+                sb.Append(Encoding.GetEncoding("Shift-Jis").GetString(byOptionShiftJis));
+
+                return sb.ToString();
+            }
             
             for (int i = startPos; i < endPos;)
             {
