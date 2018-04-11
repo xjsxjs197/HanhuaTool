@@ -2802,6 +2802,17 @@ namespace Hanhua.Common
         #region " 通常共通 "
 
         /// <summary>
+        /// 改变目录
+        /// </summary>
+        /// <param name="baseFolder"></param>
+        /// <param name="gameName"></param>
+        /// <returns></returns>
+        public static string ChgToGitHubPath(string baseFolder, string gameName)
+        {
+            return (baseFolder.Replace(gameName, "") + @"HanhuaProject\" + gameName);
+        }
+
+        /// <summary>
         /// 判断两个文件是否相同
         /// </summary>
         /// <param name="fileA"></param>

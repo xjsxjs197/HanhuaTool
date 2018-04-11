@@ -1,0 +1,17 @@
+*.dll
+*.pdb
+*.exe
+Hanhua.suo
+VrSharp/obj
+VrSharp/bin
+IsoTools/obj
+EncodeFenxi/obj
+EncodeFenxi/bin
+Common/obj
+Common/bin
+FraGag.Compression.Prs/obj
+PuyoTools.Modules/obj
+PuyoTools.Modules/bin
+Bin/Common.dll.config
+Bin/Hanhua.vshost.exe.manifest
+Bin/Interop.VBIDE.dll
