@@ -830,6 +830,11 @@ namespace Hanhua.TextEditTools.Bio3Edit
         {
             if (this.chkNgcOption.Checked)
             {
+                if (this.currentFileInfo.TextStart == 0x20562a)
+                {
+                    return Encoding.GetEncoding("Shift-Jis").GetBytes(currentChar);
+                }
+
                 // 从Option字库中查找
                 KeyValuePair<int, string> fontCharInfo = this.cnOptionChars.FirstOrDefault(p => p.Value.Equals(currentChar));
                 if (fontCharInfo.Key != 0)
