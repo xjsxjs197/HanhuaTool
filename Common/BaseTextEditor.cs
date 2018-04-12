@@ -78,9 +78,6 @@ namespace Hanhua.Common
                     // 重新加载翻译的文本
                     this.FileChanged(this.currentFileInfo);
                     this.txtCn.Text = this.DecodeText(this.currentFileInfo, true);
-
-                    // 保存成功后的处理
-                    this.AfterSave();
                 }
             }
             catch (Exception me)
@@ -277,6 +274,15 @@ namespace Hanhua.Common
         /// 保存成功后的处理
         /// </summary>
         protected virtual void AfterSave()
+        {
+        }
+
+        /// <summary>
+        /// 保存存前的处理
+        /// </summary>
+        /// <param name="byCnData">要保存的数据</param>
+        /// <param name="fileInfo">当前文件信息</param>
+        protected virtual void BeforeSave(byte[] byCnData, FilePosInfo fileInfo)
         {
         }
 
@@ -506,6 +512,9 @@ namespace Hanhua.Common
 
             // 复制修改的部分
             Array.Copy(byCnData, 0, byData, this.currentFileInfo.TextCopyStart, byCnData.Length);
+
+            // 保存存前的处理
+            this.BeforeSave(byData, this.currentFileInfo);
 
             // 翻译后的字节数组写入文件
             File.WriteAllBytes(this.cnFile, byData);
