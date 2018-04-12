@@ -391,8 +391,8 @@ namespace Hanhua.TextEditTools.Bio3Edit
             this.ResetHeight();
 
             this.gameName = "Bio3";
-            //this.baseFolder = @"E:\Study\MySelfProject\Hanhua\TodoCn\Bio3";
-            this.baseFolder = @"F:\game\iso\wii\生化危机3汉化";
+            this.baseFolder = @"E:\Study\MySelfProject\Hanhua\TodoCn\Bio3";
+            //this.baseFolder = @"F:\game\iso\wii\生化危机3汉化";
             
             this.SetPsLoadStatus(false);
 
@@ -1012,7 +1012,7 @@ namespace Hanhua.TextEditTools.Bio3Edit
         {
             // 取得需要Copy的文件
             List<FilePosInfo> needCopyFilesRdt = new List<FilePosInfo>();
-            needCopyFilesRdt.AddRange(this.LoadFiles(this.baseFolder + @"\PsTextAddr.txt"));
+            needCopyFilesRdt.AddRange(this.LoadFiles(Util.ChgToGitHubPath(this.baseFolder, this.gameName) + @"\PsTextAddr.txt"));
             if (needCopyFilesRdt.Count == 0)
             {
                 MessageBox.Show("路径错误，没有找到需要Copy的文件！");
@@ -1075,7 +1075,7 @@ namespace Hanhua.TextEditTools.Bio3Edit
             // 隐藏进度条
             this.CloseProcessBar();
 
-            File.WriteAllLines(this.baseFolder + @"\PsTextDiffAddr.txt", newAddrInfo.ToArray(), Encoding.UTF8);
+            File.WriteAllLines(Util.ChgToGitHubPath(this.baseFolder, this.gameName) + @"\PsTextDiffAddr.txt", newAddrInfo.ToArray(), Encoding.UTF8);
         }
 
         /// <summary>
@@ -1118,6 +1118,15 @@ namespace Hanhua.TextEditTools.Bio3Edit
         private string LoadOptionText(byte[] byData, List<KeyValuePair<int, string>> fontChars, int startPos, int endPos)
         { 
             StringBuilder sb = new StringBuilder();
+
+            if (startPos == 0x20562a)
+            {
+                byte[] byOptionShiftJis = new byte[endPos - startPos + 1];
+                Array.Copy(byData, startPos, byOptionShiftJis, 0, byOptionShiftJis.Length);
+                sb.Append(Encoding.GetEncoding("Shift-Jis").GetString(byOptionShiftJis));
+
+                return sb.ToString();
+            }
             
             for (int i = startPos; i < endPos;)
             {
@@ -1307,29 +1316,29 @@ namespace Hanhua.TextEditTools.Bio3Edit
             {
                 if (this.chkNgcOption.Checked)
                 {
-                    return this.LoadFiles(this.baseFolder + @"\NgcOption.txt");
+                    return this.LoadFiles(Util.ChgToGitHubPath(this.baseFolder, this.gameName) + @"\NgcOption.txt");
                 }
 
                 if (this.chkNgcDol.Checked)
                 {
-                    needCopyFiles.AddRange(this.LoadFiles(this.baseFolder + @"\NgcDolAddr.txt"));
+                    needCopyFiles.AddRange(this.LoadFiles(Util.ChgToGitHubPath(this.baseFolder, this.gameName) + @"\NgcDolAddr.txt"));
                 }
 
                 if (this.chkNgcRdt.Checked)
                 {
-                    needCopyFiles.AddRange(this.LoadFiles(this.baseFolder + @"\NgcTextAddrJ.txt"));
+                    needCopyFiles.AddRange(this.LoadFiles(Util.ChgToGitHubPath(this.baseFolder, this.gameName) + @"\NgcTextAddrJ.txt"));
                 }
             }
             else
             {
                 if (this.chkPsBin.Checked)
                 {
-                    needCopyFiles.AddRange(this.LoadFiles(this.baseFolder + @"\PsBinAddr.txt"));
+                    needCopyFiles.AddRange(this.LoadFiles(Util.ChgToGitHubPath(this.baseFolder, this.gameName) + @"\PsBinAddr.txt"));
                 }
 
                 if (this.chkPsArd.Checked)
                 {
-                    needCopyFiles.AddRange(this.LoadFiles(this.baseFolder + @"\PsTextAddr.txt"));
+                    needCopyFiles.AddRange(this.LoadFiles(Util.ChgToGitHubPath(this.baseFolder, this.gameName) + @"\PsTextAddr.txt"));
                 }
             }
 
@@ -1633,8 +1642,8 @@ namespace Hanhua.TextEditTools.Bio3Edit
             // 取得需要Copy的文件
             List<FilePosInfo> needCopyFilesBin = new List<FilePosInfo>();
             List<FilePosInfo> needCopyFilesRdt = new List<FilePosInfo>();
-            needCopyFilesBin.AddRange(this.LoadFiles(this.baseFolder + @"\PsBinAddr.txt"));
-            needCopyFilesRdt.AddRange(this.LoadFiles(this.baseFolder + @"\PsTextDiffAddr.txt"));
+            needCopyFilesBin.AddRange(this.LoadFiles(Util.ChgToGitHubPath(this.baseFolder, this.gameName) + @"\PsBinAddr.txt"));
+            needCopyFilesRdt.AddRange(this.LoadFiles(Util.ChgToGitHubPath(this.baseFolder, this.gameName) + @"\PsTextDiffAddr.txt"));
             if (needCopyFilesBin.Count == 0 || needCopyFilesRdt.Count == 0)
             {
                 MessageBox.Show("路径错误，没有找到需要Copy的文件！");
