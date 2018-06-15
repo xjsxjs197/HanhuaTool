@@ -439,16 +439,72 @@ namespace Hanhua.Common
 
             //this.WriteTtfFontPics();
             //this.TestCharPngDat();
-            CheckPsZhTxt();
+            //CheckPsZhTxt();
             //GetN64Name();
             //DecompressN64();
 			//AutoBuildRetroarch();
             //CheckColorMap();
+            CheckNgcCnGameTitle();
         }
 
         #endregion
 
         #region " 私有方法 "
+
+        private void CheckNgcCnGameTitle()
+        {
+            List<string> cnTitles = new List<string>();
+            string[] titles = File.ReadAllLines(@"E:\Study\Emu\emuSrc\WiiEmuHanhua\Nintendont\nintendont\titles_Old.txt", Encoding.UTF8);
+            string[] titles2 = File.ReadAllLines(@"E:\Study\Emu\emuSrc\WiiEmuHanhua\Nintendont\nintendont\titles2.txt", Encoding.UTF8);
+
+            foreach (string title in titles2)
+            {
+                if (string.IsNullOrEmpty(title))
+                {
+                    continue;
+                }
+
+                string curTitle = title.Substring(0, 3);
+                if (string.IsNullOrEmpty(cnTitles.FirstOrDefault(p => p.StartsWith(curTitle, StringComparison.Ordinal))))
+                {
+                    cnTitles.Add(title);
+                }
+            }
+
+            foreach (string title in titles)
+            {
+                if (string.IsNullOrEmpty(title))
+                {
+                    continue;
+                }
+
+                string curTitle = title.Substring(0, 3);
+                if (string.IsNullOrEmpty(cnTitles.FirstOrDefault(p => p.StartsWith(curTitle, StringComparison.Ordinal))))
+                {
+                    cnTitles.Add(title);
+                }
+            }
+
+            
+
+            cnTitles.Sort();
+
+            string[] cnEnTitles = File.ReadAllLines(@"E:\Study\Emu\emuSrc\WiiEmuHanhua\Nintendont\nintendont\CnEnGameName.txt", Encoding.UTF8);
+            for (int i = 0; i < cnTitles.Count; i++)
+            {
+                string enTitle = cnTitles[i];
+                string cnEnTitle = cnEnTitles.FirstOrDefault(p => p.IndexOf(enTitle.Substring(4)) > 0);
+                if (!string.IsNullOrEmpty(cnEnTitle))
+                {
+                    cnTitles[i] = (enTitle.Substring(0, 4) + cnEnTitle).Replace("(美)", "").Replace("(日)", "").Replace("(欧)", "")
+                        .Replace("A.STG", "").Replace("ACT", "").Replace("SPG", "").Replace("STG", "").Replace("RAC", "").Replace("RPG", "")
+                        .Replace("FTG", "").Replace("PUZ", "").Replace("SIM", "");
+                }
+
+            }
+
+            File.WriteAllLines(@"E:\Study\Emu\emuSrc\WiiEmuHanhua\Nintendont\nintendont\titles.txt", cnTitles.ToArray(), Encoding.UTF8);
+        }
 
         private void CheckColorMap()
         {
@@ -475,7 +531,7 @@ namespace Hanhua.Common
         private void AutoBuildRetroarch()
         {
             //string basePath = @"E:\Study\Emu\emuSrc\RetroArch\libretro-super-master\retroarch\";
-            string basePath = @"E:\Study\Emu\emuSrc\RetroArch\RetroArch-1.6.9\";
+            string basePath = @"E:\Study\Emu\emuSrc\RetroArch\libretro-super-master\retroarch\";
             
             System.Diagnostics.Process exep = new System.Diagnostics.Process();
             exep.StartInfo.FileName = @"make";
