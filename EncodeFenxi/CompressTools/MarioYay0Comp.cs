@@ -108,13 +108,13 @@ namespace Hanhua.CompressTools
                 byte[] byUncompressed = new byte[uncompressedSize];
 
                 // 开始解压缩
-                int i, j, k;
-                int p, q, r5;
-                int cnt;
+                UInt32 i, j, k;
+                UInt32 p, q, r5;
+                UInt32 cnt;
                 UInt32 r22;
-                i = uncompressedSize; // size of decoded data
-                j = Util.GetOffset(byData, 8, 0xB); // link table
-                k = Util.GetOffset(byData, 0xC, 0xF); // byte chunks and count modifiers
+                i = (UInt32)uncompressedSize; // size of decoded data
+                j = (UInt32)Util.GetOffset(byData, 8, 0xB); // link table
+                k = (UInt32)Util.GetOffset(byData, 0xC, 0xF); // byte chunks and count modifiers
                 q = 0; // current offset in dest buffer
                 cnt = 0; // mask bit counter
                 p = 16; // current offset in mask table
@@ -126,7 +126,8 @@ namespace Hanhua.CompressTools
                     if (cnt == 0)
                     {
                         // read word from mask data block
-                        r22 = (UInt32)(byData[p] << 24 | byData[p + 1] << 16 | byData[p + 2] << 8 | byData[p + 3]);
+                        //r22 = (UInt32)(byData[p] << 24 | byData[p + 1] << 16 | byData[p + 2] << 8 | byData[p + 3]);
+                        r22 = (UInt32)Util.GetOffset(byData, (int)p, (int)(p + 3));
                         p += 4;
                         cnt = 32; // bit counter
                     }
@@ -142,12 +143,13 @@ namespace Hanhua.CompressTools
                     else
                     {
                         // read 16-bit from link table
-                        UInt16 r26 = (UInt16)(byData[j] << 8 | byData[j + 1]);
+                        //UInt16 r26 = (UInt16)(byData[j] << 8 | byData[j + 1]);
+                        UInt16 r26 = (UInt16)Util.GetOffset(byData, (int)j, (int)(j + 1));
                         j += 2;
                         // ’offset’
-                        int r25 = q - (r26 & 0xfff);
+                        UInt32 r25 = (UInt32)(q - (r26 & 0xfff));
                         // ’count’
-                        int r30 = r26 >> 12;
+                        UInt32 r30 = (UInt32)((r26 >> 12) & 0xf);
                         if (r30 == 0)
                         {
                             // get ’count’ modifier
@@ -161,7 +163,7 @@ namespace Hanhua.CompressTools
                         }
                         // do block copy
                         r5 = r25;
-                        for (i = 0; i < r30; i++)
+                        for (UInt32 tmp = 0; tmp < r30; tmp++)
                         {
                             byUncompressed[q] = byUncompressed[r5 - 1];
                             q++;

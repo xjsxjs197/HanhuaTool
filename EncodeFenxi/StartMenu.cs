@@ -385,6 +385,11 @@ namespace Hanhua.Common
                     compTool = new BaseCompTool(new ViewtifulJoeRleComp());
                     compTool.Show();
                     break;
+
+                case "btnYayEdit":
+                    compTool = new BaseCompTool(new MarioYay0Comp());
+                    compTool.Show();
+                    break;
             }
         }
 
@@ -1062,6 +1067,7 @@ namespace Hanhua.Common
                 {"btnTresEdit", "Txtres类型文件处理"},
                 {"btnSzsEdit", "SZS类型文件处理"},
                 {"btnArcEdit", "ARC类型文件处理"},
+                {"btnYayEdit", "Yay0类型文件处理"},
                 {"", ""}, 
                 {"btnBio0LzEdit", "生化0 Lz类型文件处理"},
                 {"btnBioCvRdxEdit", "生化维罗妮卡 Rdx类型文件处理"},
