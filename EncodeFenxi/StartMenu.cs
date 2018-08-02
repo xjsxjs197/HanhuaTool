@@ -21,6 +21,7 @@ using Hanhua.TextEditTools.TxtresEdit;
 using Hanhua.TextEditTools.ViewtifulJoe;
 using System.IO.Compression;
 using Ionic.Zip;
+using System.Xml;
 
 namespace Hanhua.Common
 {
@@ -449,12 +450,68 @@ namespace Hanhua.Common
             //DecompressN64();
 			//AutoBuildRetroarch();
             //CheckColorMap();
-            CheckNgcCnGameTitle();
+            //CheckNgcCnGameTitle();
+            ResetSfcRomName();
         }
 
         #endregion
 
         #region " 私有方法 "
+
+        private void ResetSfcRomName()
+        {
+            this.baseFolder = @"E:\Study\Emu\Roms\Sfc\SFC_Jp(1444个)\snes\";
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load(this.baseFolder + @"gamelist.xml.cn");
+
+            XmlNode xmlInfo = xmlDoc.SelectSingleNode("/gameList");
+
+            // 显示进度条
+            this.ResetProcessBar(xmlInfo.ChildNodes.Count);
+
+            foreach (XmlNode item in xmlInfo.ChildNodes)
+            {
+                if (item.NodeType == XmlNodeType.Element)
+                {
+                    string filePath = string.Empty;
+                    string fileName = string.Empty;
+                    string fileImg = string.Empty;
+                    foreach (XmlNode subItem in item.ChildNodes)
+                    {
+                        if ("path".Equals(subItem.Name))
+                        {
+                            filePath = subItem.InnerText;
+                        }
+                        else if ("name".Equals(subItem.Name))
+                        {
+                            fileName = subItem.InnerText;
+                        }
+                        else if ("image".Equals(subItem.Name))
+                        {
+                            fileImg = subItem.InnerText;
+                        }
+                    }
+
+                    filePath = filePath.Replace("./", @"\");
+                    fileImg = fileImg.Replace("./", @"\").Replace("/", @"\");
+                    if (File.Exists(this.baseFolder + filePath))
+                    {
+                        File.Copy(this.baseFolder + filePath, (this.baseFolder + filePath).Replace("snes", "snesCn").Replace(filePath, @"\" + fileName + ".zip"), true);
+
+                        if (File.Exists(this.baseFolder + fileImg))
+                        {
+                            File.Copy(this.baseFolder + fileImg, (this.baseFolder + fileImg).Replace("snes", "snesCn").Replace(fileImg, @"\images\" + fileName + @".jpg"), true);
+                        }
+                    }
+                }
+
+                // 更新进度条
+                this.ProcessBarStep();
+            }
+
+            // 隐藏进度条
+            this.CloseProcessBar();
+        }
 
         private void CheckNgcCnGameTitle()
         {
@@ -649,36 +706,36 @@ namespace Hanhua.Common
                 sb.Append(Encoding.GetEncoding(932).GetString(new byte[] { (byte)i }));
             }
 
-            //char[] chTxt = sb.Append(Util.CreateOneLevelHanzi()).Append(Util.CreateTwoLevelHanzi()).ToString().ToCharArray();
-            //foreach (char chChar in chTxt)
-            //{
-            //    byte[] byChar = Encoding.BigEndianUnicode.GetBytes(new char[] {chChar});
-            //    allZhTxt.Add(byChar[0] << 8 | byChar[1]);
-            //}
+            char[] chTxt = sb.Append(Util.CreateOneLevelHanzi()).Append(Util.CreateTwoLevelHanzi()).ToString().ToCharArray();
+            foreach (char chChar in chTxt)
+            {
+                byte[] byChar = Encoding.BigEndianUnicode.GetBytes(new char[] { chChar });
+                allZhTxt.Add(byChar[0] << 8 | byChar[1]);
+            }
 
             //string[] allLine = File.ReadAllLines(@"H:\游戏汉化\fontTest\zhChCount.xlsx.txt", Encoding.UTF8);
-            //string[] allLine = File.ReadAllLines(@"E:\Study\MySelfProject\Hanhua\fontTest\zhChCount.xlsx.txt", Encoding.UTF8);
-            //foreach (string zhTxt in allLine)
-            //{
-            //    string curChar = zhTxt.Substring(7, 1);
-            //    byte[] byChar = Encoding.BigEndianUnicode.GetBytes(curChar);
-            //    int curUnicode = byChar[0] << 8 | byChar[1];
-            //    if (!allZhTxt.Contains(curUnicode))
-            //    {
-            //        allZhTxt.Add(curUnicode);
-            //    }
-            //}
-
-            List<string> allN64Char = this.GetN64Name();
-            foreach (string zhTxt in allN64Char)
+            string[] allLine = File.ReadAllLines(@"E:\Study\MySelfProject\Hanhua\fontTest\zhChCount.xlsx.txt", Encoding.UTF8);
+            foreach (string zhTxt in allLine)
             {
-                byte[] byChar = Encoding.BigEndianUnicode.GetBytes(zhTxt);
+                string curChar = zhTxt.Substring(7, 1);
+                byte[] byChar = Encoding.BigEndianUnicode.GetBytes(curChar);
                 int curUnicode = byChar[0] << 8 | byChar[1];
                 if (!allZhTxt.Contains(curUnicode))
                 {
                     allZhTxt.Add(curUnicode);
                 }
             }
+
+            //List<string> allN64Char = this.GetN64Name();
+            //foreach (string zhTxt in allN64Char)
+            //{
+            //    byte[] byChar = Encoding.BigEndianUnicode.GetBytes(zhTxt);
+            //    int curUnicode = byChar[0] << 8 | byChar[1];
+            //    if (!allZhTxt.Contains(curUnicode))
+            //    {
+            //        allZhTxt.Add(curUnicode);
+            //    }
+            //}
 
             allZhTxt.Sort();
 
@@ -690,13 +747,23 @@ namespace Hanhua.Common
             List<byte> charIndexMap = new List<byte>();
             //List<byte> charInfoMap = new List<byte>();
 
-            ImgInfo imgInfo = new ImgInfo(24, 24);
-            imgInfo.BlockImgH = 24;
-            imgInfo.BlockImgW = 24;
+            //ImgInfo imgInfo = new ImgInfo(24, 24);
+            //imgInfo.BlockImgH = 24;
+            //imgInfo.BlockImgW = 24;
+            //imgInfo.NeedBorder = false;
+            //imgInfo.FontStyle = FontStyle.Regular;
+            //imgInfo.FontSize = 22;
+            //imgInfo.Brush = Brushes.White;
+
+            // Retroarch font
+            ImgInfo imgInfo = new ImgInfo(13, 13);
+            imgInfo.BlockImgH = 13;
+            imgInfo.BlockImgW = 13;
             imgInfo.NeedBorder = false;
             imgInfo.FontStyle = FontStyle.Regular;
-            imgInfo.FontSize = 22;
+            imgInfo.FontSize = 12;
             imgInfo.Brush = Brushes.White;
+            imgInfo.Pen = new Pen(Color.Black, 0.1F);
 
             // 显示进度条
             this.ResetProcessBar(allZhTxt.Count);
@@ -730,7 +797,7 @@ namespace Hanhua.Common
                 //}
 
 
-                if (charIndex++ < 200)
+                if (charIndex++ < 500)
                 {
                     imgInfo.Bmp.Save(@"E:\Study\MySelfProject\Hanhua\fontTest\CharPng\" + unicodeChar + ".png");
                 }
@@ -742,7 +809,8 @@ namespace Hanhua.Common
                 //charIndexMap.Add((byte)(charIndex & 0xFF));
 
                 // 保存文字图片信息
-                byte[] byCharFont = Util.ImageEncode(imgInfo.Bmp, "IA8");
+                //byte[] byCharFont = Util.ImageEncode(imgInfo.Bmp, "IA8");
+                byte[] byCharFont = Util.ImageEncodeNoBlock(imgInfo.Bmp, "RGB5A3");
                 //charPngData.AddRange(byCharFont);
 
                 charIndexMap.AddRange(byCharFont);
@@ -754,7 +822,8 @@ namespace Hanhua.Common
             // 隐藏进度条
             this.CloseProcessBar();
 
-            File.WriteAllBytes(@"E:\Study\MySelfProject\Hanhua\fontTest\FontCn_IA8(N64).dat", charIndexMap.ToArray());
+            File.WriteAllBytes(@"E:\Study\MySelfProject\Hanhua\fontTest\ZhBufFont13X13NoBlock_RGB5A3.dat", charIndexMap.ToArray());
+            //File.WriteAllBytes(@"E:\Study\MySelfProject\Hanhua\fontTest\FontCn_IA8(N64).dat", charIndexMap.ToArray());
             //File.WriteAllBytes(@"E:\Study\MySelfProject\Hanhua\fontTest\FontCn_IA8.dat", Util.ImageEncode(cnFontData, "IA8").ToArray());
             //File.WriteAllBytes(@"E:\Study\MySelfProject\Hanhua\fontTest\FontCnCharInfo.dat", charInfoMap.ToArray());
             //File.WriteAllBytes(@"H:\游戏汉化\fontTest\ZhBufFont_IA8.dat", charIndexMap.ToArray());
