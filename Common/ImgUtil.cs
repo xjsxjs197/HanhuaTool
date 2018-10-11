@@ -54,6 +54,19 @@ namespace Hanhua.Common
         }
 
         /// <summary>
+        /// 将文字写入小块图片
+        /// </summary>
+        /// <param name="imgInfo">写文字需要的信息</param>
+        public static void WriteTextBlockImg(ImgInfo imgInfo)
+        {
+            imgInfo.Grp.DrawString(imgInfo.CharTxt, new Font(new FontFamily(imgInfo.FontName), imgInfo.FontSize, imgInfo.FontStyle), imgInfo.Brush, 
+                new Rectangle(imgInfo.PosX + imgInfo.XPadding,
+                    imgInfo.PosY + imgInfo.YPadding,
+                    imgInfo.BlockImgW - imgInfo.XPadding,
+                    imgInfo.BlockImgH - imgInfo.YPadding));
+        }
+
+        /// <summary>
         /// 写字库图片
         /// </summary>
         /// <param name="imgInfo">图片信息</param>

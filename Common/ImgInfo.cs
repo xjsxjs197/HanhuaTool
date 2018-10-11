@@ -47,7 +47,7 @@ namespace Hanhua.Common
             this.Bmp = new Bitmap(this.ImgW, this.ImgH);
             this.Grp = Graphics.FromImage(this.Bmp);
             this.Grp.SmoothingMode = SmoothingMode.HighQuality;
-            this.Grp.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
+            this.Grp.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
             this.PosX = 0;
             this.PosY = 0;
         }

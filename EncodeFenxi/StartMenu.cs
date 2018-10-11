@@ -448,15 +448,198 @@ namespace Hanhua.Common
             //CheckPsZhTxt();
             //GetN64Name();
             //DecompressN64();
-			//AutoBuildRetroarch();
+			AutoBuildRetroarch();
             //CheckColorMap();
             //CheckNgcCnGameTitle();
-            ResetSfcRomName();
+            //ResetSfcRomName();
+            //CheckSkAscComand();
+            //this.CreateCpsEnCnTitle();
+            //this.CheckJsonData();
         }
 
         #endregion
 
         #region " 私有方法 "
+
+        /// <summary>
+        /// 生成Cps中文名称列表
+        /// </summary>
+        private void CreateCpsEnCnTitle()
+        {
+            string[] enTitles = File.ReadAllLines(@"E:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\Cps1EnTitle.txt");
+            string[] cnTitles = File.ReadAllLines(@"E:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\Cps1CnTitle.txt");
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < enTitles.Length; i++)
+            {
+                sb.Append("\r\n");
+                sb.Append("msgid \"").Append(enTitles[i]).Append(".zip\"\r\n");
+                sb.Append("msgstr \"").Append(cnTitles[i]).Append("\"\r\n");
+            }
+
+            enTitles = File.ReadAllLines(@"E:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\Cps2EnTitle.txt");
+            cnTitles = File.ReadAllLines(@"E:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\Cps2CnTitle.txt");
+            for (int i = 0; i < enTitles.Length; i++)
+            {
+                sb.Append("\r\n");
+                sb.Append("msgid \"").Append(enTitles[i]).Append(".zip\"\r\n");
+                sb.Append("msgstr \"").Append(cnTitles[i]).Append("\"\r\n");
+            }
+
+            File.WriteAllText(@"E:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\zh.lang", sb.ToString(), Encoding.UTF8);
+        }
+
+        private void CheckJsonData()
+        {
+            Microsoft.Office.Interop.Excel.Application xApp = null;
+            Microsoft.Office.Interop.Excel.Workbook xBook = null;
+            Microsoft.Office.Interop.Excel.Worksheet xSheet = null;
+
+            try
+            {
+                // 创建Application对象 
+                xApp = new Microsoft.Office.Interop.Excel.ApplicationClass();
+
+                // 得到WorkBook对象, 打开已有的文件 
+                xBook = xApp.Workbooks._Open(
+                    @"D:\renkeiJson.xlsx",
+                    Missing.Value, Missing.Value, Missing.Value, Missing.Value
+                    , Missing.Value, Missing.Value, Missing.Value, Missing.Value
+                    , Missing.Value, Missing.Value, Missing.Value, Missing.Value);
+
+                // 取得相应的Sheet
+                for (int i = 1; i <= xBook.Sheets.Count; i++)
+                {
+                    xSheet = (Microsoft.Office.Interop.Excel.Worksheet)xBook.Sheets[i];
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append("{\"code\":\"000000\",\"message\":\"成功\",\"serialNo\":168,\"data\":");
+                    //sb.Append("{");
+                    sb.Append("[{");
+
+                    for (int j = 8; j <= 500; j++)
+                    {
+                        string strKey = xSheet.get_Range("C" + j, Missing.Value).Value2 as string;
+                        if (string.IsNullOrEmpty(strKey))
+                        {
+                            break;
+                        }
+
+                        if (j > 8)
+                        {
+                            sb.Append(",");
+                        }
+
+                        sb.Append("\"").Append(strKey).Append("\":");
+
+                        string type = xSheet.get_Range("D" + j, Missing.Value).Value2 as string;
+                        object val = xSheet.get_Range("G" + j, Missing.Value).Value2;
+                        if (("VARCHAR2".Equals(type) || "DATE".Equals(type)) && val != null)
+                        {
+                            sb.Append("\"");
+                        }
+                        
+                        if (val == null)
+                        {
+                            sb.Append("null");
+                        }
+                        else
+                        {
+                            sb.Append(val.ToString());
+                        }
+
+                        if (("VARCHAR2".Equals(type) || "DATE".Equals(type)) && val != null)
+                        {
+                            sb.Append("\"");
+                        }
+                    }
+
+                    //sb.Append("}}");
+                    sb.Append("}]}");
+
+                    File.WriteAllText(@"D:\jsonTestData\" + xSheet.Name + ".json", sb.ToString(), Encoding.UTF8);
+                }
+            }
+            catch (Exception me)
+            {
+                MessageBox.Show(me.Message + "\n" + me.StackTrace);
+            }
+            finally
+            {
+                // 清空各种对象
+                xSheet = null;
+                xBook = null;
+                if (xApp != null)
+                {
+                    xApp.Quit();
+                    xApp = null;
+                }
+            }
+        }
+
+        private void CheckSkAscComand()
+        {
+            Microsoft.Office.Interop.Excel.Application xApp = null;
+            Microsoft.Office.Interop.Excel.Workbook xBook = null;
+            Microsoft.Office.Interop.Excel.Worksheet xSheet = null;
+
+            try
+            {
+                // 创建Application对象 
+                xApp = new Microsoft.Office.Interop.Excel.ApplicationClass();
+
+                // 得到WorkBook对象, 打开已有的文件 
+                xBook = xApp.Workbooks._Open(
+                    @"E:\Study\MySelfProject\Hanhua\TodoCn\EternalDarkness\8013FC58汇编代码分析.xlsx",
+                    Missing.Value, Missing.Value, Missing.Value, Missing.Value
+                    , Missing.Value, Missing.Value, Missing.Value, Missing.Value
+                    , Missing.Value, Missing.Value, Missing.Value, Missing.Value);
+
+                // 取得相应的Sheet
+                for (int i = 1; i < xBook.Sheets.Count; i++)
+                {
+                    if (((Microsoft.Office.Interop.Excel.Worksheet)xBook.Sheets[i]).Name.Equals("All"))
+                    {
+                        xSheet = (Microsoft.Office.Interop.Excel.Worksheet)xBook.Sheets[i];
+                        break;
+                    }
+                }
+
+                int lineNum = 1;
+                List<string> cmdList = new List<string>();
+
+                for (int i = lineNum; i <= 2661; i++)
+                {
+                    string cellValue = xSheet.get_Range("B" + i, Missing.Value).Value2 as string;
+                    if (string.IsNullOrEmpty(cellValue))
+                    {
+                        continue;
+                    }
+
+                    string[] cmds = cellValue.Split(' ');
+                    if (!cmdList.Contains(cmds[0]))
+                    {
+                        cmdList.Add(cmds[0]);
+                    }
+                }
+            }
+            catch (Exception me)
+            {
+                MessageBox.Show(me.Message + "\n" + me.StackTrace);
+            }
+            finally
+            {
+                // 隐藏进度条
+                this.CloseProcessBar();
+
+                // 清空各种对象
+                xSheet = null;
+                xBook = null;
+                if (xApp != null)
+                {
+                    xApp.Quit();
+                    xApp = null;
+                }
+            }
+        }
 
         private void ResetSfcRomName()
         {
@@ -568,11 +751,15 @@ namespace Hanhua.Common
             File.WriteAllLines(@"E:\Study\Emu\emuSrc\WiiEmuHanhua\Nintendont\nintendont\titles.txt", cnTitles.ToArray(), Encoding.UTF8);
         }
 
+        /// <summary>
+        /// 检查Retroarch字库的白、绿字库的颜色映射
+        /// </summary>
         private void CheckColorMap()
         {
             byte[] whiteColor = File.ReadAllBytes(@"E:\Study\MySelfProject\Hanhua\fontTest\ZhBufFont13X13NoBlock_RGB5A3.dat");
             byte[] greenColor = File.ReadAllBytes(@"E:\Study\MySelfProject\Hanhua\fontTest\ZhBufFont13X13NoBlock_RGB5A3_R.dat");
             int charImgSize = 338;
+            StringBuilder sb = new StringBuilder();
             Dictionary<int, int> colorMap = new Dictionary<int, int>();
             for (int i = 4; i < whiteColor.Length; )
             {
@@ -583,6 +770,11 @@ namespace Hanhua.Common
                     {
                         int val = greenColor[j] << 8 | greenColor[j + 1];
                         colorMap.Add(key, val);
+                        sb.Append("colorMap.insert(std::pair<uint16_t, uint16_t>(");
+                        sb.Append(key);
+                        sb.Append(", ");
+                        sb.Append(val);
+                        sb.Append("));\r\n");
                     }
                 }
 
@@ -761,9 +953,9 @@ namespace Hanhua.Common
             imgInfo.BlockImgW = 13;
             imgInfo.NeedBorder = false;
             imgInfo.FontStyle = FontStyle.Regular;
-            imgInfo.FontSize = 12;
-            imgInfo.Brush = Brushes.White;
-            imgInfo.Pen = new Pen(Color.Black, 0.1F);
+            imgInfo.FontSize = 8;
+            imgInfo.Brush = Brushes.Green;
+            imgInfo.Pen = new Pen(Color.White, 0.1F);
 
             // 显示进度条
             this.ResetProcessBar(allZhTxt.Count);
@@ -776,7 +968,8 @@ namespace Hanhua.Common
                 imgInfo.CharTxt = Encoding.BigEndianUnicode.GetString(new byte[] { (byte)(unicodeChar >> 8 & 0xFF), (byte)(unicodeChar & 0xFF) });
                 imgInfo.XPadding = 0;
                 imgInfo.YPadding = 0;
-                ImgUtil.WriteBlockImg(imgInfo);
+                imgInfo.Grp.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
+                ImgUtil.WriteTextBlockImg(imgInfo);
 
                 // 保存字符映射表信息
                 byte[] byChar = Encoding.BigEndianUnicode.GetBytes(imgInfo.CharTxt);
@@ -822,7 +1015,7 @@ namespace Hanhua.Common
             // 隐藏进度条
             this.CloseProcessBar();
 
-            File.WriteAllBytes(@"E:\Study\MySelfProject\Hanhua\fontTest\ZhBufFont13X13NoBlock_RGB5A3.dat", charIndexMap.ToArray());
+            File.WriteAllBytes(@"E:\Study\MySelfProject\Hanhua\fontTest\ZhBufFont13X13NoBlock_RGB5A3_R.dat", charIndexMap.ToArray());
             //File.WriteAllBytes(@"E:\Study\MySelfProject\Hanhua\fontTest\FontCn_IA8(N64).dat", charIndexMap.ToArray());
             //File.WriteAllBytes(@"E:\Study\MySelfProject\Hanhua\fontTest\FontCn_IA8.dat", Util.ImageEncode(cnFontData, "IA8").ToArray());
             //File.WriteAllBytes(@"E:\Study\MySelfProject\Hanhua\fontTest\FontCnCharInfo.dat", charInfoMap.ToArray());
