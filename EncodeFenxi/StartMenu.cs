@@ -395,6 +395,16 @@ namespace Hanhua.Common
         }
 
         /// <summary>
+        /// 自动编译Wii上模拟器Retroarch
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnAutoBuild_Click(object sender, EventArgs e)
+        {
+            this.AutoBuildRetroarch();
+        }
+
+        /// <summary>
         /// 测试按钮
         /// </summary>
         /// <param name="sender"></param>
@@ -448,18 +458,40 @@ namespace Hanhua.Common
             //CheckPsZhTxt();
             //GetN64Name();
             //DecompressN64();
-			AutoBuildRetroarch();
             //CheckColorMap();
             //CheckNgcCnGameTitle();
             //ResetSfcRomName();
             //CheckSkAscComand();
             //this.CreateCpsEnCnTitle();
             //this.CheckJsonData();
+            this.CreateGameListFromFba();
         }
 
         #endregion
 
         #region " 私有方法 "
+
+        /// <summary>
+        /// 从Fba的列表中导出游戏列表
+        /// </summary>
+        private void CreateGameListFromFba()
+        {
+            string[] fbaList = File.ReadAllLines(@"E:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\gameListFba.txt", Encoding.UTF8);
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < fbaList.Length; i++)
+            {
+                int spaceIdx = fbaList[i].IndexOf('	');
+                if (spaceIdx > 0)
+                {
+                    sb.Append("\r\n");
+                    sb.Append("msgid \"").Append(fbaList[i].Substring(0, spaceIdx)).Append(".zip\"\r\n");
+                    sb.Append("msgstr \"").Append(fbaList[i].Substring(spaceIdx + 1).Replace(" ", "")).Append("\"\r\n");
+                }
+                
+            }
+
+            File.WriteAllText(@"E:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\gameListFba.lang", sb.ToString(), Encoding.UTF8);
+        }
 
         /// <summary>
         /// 生成Cps中文名称列表

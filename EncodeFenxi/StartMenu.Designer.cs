@@ -32,16 +32,17 @@
             this.btnFntTool = new System.Windows.Forms.Button();
             this.btnTxtTool = new System.Windows.Forms.Button();
             this.commandPanel = new System.Windows.Forms.Panel();
+            this.btnTest = new System.Windows.Forms.Button();
             this.btnFileEdit = new System.Windows.Forms.Button();
             this.btnNgcIso = new System.Windows.Forms.Button();
             this.btnImgTool = new System.Windows.Forms.Button();
-            this.btnTest = new System.Windows.Forms.Button();
+            this.btnAutoBuild = new System.Windows.Forms.Button();
             this.commandPanel.SuspendLayout();
             this.SuspendLayout();
             // 
             // pnlTopBody
             // 
-            this.pnlTopBody.Size = new System.Drawing.Size(273, 120);
+            this.pnlTopBody.Size = new System.Drawing.Size(273, 156);
             // 
             // btnFntTool
             // 
@@ -65,6 +66,7 @@
             // 
             // commandPanel
             // 
+            this.commandPanel.Controls.Add(this.btnAutoBuild);
             this.commandPanel.Controls.Add(this.btnTest);
             this.commandPanel.Controls.Add(this.btnFileEdit);
             this.commandPanel.Controls.Add(this.btnNgcIso);
@@ -74,8 +76,18 @@
             this.commandPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.commandPanel.Location = new System.Drawing.Point(0, 0);
             this.commandPanel.Name = "commandPanel";
-            this.commandPanel.Size = new System.Drawing.Size(273, 120);
+            this.commandPanel.Size = new System.Drawing.Size(273, 156);
             this.commandPanel.TabIndex = 7;
+            // 
+            // btnTest
+            // 
+            this.btnTest.Location = new System.Drawing.Point(141, 81);
+            this.btnTest.Name = "btnTest";
+            this.btnTest.Size = new System.Drawing.Size(112, 29);
+            this.btnTest.TabIndex = 25;
+            this.btnTest.Text = "测  试";
+            this.btnTest.UseVisualStyleBackColor = true;
+            this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
             // 
             // btnFileEdit
             // 
@@ -107,21 +119,21 @@
             this.btnImgTool.UseVisualStyleBackColor = true;
             this.btnImgTool.Click += new System.EventHandler(this.btnImgTool_Click);
             // 
-            // btnTest
+            // btnAutoBuild
             // 
-            this.btnTest.Location = new System.Drawing.Point(141, 81);
-            this.btnTest.Name = "btnTest";
-            this.btnTest.Size = new System.Drawing.Size(112, 29);
-            this.btnTest.TabIndex = 25;
-            this.btnTest.Text = "测  试";
-            this.btnTest.UseVisualStyleBackColor = true;
-            this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
+            this.btnAutoBuild.Location = new System.Drawing.Point(14, 116);
+            this.btnAutoBuild.Name = "btnAutoBuild";
+            this.btnAutoBuild.Size = new System.Drawing.Size(112, 29);
+            this.btnAutoBuild.TabIndex = 26;
+            this.btnAutoBuild.Text = "编译Retroarch";
+            this.btnAutoBuild.UseVisualStyleBackColor = true;
+            this.btnAutoBuild.Click += new System.EventHandler(this.btnAutoBuild_Click);
             // 
             // StartMenu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(273, 145);
+            this.ClientSize = new System.Drawing.Size(273, 181);
             this.Controls.Add(this.commandPanel);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
@@ -145,5 +157,6 @@
         private System.Windows.Forms.Button btnNgcIso;
         private System.Windows.Forms.Button btnFileEdit;
         private System.Windows.Forms.Button btnTest;
+        private System.Windows.Forms.Button btnAutoBuild;
     }
 }
