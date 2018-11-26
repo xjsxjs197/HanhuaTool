@@ -464,7 +464,8 @@ namespace Hanhua.Common
             //CheckSkAscComand();
             //this.CreateCpsEnCnTitle();
             //this.CheckJsonData();
-            this.CreateGameListFromFba();
+            //this.CreateGameListFromFba();
+            this.WriteMgbaFont();
         }
 
         #endregion
@@ -544,8 +545,8 @@ namespace Hanhua.Common
                     xSheet = (Microsoft.Office.Interop.Excel.Worksheet)xBook.Sheets[i];
                     StringBuilder sb = new StringBuilder();
                     sb.Append("{\"code\":\"000000\",\"message\":\"成功\",\"serialNo\":168,\"data\":");
-                    //sb.Append("{");
-                    sb.Append("[{");
+                    sb.Append("{");
+                    //sb.Append("[{");
 
                     for (int j = 8; j <= 500; j++)
                     {
@@ -584,8 +585,8 @@ namespace Hanhua.Common
                         }
                     }
 
-                    //sb.Append("}}");
-                    sb.Append("}]}");
+                    sb.Append("}}");
+                    //sb.Append("}]}");
 
                     File.WriteAllText(@"D:\jsonTestData\" + xSheet.Name + ".json", sb.ToString(), Encoding.UTF8);
                 }
@@ -919,7 +920,11 @@ namespace Hanhua.Common
             return allN64Char;
         }
 
-        private void CheckPsZhTxt()
+        /// <summary>
+        /// 生成所有BigEndian的中文字符
+        /// </summary>
+        /// <returns></returns>
+        private List<int> GetBigEndianAllCnChars()
         {
             List<int> allZhTxt = new List<int>();
 
@@ -936,6 +941,79 @@ namespace Hanhua.Common
                 byte[] byChar = Encoding.BigEndianUnicode.GetBytes(new char[] { chChar });
                 allZhTxt.Add(byChar[0] << 8 | byChar[1]);
             }
+
+            return allZhTxt;
+        }
+
+        /// <summary>
+        /// Mgba字库做成
+        /// </summary>
+        private void WriteMgbaFont()
+        {
+            // 生成所有BigEndian的中文字符
+            List<int> allZhTxt = this.GetBigEndianAllCnChars();
+
+            allZhTxt.Sort();
+
+            List<byte> charIndexMap = new List<byte>();
+
+            ImgInfo imgInfo = new ImgInfo(24, 24);
+            imgInfo.BlockImgH = 24;
+            imgInfo.BlockImgW = 24;
+            imgInfo.NeedBorder = true;
+            imgInfo.FontStyle = FontStyle.Regular;
+            imgInfo.FontSize = 15;
+            imgInfo.Brush = Brushes.White;
+            imgInfo.Pen = new Pen(Color.Black, 0.1F);
+
+            // 显示进度条
+            this.ResetProcessBar(allZhTxt.Count);
+
+            int charIndex = 0;
+            foreach (int unicodeChar in allZhTxt)
+            {
+                imgInfo.NewImg();
+                imgInfo.CharTxt = Encoding.BigEndianUnicode.GetString(new byte[] { (byte)(unicodeChar >> 8 & 0xFF), (byte)(unicodeChar & 0xFF) });
+                imgInfo.XPadding = 0;
+                imgInfo.YPadding = 0;
+                imgInfo.Grp.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
+                ImgUtil.WriteTextBlockImg(imgInfo);
+
+                // 保存字符映射表信息
+                byte[] byChar = Encoding.BigEndianUnicode.GetBytes(imgInfo.CharTxt);
+                byte[] byCurChar = new byte[4];
+                byCurChar[0] = byChar[0];
+                byCurChar[1] = byChar[1];
+
+                // 保存图片宽度信息，以及重新生成图片（紧靠左边）
+                imgInfo.Bmp = this.SetCharPadding(byCurChar, imgInfo.Bmp);
+
+                charIndexMap.AddRange(byCurChar);
+
+                if (charIndex++ < 500)
+                {
+                    imgInfo.Bmp.Save(@"E:\Study\MySelfProject\Hanhua\fontTest\CharPng\" + unicodeChar + ".png");
+                }
+
+                // 保存文字图片信息
+                byte[] byCharFont = Util.ImageEncode(imgInfo.Bmp, "IA8");
+                charIndexMap.AddRange(byCharFont);
+
+                // 更新进度条
+                this.ProcessBarStep();
+            }
+
+            // 隐藏进度条
+            this.CloseProcessBar();
+
+            File.WriteAllBytes(@"E:\Study\MySelfProject\Hanhua\fontTest\mGba_CnFont_IA8.dat", charIndexMap.ToArray());
+        }
+
+        private void CheckPsZhTxt()
+        {
+            // 生成所有BigEndian的中文字符
+            List<int> allZhTxt = this.GetBigEndianAllCnChars();
+
 
             //string[] allLine = File.ReadAllLines(@"H:\游戏汉化\fontTest\zhChCount.xlsx.txt", Encoding.UTF8);
             string[] allLine = File.ReadAllLines(@"E:\Study\MySelfProject\Hanhua\fontTest\zhChCount.xlsx.txt", Encoding.UTF8);
@@ -1168,8 +1246,8 @@ namespace Hanhua.Common
                 rightPos = img.Width - 1;
             }
 
-            byCurChar[2] = (byte)leftPos;
-            byCurChar[3] = (byte)rightPos;
+            //byCurChar[2] = (byte)leftPos;
+            //byCurChar[3] = (byte)rightPos;
 
             Bitmap newImg = new Bitmap(img.Width, img.Height);
             for (int y = 0; y < img.Height; y++)
@@ -1181,7 +1259,7 @@ namespace Hanhua.Common
                 }
             }
 
-            byCurChar[2] = 0;
+            //byCurChar[2] = 0;
             byCurChar[3] = (byte)(rightPos - leftPos);
 
             return newImg;
