@@ -957,12 +957,12 @@ namespace Hanhua.Common
 
             List<byte> charIndexMap = new List<byte>();
 
-            ImgInfo imgInfo = new ImgInfo(24, 24);
-            imgInfo.BlockImgH = 24;
-            imgInfo.BlockImgW = 24;
+            ImgInfo imgInfo = new ImgInfo(32, 32);
+            imgInfo.BlockImgH = 32;
+            imgInfo.BlockImgW = 32;
             imgInfo.NeedBorder = true;
-            imgInfo.FontStyle = FontStyle.Regular;
-            imgInfo.FontSize = 15;
+            imgInfo.FontStyle = FontStyle.Bold;
+            imgInfo.FontSize = 18;
             imgInfo.Brush = Brushes.White;
             imgInfo.Pen = new Pen(Color.Black, 0.1F);
 
@@ -996,7 +996,7 @@ namespace Hanhua.Common
                 }
 
                 // 保存文字图片信息
-                byte[] byCharFont = Util.ImageEncode(imgInfo.Bmp, "IA8");
+                byte[] byCharFont = Util.ImageEncode(imgInfo.Bmp, "I4");
                 charIndexMap.AddRange(byCharFont);
 
                 // 更新进度条
@@ -1006,7 +1006,7 @@ namespace Hanhua.Common
             // 隐藏进度条
             this.CloseProcessBar();
 
-            File.WriteAllBytes(@"E:\Study\MySelfProject\Hanhua\fontTest\mGba_CnFont_IA8.dat", charIndexMap.ToArray());
+            File.WriteAllBytes(@"E:\Study\MySelfProject\Hanhua\fontTest\mGba_CnFont_I4.dat", charIndexMap.ToArray());
         }
 
         private void CheckPsZhTxt()
