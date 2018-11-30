@@ -981,7 +981,7 @@ namespace Hanhua.Common
 
                 // 保存字符映射表信息
                 byte[] byChar = Encoding.BigEndianUnicode.GetBytes(imgInfo.CharTxt);
-                byte[] byCurChar = new byte[4];
+                byte[] byCurChar = new byte[32];
                 byCurChar[0] = byChar[0];
                 byCurChar[1] = byChar[1];
 
@@ -996,7 +996,7 @@ namespace Hanhua.Common
                 }
 
                 // 保存文字图片信息
-                byte[] byCharFont = Util.ImageEncode(imgInfo.Bmp, "I4");
+                byte[] byCharFont = Util.ImageEncode(imgInfo.Bmp, "IA4");
                 charIndexMap.AddRange(byCharFont);
 
                 // 更新进度条
