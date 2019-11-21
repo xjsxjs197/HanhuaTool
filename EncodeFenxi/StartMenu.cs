@@ -156,9 +156,7 @@ namespace Hanhua.Common
                     break;
 
                 case "btnBio1Tool":
-                    //string strFolder = @"E:\游戏汉化\NgcBio1\IsoA\root_cn";
-                    strFolder = @"E:\My\Hanhua\testFile\bio1Text";
-                    Bio1TextEditor bio1TextEditor = new Bio1TextEditor(strFolder);
+                    Bio1TextEditor bio1TextEditor = new Bio1TextEditor();
                     bio1TextEditor.Show();
                     break;
 

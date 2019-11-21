@@ -59,7 +59,12 @@ namespace Hanhua.TextEditTools.Bio1Edit
         /// <summary>
         /// 保存的中文的字符
         /// </summary>
-        private string[] bio1CnFontChars;
+        private string[] bio1CnTextChars;
+
+        /// <summary>
+        /// 保存的中文的字符
+        /// </summary>
+        private string[] bio1CnFileChars;
 
         /// <summary>
         /// 中文翻译文件
@@ -120,6 +125,11 @@ namespace Hanhua.TextEditTools.Bio1Edit
         /// 是否是Wii汉化
         /// </summary>
         private bool isWii;
+
+        /// <summary>
+        /// 子目录
+        /// </summary>
+        private string subFolder;
 
         #region " 字库 "
 
@@ -264,20 +274,25 @@ namespace Hanhua.TextEditTools.Bio1Edit
         /// <summary>
         /// 生化危机1 文本编辑工具
         /// </summary>
-        public Bio1TextEditor(string folder)
+        public Bio1TextEditor()
         {
             InitializeComponent();
 
             this.ResetHeight();
 
-            this.baseFolder = folder;
+            //this.gameName = "Bio1";
+            //this.baseFolder = @"E:\Study\MySelfProject\Hanhua\TodoCn\HanhuaProject\Bio1";
+            this.baseFolder = @"E:\Study\MySelfProject\Hanhua\TodoCn\HanhuaProject\Bio1";
+            this.subFolder = @"\WiiJp";
             this.txtCnEdit.OtherRichTextBox = this.txtJpEdit;
 
             this.isWii = true;
-            if (folder.IndexOf("Ngc") != -1)
+            if (this.baseFolder.IndexOf("Ngc") != -1)
             {
                 this.isWii = false;
             }
+
+            this.ReadCnFont();
 
             this.LoadAllText();
         }
@@ -454,14 +469,13 @@ namespace Hanhua.TextEditTools.Bio1Edit
             }
 
             FilePosInfo filePosInfo = this.lstFilePos[this.lstFile.SelectedIndex];
-            FileStream fs = null;
             try
             {
                 string fileName = this.TrimFileName(filePosInfo.File);
                 string jpFile = this.GetFileName(fileName, string.Empty);
 
                 // 判断文件类型
-                if (filePosInfo.File.IndexOf("subscr_2") != -1 || filePosInfo.File.IndexOf("main_3") != -1)
+                if (filePosInfo.File.IndexOf("subscr_2") >= 0 || filePosInfo.File.IndexOf("main_3") >= 0)
                 {
                     this.isComText = false;
                 }
@@ -480,11 +494,11 @@ namespace Hanhua.TextEditTools.Bio1Edit
 
                 // 开始读取文件
                 this.txtCnEdit.Text = string.Empty;
-                this.cnFile = this.GetFileName(fileName, "_cn");
-                if (!File.Exists(this.cnFile))
-                {
-                    File.Copy(jpFile, this.cnFile);
-                }
+                this.cnFile = jpFile.Replace("Jp", "Cn");
+                //if (!File.Exists(this.cnFile))
+                //{
+                //    File.Copy(jpFile, this.cnFile);
+                //}
 
                 this.txtCnEdit.Text = this.ReadText(false, this.cnFile, filePosInfo.TextStart, this.hasEntry);
                 //this.txtCnEdit.Text = File.ReadAllText(filePosInfo.File + "_info.txt", Encoding.UTF8);
@@ -493,13 +507,6 @@ namespace Hanhua.TextEditTools.Bio1Edit
             catch (Exception me)
             {
                 MessageBox.Show(me.Message);
-            }
-            finally
-            {
-                if (fs != null)
-                {
-                    fs.Close();
-                }
             }
         }
 
@@ -868,7 +875,10 @@ namespace Hanhua.TextEditTools.Bio1Edit
         /// </summary>
         private void ReadCnFont()
         {
-            string[] cnFont = File.ReadAllLines(this.isComText ? cnTextFont : cnFileFont, Encoding.UTF8);
+            this.bio1CnTextChars = File.ReadAllLines(cnTextFont, Encoding.UTF8);
+            this.bio1CnFileChars = File.ReadAllLines(cnFileFont, Encoding.UTF8);
+
+            string[] cnFont = this.isComText ? this.bio1CnTextChars : this.bio1CnFileChars;
             this.cnFontMap.Clear();
             for (int i = 0; i < cnFont.Length; i++)
             {
@@ -927,8 +937,8 @@ namespace Hanhua.TextEditTools.Bio1Edit
             this.lstFile.Items.Clear();
 
             // 读取文本配置信息
-            string[] comTextInfo = File.ReadAllLines(this.baseFolder + @"\ComText.txt");
-            string[] fileTextInfo = File.ReadAllLines(this.baseFolder + @"\FileText.txt");
+            string[] comTextInfo = File.ReadAllLines(this.baseFolder + @"\WiiComText.txt");
+            string[] fileTextInfo = File.ReadAllLines(this.baseFolder + @"\WiiFileText.txt");
             string[] textInfo = new string[comTextInfo.Length + fileTextInfo.Length];
             Array.Copy(comTextInfo, 0, textInfo, 0, comTextInfo.Length);
             Array.Copy(fileTextInfo, 0, textInfo, comTextInfo.Length, fileTextInfo.Length);
@@ -936,8 +946,8 @@ namespace Hanhua.TextEditTools.Bio1Edit
             // 根据配置的信息，读取各个文件文本
             for (int i = 0; i < textInfo.Length; i += 2)
             {
-                string fileName = textInfo[i];
-                string fullName = this.baseFolder + @"\" + fileName;
+                string fileName = textInfo[i].StartsWith("sys") ? textInfo[i] : @"files\" + textInfo[i];
+                string fullName = this.baseFolder + this.subFolder + @"\" + fileName;
                 if (File.Exists(this.GetFileName(this.TrimFileName(fullName), string.Empty)))
                 {
                     string[] posInfo = textInfo[i + 1].Split(' ');
@@ -1036,8 +1046,6 @@ namespace Hanhua.TextEditTools.Bio1Edit
         /// </summary>
         private void SetInputPos(string fileName, int textStart, int textEnd, bool hasEntry)
         {
-            FileStream fs = null;
-
             try
             {
                 int subTextStart = textStart;
@@ -1046,10 +1054,7 @@ namespace Hanhua.TextEditTools.Bio1Edit
                 if (hasEntry)
                 {
                     // 将文件中的数据，循环读取到byData中
-                    fs = new FileStream(fileName, FileMode.Open);
-                    byte[] byData = new byte[fs.Length];
-                    fs.Read(byData, 0, byData.Length);
-                    fs.Close();
+                    byte[] byData = File.ReadAllBytes(fileName);
 
                     int len = Util.GetOffset(byData, textStart + 6, textStart + 7);
                     int subEntryPosStart = textStart + 8;
@@ -1073,13 +1078,6 @@ namespace Hanhua.TextEditTools.Bio1Edit
             catch (Exception me)
             {
                 MessageBox.Show(me.Message);
-            }
-            finally
-            {
-                if (fs != null)
-                {
-                    fs.Close();
-                }
             }
         }
 
@@ -1111,7 +1109,6 @@ namespace Hanhua.TextEditTools.Bio1Edit
         /// <param name="cnTextLoaded">中文文档是否已经被Load了</param>
         private string ReadText(bool isJpText, string fileName, int textStart, bool hasEntry)
         {
-            FileStream fs = null;
             this.textEntryStart = textStart;
 
             if (isJpText)
@@ -1121,18 +1118,13 @@ namespace Hanhua.TextEditTools.Bio1Edit
             else
             {
                 // 读入中文字库
-                this.bio1CnFontChars = File.ReadAllLines(this.isComText ? Bio1TextEditor.cnTextFont : Bio1TextEditor.cnFileFont, Encoding.UTF8);
-
-                this.tempFontChars = this.bio1CnFontChars;
+                this.tempFontChars = this.isComText ? this.bio1CnTextChars : this.bio1CnFileChars;
             }
 
             try
             {
                 // 将文件中的数据，循环读取到byData中
-                fs = new FileStream(fileName, FileMode.Open);
-                byte[] byData = new byte[fs.Length];
-                fs.Read(byData, 0, byData.Length);
-                fs.Close();
+                byte[] byData = File.ReadAllBytes(fileName);
 
                 if (!hasEntry)
                 {
@@ -1213,13 +1205,6 @@ namespace Hanhua.TextEditTools.Bio1Edit
             {
                 MessageBox.Show(me.Message);
                 return string.Empty;
-            }
-            finally
-            {
-                if (fs != null)
-                {
-                    fs.Close();
-                }
             }
         }
 
@@ -1843,15 +1828,10 @@ namespace Hanhua.TextEditTools.Bio1Edit
         /// <param name="cnBytes">翻译的字节数据</param>
         private bool Save(List<byte> cnBytes, bool hasEntry)
         {
-            FileStream fs = null;
-
             try
             {
                 // 将文件中的数据，循环读取到byData中
-                fs = new FileStream(this.cnFile, FileMode.Open);
-                byte[] byData = new byte[fs.Length];
-                fs.Read(byData, 0, byData.Length);
-                fs.Close();
+                byte[] byData = File.ReadAllBytes(this.cnFile);
 
                 int startPos = this.inputCnStartPos;
                 int maxLen = this.inputCnEndPos;
@@ -1896,13 +1876,6 @@ namespace Hanhua.TextEditTools.Bio1Edit
             {
                 MessageBox.Show(me.Message);
                 return false;
-            }
-            finally
-            {
-                if (fs != null)
-                {
-                    fs.Close();
-                }
             }
         }
 
