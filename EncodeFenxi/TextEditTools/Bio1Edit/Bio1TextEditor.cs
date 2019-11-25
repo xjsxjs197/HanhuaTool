@@ -281,8 +281,8 @@ namespace Hanhua.TextEditTools.Bio1Edit
             this.ResetHeight();
 
             //this.gameName = "Bio1";
+            this.baseFolder = @"G:\GitHub\HanhuaProject\Bio1";
             //this.baseFolder = @"E:\Study\MySelfProject\Hanhua\TodoCn\HanhuaProject\Bio1";
-            this.baseFolder = @"E:\Study\MySelfProject\Hanhua\TodoCn\HanhuaProject\Bio1";
             this.subFolder = @"\WiiJp";
             this.txtCnEdit.OtherRichTextBox = this.txtJpEdit;
 
