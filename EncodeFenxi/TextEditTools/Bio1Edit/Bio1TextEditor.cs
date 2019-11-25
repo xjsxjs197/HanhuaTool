@@ -1733,9 +1733,34 @@ namespace Hanhua.TextEditTools.Bio1Edit
         /// <returns></returns>
         private int GetCharIndex(string currentChar)
         {
-            bool getedInsertIndex = false;
-            int insertIndex = -1;
+            //bool getedInsertIndex = false;
+            //int insertIndex = -1;
 
+            //for (int i = 0; i < this.cnFontMap.Count; i++)
+            //{
+            //    FontCharInfo fontChar = this.cnFontMap[i];
+            //    if (fontChar.Char == currentChar)
+            //    {
+            //        return this.CheckMaxIndex(fontChar.Index);
+            //    }
+            //    else if (fontChar.Char == "*" && getedInsertIndex == false)
+            //    {
+            //        insertIndex = i;
+            //        getedInsertIndex = true;
+            //    }
+            //}
+
+            //if (insertIndex == -1)
+            //{
+            //    insertIndex = this.cnFontMap.Count;
+            //    this.cnFontMap.Add(new FontCharInfo(currentChar, this.cnFontMap.Count));
+            //    return this.CheckMaxIndex(insertIndex);
+            //}
+            //else
+            //{
+            //    this.cnFontMap[insertIndex].Char = currentChar;
+            //    return insertIndex;
+            //}
             for (int i = 0; i < this.cnFontMap.Count; i++)
             {
                 FontCharInfo fontChar = this.cnFontMap[i];
@@ -1743,24 +1768,9 @@ namespace Hanhua.TextEditTools.Bio1Edit
                 {
                     return this.CheckMaxIndex(fontChar.Index);
                 }
-                else if (fontChar.Char == "*" && getedInsertIndex == false)
-                {
-                    insertIndex = i;
-                    getedInsertIndex = true;
-                }
             }
 
-            if (insertIndex == -1)
-            {
-                insertIndex = this.cnFontMap.Count;
-                this.cnFontMap.Add(new FontCharInfo(currentChar, this.cnFontMap.Count));
-                return this.CheckMaxIndex(insertIndex);
-            }
-            else
-            {
-                this.cnFontMap[insertIndex].Char = currentChar;
-                return insertIndex;
-            }
+            throw new Exception("没有找到相应文字：" + currentChar);
         }
 
         /// <summary>
@@ -1862,13 +1872,13 @@ namespace Hanhua.TextEditTools.Bio1Edit
                 this.DisplayTitle(this.inputCnEndPos - this.inputCnStartPos, cnBytes.Count);
 
                 // 写字库文件
-                string[] newFont = new string[this.cnFontMap.Count];
-                int charIndex = 0;
-                foreach (FontCharInfo fontChar in this.cnFontMap)
-                {
-                    newFont[charIndex++] = fontChar.Char;
-                }
-                File.WriteAllLines(this.isComText ? cnTextFont : cnFileFont, newFont, Encoding.UTF8);
+                //string[] newFont = new string[this.cnFontMap.Count];
+                //int charIndex = 0;
+                //foreach (FontCharInfo fontChar in this.cnFontMap)
+                //{
+                //    newFont[charIndex++] = fontChar.Char;
+                //}
+                //File.WriteAllLines(this.isComText ? cnTextFont : cnFileFont, newFont, Encoding.UTF8);
 
                 return true;
             }

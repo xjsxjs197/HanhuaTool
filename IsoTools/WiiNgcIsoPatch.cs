@@ -554,7 +554,13 @@ namespace IsoTools
                     }
                     else
                     {
-                        throw new Exception("选中的补丁目录不正确，一定要选择补丁的根目录");
+                        DialogResult dr = MessageBox.Show(Util.GetShortName(cnFile.File) + " 对应文件原始不存在，要继续吗？",
+                            "请确认", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                        if (dr != DialogResult.Yes)
+                        {
+                            return;
+                        }
+                        //throw new Exception("选中的补丁目录不正确，一定要选择补丁的根目录");
                     }
                 }
 
