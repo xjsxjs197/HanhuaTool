@@ -281,8 +281,8 @@ namespace Hanhua.TextEditTools.Bio1Edit
             this.ResetHeight();
 
             //this.gameName = "Bio1";
-            //this.baseFolder = @"G:\GitHub\HanhuaProject\Bio1";
-            this.baseFolder = @"E:\Study\MySelfProject\Hanhua\TodoCn\HanhuaProject\Bio1";
+            this.baseFolder = @"G:\GitHub\HanhuaProject\Bio1";
+            //this.baseFolder = @"E:\Study\MySelfProject\Hanhua\TodoCn\HanhuaProject\Bio1";
             this.subFolder = @"\WiiJp";
             this.txtCnEdit.OtherRichTextBox = this.txtJpEdit;
 
@@ -970,20 +970,21 @@ namespace Hanhua.TextEditTools.Bio1Edit
         {
             if (this.hasEntry)
             {
-                int jpLen = this.txtJpEdit.Text.Replace("^", string.Empty).Length;
-                int cnLen = this.txtCnEdit.Text.Replace("^", string.Empty).Length;
+                //int jpLen = this.txtJpEdit.Text.Replace("^", string.Empty).Length;
+                //int cnLen = this.txtCnEdit.Text.Replace("^", string.Empty).Length;
 
-                if (jpLen < cnLen)
-                {
-                    this.DisplayTitle(jpLen, cnLen);
-                    return false;
-                }
-                else
-                {
-                    this.DisplayTitle(0, 0);
-                    this.txtCnEdit.BackColor = SystemColors.Window;
-                    return true;
-                }
+                //if (jpLen < cnLen)
+                //{
+                //    this.DisplayTitle(jpLen, cnLen);
+                //    return false;
+                //}
+                //else
+                //{
+                //    this.DisplayTitle(0, 0);
+                //    this.txtCnEdit.BackColor = SystemColors.Window;
+                //    return true;
+                //}
+                return true;
             }
             else
             {
@@ -997,16 +998,16 @@ namespace Hanhua.TextEditTools.Bio1Edit
                     jpText = jpTexts[i];
                     cnText = cnTexts[i];
 
-                    if (cnText.Length > jpText.Length || cnText.Length < jpText.Length)
-                    {
-                        this.DisplayTitle(jpText.Length, cnText.Length);
-                        this.txtCnEdit.Focus();
-                        this.txtCnEdit.SelectionStart = selectionStart;
-                        this.txtCnEdit.SelectionLength = cnText.Length;
-                        this.txtCnEdit.SelectionColor = Color.SeaGreen;
+                    //if (cnText.Length > jpText.Length || cnText.Length < jpText.Length)
+                    //{
+                    //    this.DisplayTitle(jpText.Length, cnText.Length);
+                    //    this.txtCnEdit.Focus();
+                    //    this.txtCnEdit.SelectionStart = selectionStart;
+                    //    this.txtCnEdit.SelectionLength = cnText.Length;
+                    //    this.txtCnEdit.SelectionColor = Color.SeaGreen;
 
-                        return false;
-                    }
+                    //    return false;
+                    //}
                     
                     // 关键字是否被删除的判断
                     foreach (string keyWord in this.keyWords)
@@ -1816,6 +1817,11 @@ namespace Hanhua.TextEditTools.Bio1Edit
             if (this.oldTextLen != cnBytes.Count)
             {
                 int diffLen = this.oldTextLen - cnBytes.Count;
+                if (diffLen < 0)
+                {
+                    this.DisplayTitle(this.oldTextLen, cnBytes.Count);
+                    return false;
+                }
                 while (diffLen > 0)
                 {
                     cnBytes.Add(0);
