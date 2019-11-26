@@ -463,12 +463,27 @@ namespace Hanhua.Common
             //this.CreateCpsEnCnTitle();
             //this.CheckJsonData();
             //this.CreateGameListFromFba();
-            this.WriteMgbaFont();
+            //this.WriteMgbaFont();
+            this.CopyBioFontWidthInfo();
         }
 
         #endregion
 
         #region " 私有方法 "
+
+        private void CopyBioFontWidthInfo()
+        {
+            byte[] byNgc = File.ReadAllBytes(@"E:\Study\MySelfProject\Hanhua\TodoCn\HanhuaProject\Bio1\NgcCnA\&&systemdata\Start_cn.dol");
+            byte[] byWii = File.ReadAllBytes(@"E:\Study\MySelfProject\Hanhua\TodoCn\HanhuaProject\Bio1\WiiCn\sys\main.dol");
+
+            int copyStart = 0x17d9d0 + (32 * 34 + 2) * 2;
+            int copyTarget = 0x2ee900 + (32 * 34 + 2) * 2;
+            int copyLen = 32 * 29 + 6;
+
+            Array.Copy(byNgc, copyStart, byWii, copyTarget, copyLen);
+
+            File.WriteAllBytes(@"E:\Study\MySelfProject\Hanhua\TodoCn\HanhuaProject\Bio1\WiiCn\sys\main.dol", byWii);
+        }
 
         /// <summary>
         /// 从Fba的列表中导出游戏列表

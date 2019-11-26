@@ -190,12 +190,12 @@ namespace Hanhua.TextEditTools.Bio1Edit
                 if (this.isWii)
                 {
                     charInfoStart = 0x2ee900;
-                    fontWidInfoFile = this.baseFolder + @"\sys\main_cn.dol";
+                    fontWidInfoFile = this.baseFolder + @"\WiiCn\sys\main.dol";
                 }
                 else
                 {
                     charInfoStart = 0x17d9d0;
-                    fontWidInfoFile = this.baseFolder + @"\&&systemdata\Start_cn.dol";
+                    fontWidInfoFile = this.baseFolder + @"\&&systemdata\Start.dol";
                 }
 
                 int charInfoLen = 32 * 34 + 2;
@@ -418,8 +418,8 @@ namespace Hanhua.TextEditTools.Bio1Edit
         {
             if (this.isComText)
             {
-                Bitmap bio1ComFont1 = new Bitmap(@"..\EncodeFenxi\BioTools\Bio1Edit\bio1ComFont1.bmp");
-                Bitmap bio1ComFont2 = new Bitmap(@"..\EncodeFenxi\BioTools\Bio1Edit\bio1ComFont2.bmp");
+                Bitmap bio1ComFont1 = new Bitmap(@"..\EncodeFenxi\TextEditTools\Bio1Edit\bio1ComFont1.bmp");
+                Bitmap bio1ComFont2 = new Bitmap(@"..\EncodeFenxi\TextEditTools\Bio1Edit\bio1ComFont2.bmp");
 
                 this.fontBmp = new Bitmap(bio1ComFont1.Width, bio1ComFont1.Height + bio1ComFont2.Height);
                 for (int y = 0; y < bio1ComFont1.Height; y += 1)
@@ -440,7 +440,7 @@ namespace Hanhua.TextEditTools.Bio1Edit
             }
             else
             {
-                this.fontBmp = new Bitmap(@"..\BioTools\Bio1Edit\bio1FileFont.bmp");
+                this.fontBmp = new Bitmap(@"..\\EncodeFenxi\TextEditTools\Bio1Edit\bio1FileFont.bmp");
             }
 
             this.fontCharInfoLst.Clear();
@@ -451,7 +451,7 @@ namespace Hanhua.TextEditTools.Bio1Edit
             {
                 if (this.isWii)
                 {
-                    fs = new FileStream(this.baseFolder + @"\sys\main.dol", FileMode.Open);
+                    fs = new FileStream(this.baseFolder + @"\WiiJp\sys\main.dol", FileMode.Open);
                     fs.Seek(0x2ee900, SeekOrigin.Begin);
                     byData = new byte[0x2ef8d0 - 0x2ee900];
                 }
@@ -702,7 +702,7 @@ namespace Hanhua.TextEditTools.Bio1Edit
 
                 graphPath.AddString(fontChar, new FontFamily(txtFontTest.Font.Name), (int)FontStyle.Regular, txtFontTest.Font.Size, rectangle, sf);
                 g.FillPath(Brushes.White, graphPath);
-                //g.DrawPath(blackPen, graphPath);
+                g.DrawPath(blackPen, graphPath);
 
                 Region[] charRegions = g.MeasureCharacterRanges(fontChar, this.selectedFont, rectangle, sf);
                 int charWidth = (int)charRegions[0].GetBounds(g).Width;
