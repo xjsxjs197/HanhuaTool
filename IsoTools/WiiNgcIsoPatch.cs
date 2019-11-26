@@ -527,10 +527,13 @@ namespace IsoTools
                 exep.StartInfo.CreateNoWindow = true;
                 exep.StartInfo.UseShellExecute = false;
 
-                // 开始解压Wii iso
-                exep.StartInfo.Arguments = "EXTRACT \"" + jpIsoFile + "\" --dest \"" + WII_ISO_TEMP + "\"  --psel DATA --section --long";
-                exep.Start();
-                exep.WaitForExit();
+                if (!this.chkNoDec.Checked)
+                {
+                    // 开始解压Wii iso
+                    exep.StartInfo.Arguments = "EXTRACT \"" + jpIsoFile + "\" --dest \"" + WII_ISO_TEMP + "\"  --psel DATA --section --long";
+                    exep.Start();
+                    exep.WaitForExit();
+                }
 
                 // 改变标题，按钮状态
                 this.SetWinStatus(false, oldTitle + " 补丁文件复制中，请耐心等待......");
