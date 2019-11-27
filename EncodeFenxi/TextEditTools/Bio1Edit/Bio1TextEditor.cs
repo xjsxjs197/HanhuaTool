@@ -281,8 +281,8 @@ namespace Hanhua.TextEditTools.Bio1Edit
             this.ResetHeight();
 
             //this.gameName = "Bio1";
-            this.baseFolder = @"G:\GitHub\HanhuaProject\Bio1";
-            //this.baseFolder = @"E:\Study\MySelfProject\Hanhua\TodoCn\HanhuaProject\Bio1";
+            //this.baseFolder = @"G:\GitHub\HanhuaProject\Bio1";
+            this.baseFolder = @"E:\Study\MySelfProject\Hanhua\TodoCn\HanhuaProject\Bio1";
             this.subFolder = @"\WiiJp";
             this.txtCnEdit.OtherRichTextBox = this.txtJpEdit;
 
@@ -988,8 +988,8 @@ namespace Hanhua.TextEditTools.Bio1Edit
             }
             else
             {
-                string[] jpTexts = Regex.Split(this.txtJpEdit.Text.Replace("^1^^6^", "^1 0^"), @"1 0");
-                string[] cnTexts = Regex.Split(this.txtCnEdit.Text.Replace("^1^^6^", "^1 0^"), @"1 0");
+                string[] jpTexts = Regex.Split(this.txtJpEdit.Text.Replace("^1^^6^", "^1 0^"), @"^1 0^");
+                string[] cnTexts = Regex.Split(this.txtCnEdit.Text.Replace("^1^^6^", "^1 0^"), @"^1 0^");
                 string jpText = string.Empty;
                 string cnText = string.Empty;
                 int selectionStart = 0;
@@ -998,16 +998,16 @@ namespace Hanhua.TextEditTools.Bio1Edit
                     jpText = jpTexts[i];
                     cnText = cnTexts[i];
 
-                    //if (cnText.Length > jpText.Length || cnText.Length < jpText.Length)
-                    //{
-                    //    this.DisplayTitle(jpText.Length, cnText.Length);
-                    //    this.txtCnEdit.Focus();
-                    //    this.txtCnEdit.SelectionStart = selectionStart;
-                    //    this.txtCnEdit.SelectionLength = cnText.Length;
-                    //    this.txtCnEdit.SelectionColor = Color.SeaGreen;
+                    if (cnText.Length > jpText.Length || cnText.Length < jpText.Length)
+                    {
+                        this.DisplayTitle(jpText.Length, cnText.Length);
+                        this.txtCnEdit.Focus();
+                        this.txtCnEdit.SelectionStart = selectionStart;
+                        this.txtCnEdit.SelectionLength = cnText.Length;
+                        this.txtCnEdit.SelectionColor = Color.SeaGreen;
 
-                    //    return false;
-                    //}
+                        return false;
+                    }
                     
                     // 关键字是否被删除的判断
                     foreach (string keyWord in this.keyWords)

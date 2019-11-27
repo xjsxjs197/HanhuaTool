@@ -38,17 +38,19 @@
             this.label1 = new System.Windows.Forms.Label();
             this.chkSameSize = new System.Windows.Forms.CheckBox();
             this.chkNoDec = new System.Windows.Forms.CheckBox();
+            this.chkSaveTemp = new System.Windows.Forms.CheckBox();
             this.pnlTopBody.SuspendLayout();
             this.SuspendLayout();
             // 
             // pnlTopBody
             // 
+            this.pnlTopBody.Controls.Add(this.chkSaveTemp);
             this.pnlTopBody.Controls.Add(this.chkNoDec);
-            this.pnlTopBody.Size = new System.Drawing.Size(504, 167);
+            this.pnlTopBody.Size = new System.Drawing.Size(504, 191);
             // 
             // btnCopy
             // 
-            this.btnCopy.Location = new System.Drawing.Point(181, 124);
+            this.btnCopy.Location = new System.Drawing.Point(181, 148);
             this.btnCopy.Name = "btnCopy";
             this.btnCopy.Size = new System.Drawing.Size(113, 31);
             this.btnCopy.TabIndex = 16;
@@ -58,7 +60,7 @@
             // 
             // btnCnSelect
             // 
-            this.btnCnSelect.Location = new System.Drawing.Point(388, 90);
+            this.btnCnSelect.Location = new System.Drawing.Point(388, 114);
             this.btnCnSelect.Name = "btnCnSelect";
             this.btnCnSelect.Size = new System.Drawing.Size(87, 21);
             this.btnCnSelect.TabIndex = 2;
@@ -68,7 +70,7 @@
             // 
             // txtCnFolder
             // 
-            this.txtCnFolder.Location = new System.Drawing.Point(120, 92);
+            this.txtCnFolder.Location = new System.Drawing.Point(120, 116);
             this.txtCnFolder.Name = "txtCnFolder";
             this.txtCnFolder.ReadOnly = true;
             this.txtCnFolder.Size = new System.Drawing.Size(253, 19);
@@ -77,7 +79,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(25, 95);
+            this.label2.Location = new System.Drawing.Point(25, 119);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(83, 12);
             this.label2.TabIndex = 13;
@@ -130,11 +132,21 @@
             this.chkNoDec.Text = "已存在加Wii解压缩文件";
             this.chkNoDec.UseVisualStyleBackColor = true;
             // 
+            // chkSaveTemp
+            // 
+            this.chkSaveTemp.AutoSize = true;
+            this.chkSaveTemp.Location = new System.Drawing.Point(126, 90);
+            this.chkSaveTemp.Name = "chkSaveTemp";
+            this.chkSaveTemp.Size = new System.Drawing.Size(120, 16);
+            this.chkSaveTemp.TabIndex = 19;
+            this.chkSaveTemp.Text = "不要删除临时文件";
+            this.chkSaveTemp.UseVisualStyleBackColor = true;
+            // 
             // WiiNgcIsoPatch
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(504, 192);
+            this.ClientSize = new System.Drawing.Size(504, 216);
             this.Controls.Add(this.btnCopy);
             this.Controls.Add(this.btnCnSelect);
             this.Controls.Add(this.chkSameSize);
@@ -175,5 +187,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.CheckBox chkSameSize;
         private System.Windows.Forms.CheckBox chkNoDec;
+        private System.Windows.Forms.CheckBox chkSaveTemp;
     }
 }

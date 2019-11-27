@@ -583,12 +583,15 @@ namespace IsoTools
                 exep.Start();
                 exep.WaitForExit();
 
-                // 改变标题，按钮状态
-                this.SetWinStatus(false, oldTitle + " 删除临时文件，请耐心等待......");
+                if (!this.chkSaveTemp.Checked)
+                {
+                    // 改变标题，按钮状态
+                    this.SetWinStatus(false, oldTitle + " 删除临时文件，请耐心等待......");
 
-                // 删除临时文件
-                DirectoryInfo di = new DirectoryInfo(@".\" + WII_ISO_TEMP);
-                di.Delete(true);
+                    // 删除临时文件
+                    DirectoryInfo di = new DirectoryInfo(@".\" + WII_ISO_TEMP);
+                    di.Delete(true);
+                }
 
                 MessageBox.Show("打汉化补丁完成！");
             }
@@ -728,6 +731,8 @@ namespace IsoTools
                 this.btnCnSelect.Enabled = status;
                 this.chkSameSize.Enabled = status;
                 this.btnCopy.Enabled = status;
+                this.chkSaveTemp.Enabled = status;
+                this.chkNoDec.Enabled = status;
 
                 this.Text = title;
             });
