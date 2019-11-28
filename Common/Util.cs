@@ -3408,6 +3408,29 @@ namespace Hanhua.Common
             }
         }
 
+        /// <summary>
+        /// 动态取得汉化目录
+        /// </summary>
+        /// <param name="gameId"></param>
+        /// <returns></returns>
+        public static string GetHanhuaFolder(string gameId)
+        {
+            string folderFile = @".\HanhuaFolder.txt";
+            if (File.Exists(folderFile))
+            {
+                string[] folders = File.ReadAllLines(folderFile, Encoding.UTF8);
+                for (int i = 0; i < folders.Length; i += 2 )
+                {
+                    if (folders[i].Equals(gameId))
+                    {
+                        return folders[i + 1];
+                    }
+                }
+            }
+
+            return string.Empty;
+        }
+
         #endregion
 
         #region " 私有方法 "

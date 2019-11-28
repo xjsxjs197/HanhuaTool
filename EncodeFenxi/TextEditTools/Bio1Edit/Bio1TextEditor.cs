@@ -282,7 +282,7 @@ namespace Hanhua.TextEditTools.Bio1Edit
 
             //this.gameName = "Bio1";
             //this.baseFolder = @"G:\GitHub\HanhuaProject\Bio1";
-            this.baseFolder = @"E:\Study\MySelfProject\Hanhua\TodoCn\HanhuaProject\Bio1";
+            this.baseFolder = Util.GetHanhuaFolder("Bio1");
             this.subFolder = @"\WiiJp";
             this.txtCnEdit.OtherRichTextBox = this.txtJpEdit;
 
@@ -293,6 +293,12 @@ namespace Hanhua.TextEditTools.Bio1Edit
             }
 
             this.ReadCnFont();
+
+            if (string.IsNullOrEmpty(this.baseFolder))
+            {
+                MessageBox.Show("没有找到汉化目录！");
+                return;
+            }
 
             this.LoadAllText();
         }
