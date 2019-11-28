@@ -397,89 +397,10 @@ namespace Hanhua.TextEditTools.Bio3Edit
             this.SetPsLoadStatus(false);
 
             // 初始化
-            this.EditorInit();
+            this.EditorInit(false);
         }
 
         #region " 事件 "
-
-        /// <summary>
-        /// 打包
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void btnPatch_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                //string temp = "以件休传以软";
-                //List<byte> byTest = new List<byte>();
-                //for (int i = 0; i < temp.Length; i++)
-                //{
-                //    byTest.AddRange(this.EncodeChar(temp.Substring(i, 1)));
-                //}
-
-                //StringBuilder sb = new StringBuilder();
-                //for (int i = 0; i < byTest.Count; i++)
-                //{
-                //    sb.Append(byTest[i].ToString("x") + " ");
-                //}
-                //sb.ToString();
-
-                string bio3Ngc = this.baseFolder + @"\";
-
-                // 复制start.dol
-                Directory.CreateDirectory(bio3Ngc + @"NgcBio3Patch\root\&&systemdata\");
-                //byte[] startDol = File.ReadAllBytes(bio3Ngc + @"NgcBio3Cn\root\&&systemdata\Start.dol");
-                //byte[] targetDol = new byte[2298368];
-                //Array.Copy(startDol, 0, targetDol, 0, targetDol.Length);
-                //File.WriteAllBytes(bio3Ngc + @"NgcBio3Patch\root\&&systemdata\Start.dol", targetDol);
-                File.Copy(bio3Ngc + @"NgcBio3Cn\root\&&systemdata\Start.dol_Copy", bio3Ngc + @"NgcBio3Patch\root\&&systemdata\Start.dol", true);
-
-                // 复制其他文件
-                string[] copyFiles = File.ReadAllLines(bio3Ngc + @"NgcOtherFile.txt");
-                for (int i = 0; i < copyFiles.Length; i++)
-                {
-                    string targetFile = bio3Ngc + @"NgcBio3Patch\" + copyFiles[i];
-                    if (!Directory.Exists(Path.GetDirectoryName(targetFile)))
-                    {
-                        Directory.CreateDirectory(Path.GetDirectoryName(targetFile));
-                    }
-                    File.Copy(bio3Ngc + @"NgcBio3Cn\" + copyFiles[i], targetFile, true);
-                }
-
-                //// 复制data_aj文件
-                //copyFiles = File.ReadAllLines(bio3Ngc + @"NgcBio3Jp\NgcTextAddrAj.txt");
-                //Directory.CreateDirectory(bio3Ngc + @"NgcBio3Patch\root\bio19\data_aj\rdt\");
-                //for (int i = 0; i < copyFiles.Length; i += 2)
-                //{
-                //    File.Copy(bio3Ngc + @"NgcBio3Cn\root\bio19\data_aj\rdt\" + copyFiles[i] + ".rdt", bio3Ngc + @"NgcBio3Patch\root\bio19\data_aj\rdt\" + copyFiles[i] + ".rdt", true);
-                //}
-
-                // 复制data_j文件
-                copyFiles = File.ReadAllLines(bio3Ngc + @"NgcTextAddrj.txt");
-                Directory.CreateDirectory(bio3Ngc + @"NgcBio3Patch\root\bio19\data_j\rdt\");
-                for (int i = 0; i < copyFiles.Length; i += 2)
-                {
-                    File.Copy(bio3Ngc + @"NgcBio3Cn\root\bio19\data_j\rdt\" + copyFiles[i] + ".rdt", bio3Ngc + @"NgcBio3Patch\root\bio19\data_j\rdt\" + copyFiles[i] + ".rdt", true);
-                }
-
-                MessageBox.Show("打包完成！");
-            }
-            catch (Exception exp)
-            {
-                MessageBox.Show(exp.Message + "\n" + exp.StackTrace);
-            }
-        }
-
-        /// <summary>
-        /// 重新加载
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void btnReLoad_Click(object sender, EventArgs e)
-        {
-            this.EditorInit();
-        }
 
         /// <summary>
         /// 切换类型
@@ -556,6 +477,64 @@ namespace Hanhua.TextEditTools.Bio3Edit
         #endregion
 
         #region " 重写父类方法 "
+
+        /// <summary>
+        /// 生成打包文件
+        /// </summary>
+        protected override void CreatePatch()
+        {
+            //string temp = "以件休传以软";
+            //List<byte> byTest = new List<byte>();
+            //for (int i = 0; i < temp.Length; i++)
+            //{
+            //    byTest.AddRange(this.EncodeChar(temp.Substring(i, 1)));
+            //}
+
+            //StringBuilder sb = new StringBuilder();
+            //for (int i = 0; i < byTest.Count; i++)
+            //{
+            //    sb.Append(byTest[i].ToString("x") + " ");
+            //}
+            //sb.ToString();
+
+            string bio3Ngc = this.baseFolder + @"\";
+
+            // 复制start.dol
+            Directory.CreateDirectory(bio3Ngc + @"NgcBio3Patch\root\&&systemdata\");
+            //byte[] startDol = File.ReadAllBytes(bio3Ngc + @"NgcBio3Cn\root\&&systemdata\Start.dol");
+            //byte[] targetDol = new byte[2298368];
+            //Array.Copy(startDol, 0, targetDol, 0, targetDol.Length);
+            //File.WriteAllBytes(bio3Ngc + @"NgcBio3Patch\root\&&systemdata\Start.dol", targetDol);
+            File.Copy(bio3Ngc + @"NgcBio3Cn\root\&&systemdata\Start.dol_Copy", bio3Ngc + @"NgcBio3Patch\root\&&systemdata\Start.dol", true);
+
+            // 复制其他文件
+            string[] copyFiles = File.ReadAllLines(bio3Ngc + @"NgcOtherFile.txt");
+            for (int i = 0; i < copyFiles.Length; i++)
+            {
+                string targetFile = bio3Ngc + @"NgcBio3Patch\" + copyFiles[i];
+                if (!Directory.Exists(Path.GetDirectoryName(targetFile)))
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(targetFile));
+                }
+                File.Copy(bio3Ngc + @"NgcBio3Cn\" + copyFiles[i], targetFile, true);
+            }
+
+            //// 复制data_aj文件
+            //copyFiles = File.ReadAllLines(bio3Ngc + @"NgcBio3Jp\NgcTextAddrAj.txt");
+            //Directory.CreateDirectory(bio3Ngc + @"NgcBio3Patch\root\bio19\data_aj\rdt\");
+            //for (int i = 0; i < copyFiles.Length; i += 2)
+            //{
+            //    File.Copy(bio3Ngc + @"NgcBio3Cn\root\bio19\data_aj\rdt\" + copyFiles[i] + ".rdt", bio3Ngc + @"NgcBio3Patch\root\bio19\data_aj\rdt\" + copyFiles[i] + ".rdt", true);
+            //}
+
+            // 复制data_j文件
+            copyFiles = File.ReadAllLines(bio3Ngc + @"NgcTextAddrj.txt");
+            Directory.CreateDirectory(bio3Ngc + @"NgcBio3Patch\root\bio19\data_j\rdt\");
+            for (int i = 0; i < copyFiles.Length; i += 2)
+            {
+                File.Copy(bio3Ngc + @"NgcBio3Cn\root\bio19\data_j\rdt\" + copyFiles[i] + ".rdt", bio3Ngc + @"NgcBio3Patch\root\bio19\data_j\rdt\" + copyFiles[i] + ".rdt", true);
+            }
+        }
 
         /// <summary>
         /// 读取字库信息

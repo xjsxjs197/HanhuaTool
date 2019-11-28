@@ -103,37 +103,10 @@ namespace Hanhua.TextEditTools.ViewtifulJoe
             this.baseFolder = @"G:\游戏汉化\红侠乔伊";
             
             // 初始化
-            this.EditorInit();
+            this.EditorInit(false);
         }
 
         #region " 事件 "
-
-        /// <summary>
-        /// 打包
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void btnPatch_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                
-            }
-            catch (Exception exp)
-            {
-                MessageBox.Show(exp.Message + "\n" + exp.StackTrace);
-            }
-        }
-
-        /// <summary>
-        /// 重新加载
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void btnReLoad_Click(object sender, EventArgs e)
-        {
-            this.EditorInit();
-        }
 
         /// <summary>
         /// 字库做成

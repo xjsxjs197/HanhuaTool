@@ -30,6 +30,11 @@ namespace Hanhua.Common
         private void InitializeComponent()
         {
             this.pnlCommand = new System.Windows.Forms.Panel();
+            this.pnlDisk = new System.Windows.Forms.Panel();
+            this.rdoBDisk = new System.Windows.Forms.RadioButton();
+            this.rdoADisk = new System.Windows.Forms.RadioButton();
+            this.btnReLoad = new System.Windows.Forms.Button();
+            this.btnPatch = new System.Windows.Forms.Button();
             this.btnImport = new System.Windows.Forms.Button();
             this.btnExport = new System.Windows.Forms.Button();
             this.btnSave = new System.Windows.Forms.Button();
@@ -38,12 +43,20 @@ namespace Hanhua.Common
             this.txtCn = new Hanhua.Common.RichTextBoxEx();
             this.fileList = new System.Windows.Forms.ListBox();
             this.pnlCommand.SuspendLayout();
+            this.pnlDisk.SuspendLayout();
             this.pnlEditor.SuspendLayout();
             this.SuspendLayout();
+            // 
+            // pnlTopBody
+            // 
+            this.pnlTopBody.Size = new System.Drawing.Size(912, 579);
             // 
             // pnlCommand
             // 
             this.pnlCommand.BackColor = System.Drawing.Color.SandyBrown;
+            this.pnlCommand.Controls.Add(this.pnlDisk);
+            this.pnlCommand.Controls.Add(this.btnReLoad);
+            this.pnlCommand.Controls.Add(this.btnPatch);
             this.pnlCommand.Controls.Add(this.btnImport);
             this.pnlCommand.Controls.Add(this.btnExport);
             this.pnlCommand.Controls.Add(this.btnSave);
@@ -52,6 +65,59 @@ namespace Hanhua.Common
             this.pnlCommand.Name = "pnlCommand";
             this.pnlCommand.Size = new System.Drawing.Size(912, 34);
             this.pnlCommand.TabIndex = 0;
+            // 
+            // pnlDisk
+            // 
+            this.pnlDisk.BackColor = System.Drawing.Color.Silver;
+            this.pnlDisk.Controls.Add(this.rdoBDisk);
+            this.pnlDisk.Controls.Add(this.rdoADisk);
+            this.pnlDisk.Location = new System.Drawing.Point(453, 0);
+            this.pnlDisk.Name = "pnlDisk";
+            this.pnlDisk.Size = new System.Drawing.Size(60, 34);
+            this.pnlDisk.TabIndex = 19;
+            // 
+            // rdoBDisk
+            // 
+            this.rdoBDisk.AutoSize = true;
+            this.rdoBDisk.Location = new System.Drawing.Point(9, 17);
+            this.rdoBDisk.Name = "rdoBDisk";
+            this.rdoBDisk.Size = new System.Drawing.Size(43, 16);
+            this.rdoBDisk.TabIndex = 9;
+            this.rdoBDisk.Text = "B盘";
+            this.rdoBDisk.UseVisualStyleBackColor = true;
+            // 
+            // rdoADisk
+            // 
+            this.rdoADisk.AutoSize = true;
+            this.rdoADisk.Checked = true;
+            this.rdoADisk.Location = new System.Drawing.Point(9, 1);
+            this.rdoADisk.Name = "rdoADisk";
+            this.rdoADisk.Size = new System.Drawing.Size(43, 16);
+            this.rdoADisk.TabIndex = 8;
+            this.rdoADisk.TabStop = true;
+            this.rdoADisk.Text = "A盘";
+            this.rdoADisk.UseVisualStyleBackColor = true;
+            this.rdoADisk.CheckedChanged += new System.EventHandler(this.rdoADisk_CheckedChanged);
+            // 
+            // btnReLoad
+            // 
+            this.btnReLoad.Location = new System.Drawing.Point(535, 4);
+            this.btnReLoad.Name = "btnReLoad";
+            this.btnReLoad.Size = new System.Drawing.Size(60, 26);
+            this.btnReLoad.TabIndex = 16;
+            this.btnReLoad.Text = "刷新";
+            this.btnReLoad.UseVisualStyleBackColor = true;
+            this.btnReLoad.Click += new System.EventHandler(this.btnReLoad_Click);
+            // 
+            // btnPatch
+            // 
+            this.btnPatch.Location = new System.Drawing.Point(601, 4);
+            this.btnPatch.Name = "btnPatch";
+            this.btnPatch.Size = new System.Drawing.Size(60, 26);
+            this.btnPatch.TabIndex = 15;
+            this.btnPatch.Text = "打包";
+            this.btnPatch.UseVisualStyleBackColor = true;
+            this.btnPatch.Click += new System.EventHandler(this.btnPatch_Click);
             // 
             // btnImport
             // 
@@ -143,9 +209,12 @@ namespace Hanhua.Common
             this.Controls.Add(this.pnlCommand);
             this.Name = "BaseTextEditor";
             this.Text = "文本编辑";
+            this.Controls.SetChildIndex(this.pnlTopBody, 0);
             this.Controls.SetChildIndex(this.pnlCommand, 0);
             this.Controls.SetChildIndex(this.pnlEditor, 0);
             this.pnlCommand.ResumeLayout(false);
+            this.pnlDisk.ResumeLayout(false);
+            this.pnlDisk.PerformLayout();
             this.pnlEditor.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -161,5 +230,10 @@ namespace Hanhua.Common
         private RichTextBoxEx txtJp;
         private System.Windows.Forms.Button btnExport;
         private System.Windows.Forms.Button btnImport;
+        private System.Windows.Forms.Button btnReLoad;
+        private System.Windows.Forms.Button btnPatch;
+        private System.Windows.Forms.Panel pnlDisk;
+        private System.Windows.Forms.RadioButton rdoBDisk;
+        private System.Windows.Forms.RadioButton rdoADisk;
     }
 }

@@ -29,7 +29,6 @@ namespace Hanhua.TextEditTools.TalesOfSymphonia
         /// </summary>
         private void InitializeComponent()
         {
-            this.btnPatch = new System.Windows.Forms.Button();
             this.btnFont = new System.Windows.Forms.Button();
             this.pnlCommand.SuspendLayout();
             this.SuspendLayout();
@@ -37,28 +36,16 @@ namespace Hanhua.TextEditTools.TalesOfSymphonia
             // pnlCommand
             // 
             this.pnlCommand.Controls.Add(this.btnFont);
-            this.pnlCommand.Controls.Add(this.btnPatch);
             this.pnlCommand.Location = new System.Drawing.Point(0, 550);
-            this.pnlCommand.Controls.SetChildIndex(this.btnPatch, 0);
             this.pnlCommand.Controls.SetChildIndex(this.btnFont, 0);
             // 
             // pnlTopBody
             // 
             this.pnlTopBody.Size = new System.Drawing.Size(912, 584);
             // 
-            // btnPatch
-            // 
-            this.btnPatch.Location = new System.Drawing.Point(438, 4);
-            this.btnPatch.Name = "btnPatch";
-            this.btnPatch.Size = new System.Drawing.Size(60, 26);
-            this.btnPatch.TabIndex = 6;
-            this.btnPatch.Text = "刷新";
-            this.btnPatch.UseVisualStyleBackColor = true;
-            this.btnPatch.Click += new System.EventHandler(this.btnPatch_Click);
-            // 
             // btnFont
             // 
-            this.btnFont.Location = new System.Drawing.Point(504, 4);
+            this.btnFont.Location = new System.Drawing.Point(354, 4);
             this.btnFont.Name = "btnFont";
             this.btnFont.Size = new System.Drawing.Size(60, 26);
             this.btnFont.TabIndex = 7;
@@ -81,7 +68,6 @@ namespace Hanhua.TextEditTools.TalesOfSymphonia
 
         #endregion
 
-        private System.Windows.Forms.Button btnPatch;
         private System.Windows.Forms.Button btnFont;
 
     }

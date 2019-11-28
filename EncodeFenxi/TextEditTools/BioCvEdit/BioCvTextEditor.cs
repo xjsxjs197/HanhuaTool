@@ -51,59 +51,15 @@ namespace Hanhua.TextEditTools.BioCvEdit
 
             this.gameName = "BioCv";
             //this.baseFolder = @"E:\Study\Hanhua\TodoCn\BioCv";
-            this.subDisk = "A";
             this.baseFolder = @"E:\游戏汉化\NgcBioCv";
             
             this.SetDcLoadStatus(false);
 
             // 初始化
-            this.EditorInit();
+            this.EditorInit(true);
         }
 
         #region " 事件 "
-
-        /// <summary>
-        /// 打包
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void btnPatch_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                string srcFolder = this.baseFolder + @"\BioCvNgcCn\" + this.subDisk + @"\root\";
-                string targetFolder = srcFolder.Replace("BioCvNgcCn", "Patch");
-                if (!Directory.Exists(targetFolder))
-                {
-                    Directory.CreateDirectory(targetFolder);
-                }
-
-                File.Copy(srcFolder + "adv.afs", targetFolder + "adv.afs", true);
-                File.Copy(srcFolder + "item.afs", targetFolder + "item.afs", true);
-                File.Copy(srcFolder + "mry.afs", targetFolder + "mry.afs", true);
-                File.Copy(srcFolder + "system.afs", targetFolder + "system.afs", true);
-                File.Copy(srcFolder + "sysmes.ald", targetFolder + "sysmes.ald", true);
-
-                string rdxName = "rdx_lnk" + (this.subDisk.Equals("A", StringComparison.OrdinalIgnoreCase) ? "1" : "2") + ".afs";
-                File.Copy(srcFolder + rdxName, targetFolder + rdxName, true);
-
-                MessageBox.Show("打包完成！");
-            }
-            catch (Exception exp)
-            {
-                MessageBox.Show(exp.Message + "\n" + exp.StackTrace);
-            }
-        }
-
-        /// <summary>
-        /// 重新加载
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void btnReLoad_Click(object sender, EventArgs e)
-        {
-            this.EditorInit();
-        }
 
         /// <summary>
         /// 切换类型
@@ -171,6 +127,28 @@ namespace Hanhua.TextEditTools.BioCvEdit
         #endregion
 
         #region " 重写父类方法 "
+
+        /// <summary>
+        /// 生成打包文件
+        /// </summary>
+        protected override void CreatePatch()
+        {
+            string srcFolder = this.baseFolder + @"\BioCvNgcCn\" + this.subDisk + @"\root\";
+            string targetFolder = srcFolder.Replace("BioCvNgcCn", "Patch");
+            if (!Directory.Exists(targetFolder))
+            {
+                Directory.CreateDirectory(targetFolder);
+            }
+
+            File.Copy(srcFolder + "adv.afs", targetFolder + "adv.afs", true);
+            File.Copy(srcFolder + "item.afs", targetFolder + "item.afs", true);
+            File.Copy(srcFolder + "mry.afs", targetFolder + "mry.afs", true);
+            File.Copy(srcFolder + "system.afs", targetFolder + "system.afs", true);
+            File.Copy(srcFolder + "sysmes.ald", targetFolder + "sysmes.ald", true);
+
+            string rdxName = "rdx_lnk" + (this.subDisk.Equals("A", StringComparison.OrdinalIgnoreCase) ? "1" : "2") + ".afs";
+            File.Copy(srcFolder + rdxName, targetFolder + rdxName, true);
+        }
 
         /// <summary>
         /// 读取字库信息

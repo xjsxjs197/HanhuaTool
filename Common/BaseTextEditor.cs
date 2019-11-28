@@ -47,6 +47,11 @@ namespace Hanhua.Common
         /// </summary>
         protected int fileIndex = -1;
 
+        /// <summary>
+        /// 换碟区域是否显示
+        /// </summary>
+        protected bool isChgDiskDisplay = true;
+
         #endregion
 
         /// <summary>
@@ -170,15 +175,77 @@ namespace Hanhua.Common
             this.fileList.Width = (int)(this.pnlEditor.Width * 0.23);
         }
 
+        /// <summary>
+        /// 刷新页面
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnReLoad_Click(object sender, EventArgs e)
+        {
+            // 重新初始化页面
+            this.EditorInit(this.isChgDiskDisplay);
+        }
+
+        /// <summary>
+        /// 补丁打包
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnPatch_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                this.CreatePatch();
+
+                MessageBox.Show("打包完成！");
+            }
+            catch (Exception exp)
+            {
+                MessageBox.Show(exp.Message + "\n" + exp.StackTrace);
+            }
+        }
+
+        /// <summary>
+        /// 换盘
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void rdoADisk_CheckedChanged(object sender, EventArgs e)
+        {
+            if (this.rdoADisk.Checked)
+            {
+                this.subDisk = "A";
+            }
+            else
+            {
+                this.subDisk = "B";
+            }
+        }
+
         #endregion
 
         #region " 子类可以继承实现的方法 "
 
         /// <summary>
+        /// 生成打包文件
+        /// </summary>
+        protected virtual void CreatePatch()
+        { 
+        }
+
+        /// <summary>
         /// 画面初始化
         /// </summary>
-        protected virtual void EditorInit()
+        protected virtual void EditorInit(bool isChgDiskDisplay)
         {
+            // 设置换碟区域
+            this.pnlDisk.Visible = isChgDiskDisplay;
+            this.isChgDiskDisplay = isChgDiskDisplay;
+            if (this.pnlDisk.Visible)
+            {
+                this.subDisk = "A";
+            }
+
             // 设置标题
             if (this.Text.IndexOf(this.gameName) == -1)
             {

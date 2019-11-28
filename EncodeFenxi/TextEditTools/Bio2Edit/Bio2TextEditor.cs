@@ -559,7 +559,7 @@ namespace Hanhua.TextEditTools.Bio2Edit
             this.SetPsLoadStatus(false);
 
             // 初始化
-            this.EditorInit();
+            this.EditorInit(true);
 
             //this.baseFile = this.baseFolder + @"\Bio2NgcDol.xls";
             //SaveMovTxt();
@@ -581,26 +581,6 @@ namespace Hanhua.TextEditTools.Bio2Edit
         }
 
         #region " 事件 "
-
-        /// <summary>
-        /// 打包
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void btnPatch_Click(object sender, EventArgs e)
-        {
-            this.Do(this.CopyCnFiles);
-        }
-
-        /// <summary>
-        /// 重新加载
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void btnReLoad_Click(object sender, EventArgs e)
-        {
-            this.EditorInit();
-        }
 
         /// <summary>
         /// 切换类型
@@ -667,26 +647,17 @@ namespace Hanhua.TextEditTools.Bio2Edit
             //File.WriteAllText(this.baseFolder + @"\Bio2PsNgcRdtB.txt", sb.ToString());
         }
 
-        /// <summary>
-        /// 换盘
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void rdoADisk_CheckedChanged(object sender, EventArgs e)
-        {
-            if (this.rdoADisk.Checked)
-            {
-                this.subDisk = "A";
-            }
-            else
-            {
-                this.subDisk = "B";
-            }
-        }
-
         #endregion
 
         #region " 重写父类方法 "
+
+        /// <summary>
+        /// 生成打包文件
+        /// </summary>
+        protected override void CreatePatch()
+        {
+            this.Do(this.CopyCnFiles);
+        }
 
         /// <summary>
         /// 读取字库信息
