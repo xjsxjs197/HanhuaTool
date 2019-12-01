@@ -464,12 +464,29 @@ namespace Hanhua.Common
             //this.CheckJsonData();
             //this.CreateGameListFromFba();
             //this.WriteMgbaFont();
-            this.CopyBioFontWidthInfo();
+            //this.CopyBioFontWidthInfo();
+            this.ChangeNgcFileName();
         }
 
         #endregion
 
         #region " 私有方法 "
+
+        private void ChangeNgcFileName()
+        {
+            string path = @"G:\GitHub\HanhuaProject\Bio1\NgcCnB\";
+            List<FilePosInfo> allFiles = Util.GetAllFiles(path);
+            foreach (FilePosInfo file in allFiles)
+            {
+                if (file.IsFolder || !file.File.EndsWith("_cn.dat", StringComparison.OrdinalIgnoreCase)
+                    || !File.Exists(file.File))
+                {
+                    continue;
+                }
+
+                File.Move(file.File, file.File.Replace("_cn.dat", ".dat"));
+            }
+        }
 
         private void CopyBioFontWidthInfo()
         {
