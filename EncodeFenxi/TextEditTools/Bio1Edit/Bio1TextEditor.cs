@@ -131,6 +131,11 @@ namespace Hanhua.TextEditTools.Bio1Edit
         /// </summary>
         private string subFolder;
 
+        /// <summary>
+        /// AB盘
+        /// </summary>
+        private string disk;
+
         #region " 字库 "
 
         #region " 共通文本字库 "
@@ -284,23 +289,10 @@ namespace Hanhua.TextEditTools.Bio1Edit
             //this.baseFolder = @"G:\GitHub\HanhuaProject\Bio1";
             this.baseFolder = Util.GetHanhuaFolder("Bio1");
             this.subFolder = @"\WiiJp";
+            this.isWii = true;
             this.txtCnEdit.OtherRichTextBox = this.txtJpEdit;
 
-            this.isWii = true;
-            if (this.baseFolder.IndexOf("Ngc") != -1)
-            {
-                this.isWii = false;
-            }
-
-            this.ReadCnFont();
-
-            if (string.IsNullOrEmpty(this.baseFolder))
-            {
-                MessageBox.Show("没有找到汉化目录！");
-                return;
-            }
-
-            this.LoadAllText();
+            this.Init();
         }
 
         #endregion
@@ -380,10 +372,12 @@ namespace Hanhua.TextEditTools.Bio1Edit
         /// <param name="e"></param>
         private void btnCnFontSave_Click(object sender, EventArgs e)
         {
-            // 重新初始化字库字符
-            this.ResetFontChar();
+            //// 重新初始化字库字符
+            //this.ResetFontChar();
 
-            MessageBox.Show("字库文字被重置，需要再次导入所有文本！");
+            //MessageBox.Show("字库文字被重置，需要再次导入所有文本！");
+            
+            this.Init();
         }
 
         /// <summary>
@@ -452,17 +446,6 @@ namespace Hanhua.TextEditTools.Bio1Edit
         }
 
         /// <summary>
-        /// 检查翻译的长度的正确性
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void btnCheck_Click(object sender, EventArgs e)
-        {
-            // 检查输入的中文长度是否正确
-            this.CheckCnText();
-        }
-
-        /// <summary>
         /// 变更文件
         /// </summary>
         /// <param name="sender"></param>
@@ -514,41 +497,6 @@ namespace Hanhua.TextEditTools.Bio1Edit
             {
                 MessageBox.Show(me.Message);
             }
-        }
-
-        /// <summary>
-        /// 将汉化文件Copy到相应目录
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void btnPatch_Click(object sender, EventArgs e)
-        {
-            // 将汉化的文件Copy相应的地方
-            string targetPath = this.baseFolder + @"\生化危机1文件";
-            this.CopyFiles(this.baseFolder + @"\etc\", targetPath, true);
-            this.CopyFiles(this.baseFolder + @"\subscr\", targetPath, true);
-            this.CopyFiles(this.baseFolder + @"\st1\", targetPath, true);
-            this.CopyFiles(this.baseFolder + @"\st2\", targetPath, true);
-            this.CopyFiles(this.baseFolder + @"\st3\", targetPath, true);
-            this.CopyFiles(this.baseFolder + @"\st4\", targetPath, true);
-            this.CopyFiles(this.baseFolder + @"\st5\", targetPath, true);
-            if (this.isWii)
-            {
-                this.CopyFiles(this.baseFolder + @"\sys\", targetPath, true);
-            }
-            else
-            {
-                this.CopyFiles(this.baseFolder + @"\&&systemdata\", targetPath, true);
-            }
-
-            // Copy各种图片
-            Util.NeedCheckTpl = true;
-            this.CopyFiles(this.baseFolder + @"\fixGraphic\", targetPath, false);
-            this.CopyFiles(this.baseFolder + @"\strap\", targetPath, false);
-            this.CopyFiles(this.baseFolder + @"\tpl\", targetPath, false);
-            Util.NeedCheckTpl = false;
-
-            MessageBox.Show("Copy完成！");
         }
 
         /// <summary>
@@ -793,44 +741,64 @@ namespace Hanhua.TextEditTools.Bio1Edit
             }
         }
 
+        /// <summary>
+        /// 切换WiiNgc模式
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void rdoWii_CheckedChanged(object sender, EventArgs e)
+        {
+            if (this.rdoWii.Checked)
+            {
+                this.isWii = true;
+                this.subFolder = @"\WiiJp";
+                this.rdoADisk.Checked = false;
+                this.rdoADisk.Enabled = false;
+                this.rdoBDisk.Enabled = false;
+                this.disk = "";
+            }
+            else
+            {
+                this.isWii = false;
+                this.subFolder = @"\NgcJp";
+                this.rdoADisk.Checked = true;
+                this.rdoADisk.Enabled = true;
+                this.rdoBDisk.Enabled = true;
+                this.disk = "A";
+            }
+        }
+
         #endregion
 
         #region " 私有方法 "
 
         /// <summary>
-        /// 将源目录下的文件Copy到目标目录
+        /// 初始化
         /// </summary>
-        /// <param name="source"></param>
-        /// <param name="target"></param>
-        private void CopyFiles(string source, string target, bool withCn)
+        private void Init()
         {
-            List<FilePosInfo> fileNameInfo = Util.GetAllFiles(source).Where(p => !p.IsFolder && (!withCn || (withCn && p.File.IndexOf("_cn.") >= 0))).ToList();
-            if (fileNameInfo.Count == 0)
+            this.ReadCnFont();
+
+            if (string.IsNullOrEmpty(this.baseFolder))
             {
+                MessageBox.Show("没有找到汉化目录！");
                 return;
             }
 
-            foreach (FilePosInfo fileInfo in fileNameInfo)
+            if (this.isWii)
             {
-                string targetFile = fileInfo.File.Replace("_cn", string.Empty).Replace("_文本字库", string.Empty);
-
-                if (fileInfo.File.IndexOf("main") != -1 || !this.isWii)
-                {
-                    targetFile = targetFile.Replace(this.baseFolder, target);
-                }
-                else
-                {
-                    targetFile = targetFile.Replace(this.baseFolder, target + @"\files");
-                }
-
-                if (!File.Exists(targetFile))
-                {
-                    string shortName = Util.GetShortName(targetFile);
-                    System.IO.Directory.CreateDirectory(targetFile.Replace(shortName, string.Empty));
-                }
-
-                File.Copy(fileInfo.File, targetFile, true);
+                this.disk = "";
             }
+            else if (this.rdoADisk.Checked)
+            {
+                this.disk = "A";
+            }
+            else
+            {
+                this.disk = "B";
+            }
+
+            this.LoadAllText();
         }
 
         /// <summary>
@@ -943,8 +911,8 @@ namespace Hanhua.TextEditTools.Bio1Edit
             this.lstFile.Items.Clear();
 
             // 读取文本配置信息
-            string[] comTextInfo = File.ReadAllLines(this.baseFolder + @"\WiiComText.txt");
-            string[] fileTextInfo = File.ReadAllLines(this.baseFolder + @"\WiiFileText.txt");
+            string[] comTextInfo = File.ReadAllLines(this.baseFolder + (this.isWii ? @"\WiiComText.txt" : @"\NgcComText.txt"));
+            string[] fileTextInfo = File.ReadAllLines(this.baseFolder + (this.isWii ? @"\WiiFileText.txt" : @"\NgcFileText.txt"));
             string[] textInfo = new string[comTextInfo.Length + fileTextInfo.Length];
             Array.Copy(comTextInfo, 0, textInfo, 0, comTextInfo.Length);
             Array.Copy(fileTextInfo, 0, textInfo, comTextInfo.Length, fileTextInfo.Length);
@@ -952,8 +920,8 @@ namespace Hanhua.TextEditTools.Bio1Edit
             // 根据配置的信息，读取各个文件文本
             for (int i = 0; i < textInfo.Length; i += 2)
             {
-                string fileName = textInfo[i].StartsWith("sys") ? textInfo[i] : @"files\" + textInfo[i];
-                string fullName = this.baseFolder + this.subFolder + @"\" + fileName;
+                string fileName = textInfo[i].StartsWith("sys") || !this.isWii ? textInfo[i] : @"files\" + textInfo[i];
+                string fullName = this.baseFolder + this.subFolder + this.disk + @"\" + fileName;
                 if (File.Exists(this.GetFileName(this.TrimFileName(fullName), string.Empty)))
                 {
                     string[] posInfo = textInfo[i + 1].Split(' ');
@@ -961,6 +929,9 @@ namespace Hanhua.TextEditTools.Bio1Edit
                     this.lstFile.Items.Add(this.TrimFileName(fileName)
                         + "（" + textInfo[i + 1] + "）");
                     this.lstFilePos.Add(new FilePosInfo(fullName, posInfo));
+                }
+                else
+                { 
                 }
             }
 
