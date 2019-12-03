@@ -464,8 +464,8 @@ namespace Hanhua.Common
             //this.CheckJsonData();
             //this.CreateGameListFromFba();
             //this.WriteMgbaFont();
-            //this.CopyBioFontWidthInfo();
-            this.ChangeNgcFileName();
+            this.CopyBioFontWidthInfo();
+            //this.ChangeNgcFileName();
         }
 
         #endregion
@@ -490,16 +490,20 @@ namespace Hanhua.Common
 
         private void CopyBioFontWidthInfo()
         {
-            byte[] byNgc = File.ReadAllBytes(@"E:\Study\MySelfProject\Hanhua\TodoCn\HanhuaProject\Bio1\NgcCnA\&&systemdata\Start_cn.dol");
-            byte[] byWii = File.ReadAllBytes(@"E:\Study\MySelfProject\Hanhua\TodoCn\HanhuaProject\Bio1\WiiCn\sys\main.dol");
+            string ngcFile = @"E:\Study\MySelfProject\Hanhua\TodoCn\HanhuaProject\Bio1\NgcCnB\&&systemdata\Start.dol";
+            string wiiFile = @"E:\Study\MySelfProject\Hanhua\TodoCn\HanhuaProject\Bio1\WiiCn\sys\main.dol";
+            byte[] byNgc = File.ReadAllBytes(ngcFile);
+            byte[] byWii = File.ReadAllBytes(wiiFile);
 
-            int copyStart = 0x17d9d0 + (32 * 34 + 2) * 2;
-            int copyTarget = 0x2ee900 + (32 * 34 + 2) * 2;
+            int ngcStart = 0x17d9d0 + (32 * 34 + 2) * 2;
+            int wiiStart = 0x2ee900 + (32 * 34 + 2) * 2;
             int copyLen = 32 * 29 + 6;
 
-            Array.Copy(byNgc, copyStart, byWii, copyTarget, copyLen);
+            Array.Copy(byWii, wiiStart, byNgc, ngcStart, copyLen);
 
-            File.WriteAllBytes(@"E:\Study\MySelfProject\Hanhua\TodoCn\HanhuaProject\Bio1\WiiCn\sys\main.dol", byWii);
+            File.WriteAllBytes(ngcFile, byNgc);
+
+            MessageBox.Show("Copy Font width info Ok");
         }
 
         /// <summary>
