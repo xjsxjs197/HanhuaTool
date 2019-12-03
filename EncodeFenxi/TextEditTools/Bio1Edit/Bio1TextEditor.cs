@@ -636,6 +636,8 @@ namespace Hanhua.TextEditTools.Bio1Edit
             //    fileName = @"D:\game\iso\wii\生化危机1汉化\FileText.xls";
             //}
             string fileName = this.baseFile;
+            string sheetName = string.Empty;
+            int sheetIndex = -1;
 
             Microsoft.Office.Interop.Excel.Application xApp = null;
             Microsoft.Office.Interop.Excel.Workbook xBook = null;
@@ -661,8 +663,7 @@ namespace Hanhua.TextEditTools.Bio1Edit
                 {
                     // 查找当前sheet对应的文本
                     xSheet = (Microsoft.Office.Interop.Excel.Worksheet)xBook.Sheets[j];
-                    int sheetIndex = -1;
-                    string sheetName = string.Empty;
+                    sheetIndex = -1;
                     for (int i = 0; i < this.lstFile.Items.Count; i++)
                     {
                         sheetName = Util.GetShortFileName(this.lstFilePos[i].File);
@@ -723,7 +724,7 @@ namespace Hanhua.TextEditTools.Bio1Edit
             }
             catch (Exception me)
             {
-                MessageBox.Show(this.baseFile + "\n" + me.Message);
+                MessageBox.Show(this.baseFile + "\n" + sheetName + " " + this.lstFile.Items.Count + " " + sheetIndex + "\n" + me.Message);
             }
             finally
             {
@@ -929,9 +930,6 @@ namespace Hanhua.TextEditTools.Bio1Edit
                     this.lstFile.Items.Add(this.TrimFileName(fileName)
                         + "（" + textInfo[i + 1] + "）");
                     this.lstFilePos.Add(new FilePosInfo(fullName, posInfo));
-                }
-                else
-                { 
                 }
             }
 
@@ -1222,7 +1220,14 @@ namespace Hanhua.TextEditTools.Bio1Edit
             }
 
             //return startPos.ToString("x") + " : " + sb.ToString();
-            return sb.ToString();
+            if (this.isWii)
+            {
+                return sb.ToString();
+            }
+            else
+            {
+                return this.GetTextWithoutZero(sb.ToString());
+            }
         }
 
         /// <summary>
@@ -1873,29 +1878,17 @@ namespace Hanhua.TextEditTools.Bio1Edit
         }
 
         /// <summary>
-        /// 取得后面不带0的中文文本
+        /// 取得后面不带0的文本
         /// </summary>
         /// <returns></returns>
-        private string GetCnTextWithoutZero()
+        private string GetTextWithoutZero(string text)
         {
-            string cnText = this.txtCnEdit.Text;
-
-            if (cnText.EndsWith("^0^"))
+            while (text.EndsWith("^0^"))
             {
-                int checkIndex = cnText.Length - 4;
-                while (cnText.Substring(checkIndex, 3) == "^0^")
-                {
-                    checkIndex -= 3;
-                }
-
-                checkIndex += 3;
-
-                return cnText.Substring(0, checkIndex);
+                text = text.Substring(0, text.Length - 3);
             }
-            else
-            {
-                return cnText;
-            }
+
+            return text;
         }
 
         #endregion

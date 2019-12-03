@@ -490,14 +490,14 @@ namespace Hanhua.Common
 
         private void CopyBioFontWidthInfo()
         {
-            string ngcFile = @"E:\Study\MySelfProject\Hanhua\TodoCn\HanhuaProject\Bio1\NgcCnB\&&systemdata\Start.dol";
+            string ngcFile = @"E:\Study\MySelfProject\Hanhua\TodoCn\HanhuaProject\Bio1\NgcCnA\&&systemdata\Start.dol";
             string wiiFile = @"E:\Study\MySelfProject\Hanhua\TodoCn\HanhuaProject\Bio1\WiiCn\sys\main.dol";
             byte[] byNgc = File.ReadAllBytes(ngcFile);
             byte[] byWii = File.ReadAllBytes(wiiFile);
 
             int ngcStart = 0x17d9d0 + (32 * 34 + 2) * 2;
             int wiiStart = 0x2ee900 + (32 * 34 + 2) * 2;
-            int copyLen = 32 * 29 + 6;
+            int copyLen = (32 * 29 + 6) * 2;
 
             Array.Copy(byWii, wiiStart, byNgc, ngcStart, copyLen);
 

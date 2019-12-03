@@ -83,6 +83,7 @@
       <DependentUpon>Bio0TextEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="TextEditTools\Bio1Edit\Bio1TextEditor.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="TextEditTools\Bio1Edit\Bio1TextEditor.Designer.cs">
       <DependentUpon>Bio1TextEditor.cs</DependentUpon>
@@ -348,6 +349,7 @@
       <DependentUpon>ImageViewer.cs</DependentUpon>
     </Compile>
     <Compile Include="TextEditTools\Bio1Edit\Bio1FontEditor.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="TextEditTools\Bio1Edit\Bio1FontEditor.Designer.cs">
       <DependentUpon>Bio1FontEditor.cs</DependentUpon>
