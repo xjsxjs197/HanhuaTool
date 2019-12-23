@@ -115,11 +115,13 @@
             // chkSameSize
             // 
             this.chkSameSize.AutoSize = true;
+            this.chkSameSize.Checked = true;
+            this.chkSameSize.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkSameSize.Location = new System.Drawing.Point(126, 46);
             this.chkSameSize.Name = "chkSameSize";
-            this.chkSameSize.Size = new System.Drawing.Size(238, 16);
+            this.chkSameSize.Size = new System.Drawing.Size(244, 16);
             this.chkSameSize.TabIndex = 17;
-            this.chkSameSize.Text = "保持内部文件大小、位置一致（Ngc生化0）";
+            this.chkSameSize.Text = "保持内部文件大小、位置一致（Ngc生化等）";
             this.chkSameSize.UseVisualStyleBackColor = true;
             // 
             // chkNoDec

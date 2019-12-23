@@ -284,6 +284,9 @@ namespace IsoTools
                     }
                 }
 
+                // 重新设置原始文件路径，去掉里面的[root]，因为中文补丁文件中，可能没有这个路径
+                jpFiInfosForSort.ForEach(p => p.File = p.File.Replace(@"root\", ""));
+
                 // 读取所有补丁文件信息
                 Util.IsGetAllFile = true;
                 List<FilePosInfo> allCnFiles = Util.GetAllFiles(cnPatchFolder).Where(p => !p.IsFolder).ToList();
