@@ -1453,7 +1453,7 @@ namespace Hanhua.TextEditTools.Bio1Edit
 
                 // 控制字符
                 case 0xC:
-                    if (nextValue == 9 || nextValue == 0xffff)
+                    if (nextValue == 9 || nextValue == 0xffff || nextValue == 0x028A || nextValue == 0xC3)
                     {
                         text = "^c^";
                     }
