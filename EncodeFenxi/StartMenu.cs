@@ -458,13 +458,13 @@ namespace Hanhua.Common
             //DecompressN64();
             //CheckColorMap();
             //CheckNgcCnGameTitle();
-            //ResetSfcRomName();
+            ResetSfcRomName();
             //CheckSkAscComand();
             //this.CreateCpsEnCnTitle();
             //this.CheckJsonData();
             //this.CreateGameListFromFba();
             //this.WriteMgbaFont();
-            this.CopyBioFontWidthInfo();
+            //this.CopyBioFontWidthInfo();
             //this.ChangeNgcFileName();
         }
 
@@ -710,14 +710,49 @@ namespace Hanhua.Common
 
         private void ResetSfcRomName()
         {
+            Dictionary<string, string> cnNameMap = new Dictionary<string, string>();
+            Dictionary<string, string> enNameMap = new Dictionary<string, string>();
             this.baseFolder = @"E:\Study\Emu\Roms\Sfc\SFC_Jp(1444个)\snes\";
+            string pngPath = @"E:\Study\Emu\AllThumbnails\Sfc\";
             XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.Load(this.baseFolder + @"gamelist.xml.cn");
+
+            this.LoadSfcNameMap(xmlDoc, enNameMap, @"gamelist.xml.en");
+            this.LoadSfcNameMap(xmlDoc, cnNameMap, @"gamelist.xml.cn");
+
+            foreach (KeyValuePair<string, string> pathName in enNameMap)
+            {
+                string pngFile = pngPath + @"Named_Titles\" + pathName.Value + ".png";
+                if (File.Exists(pngFile))
+                {
+                    File.Copy(pngFile, pngFile.Replace(@"Sfc\", @"thumbnails\nintendo_sfc\").Replace(pathName.Value, cnNameMap[pathName.Key]), true);
+                }
+
+                pngFile = pngPath + @"Named_Snaps\" + pathName.Value + ".png";
+                if (File.Exists(pngFile))
+                {
+                    File.Copy(pngFile, pngFile.Replace(@"Sfc\", @"thumbnails\nintendo_sfc\").Replace(pathName.Value, cnNameMap[pathName.Key]), true);
+                }
+
+                pngFile = pngPath + @"Named_Boxarts\" + pathName.Value + ".png";
+                if (File.Exists(pngFile))
+                {
+                    File.Copy(pngFile, pngFile.Replace(@"Sfc\", @"thumbnails\nintendo_sfc\").Replace(pathName.Value, cnNameMap[pathName.Key]), true);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="xmlDoc"></param>
+        /// <param name="cnNameMap"></param>
+        private void LoadSfcNameMap(XmlDocument xmlDoc, Dictionary<string, string> nameMap, string xml)
+        {
+            xmlDoc.Load(this.baseFolder + xml);
 
             XmlNode xmlInfo = xmlDoc.SelectSingleNode("/gameList");
-
             // 显示进度条
-            this.ResetProcessBar(xmlInfo.ChildNodes.Count);
+            //this.ResetProcessBar(xmlInfo.ChildNodes.Count);
 
             foreach (XmlNode item in xmlInfo.ChildNodes)
             {
@@ -743,24 +778,28 @@ namespace Hanhua.Common
                     }
 
                     filePath = filePath.Replace("./", @"\");
-                    fileImg = fileImg.Replace("./", @"\").Replace("/", @"\");
-                    if (File.Exists(this.baseFolder + filePath))
+                    if (filePath.IndexOf(fileName) < 0)
                     {
-                        File.Copy(this.baseFolder + filePath, (this.baseFolder + filePath).Replace("snes", "snesCn").Replace(filePath, @"\" + fileName + ".zip"), true);
-
-                        if (File.Exists(this.baseFolder + fileImg))
-                        {
-                            File.Copy(this.baseFolder + fileImg, (this.baseFolder + fileImg).Replace("snes", "snesCn").Replace(fileImg, @"\images\" + fileName + @".jpg"), true);
-                        }
+                        nameMap.Add(filePath, fileName);
                     }
+                    //fileImg = fileImg.Replace("./", @"\").Replace("/", @"\");
+                    //if (File.Exists(this.baseFolder + filePath))
+                    //{
+                    //    File.Copy(this.baseFolder + filePath, (this.baseFolder + filePath).Replace("snes", "snesCn").Replace(filePath, @"\" + fileName + ".zip"), true);
+
+                    //    if (File.Exists(this.baseFolder + fileImg))
+                    //    {
+                    //        File.Copy(this.baseFolder + fileImg, (this.baseFolder + fileImg).Replace("snes", "snesCn").Replace(fileImg, @"\images\" + fileName + @".jpg"), true);
+                    //    }
+                    //}
                 }
 
                 // 更新进度条
-                this.ProcessBarStep();
+                //this.ProcessBarStep();
             }
 
             // 隐藏进度条
-            this.CloseProcessBar();
+            //this.CloseProcessBar();
         }
 
         private void CheckNgcCnGameTitle()
