@@ -65,7 +65,7 @@ namespace Hanhua.Common
         /// <summary>
         /// 文字大小
         /// </summary>
-        public int FontSize { get; set; }
+        public float FontSize { get; set; }
 
         /// <summary>
         /// 文字位置

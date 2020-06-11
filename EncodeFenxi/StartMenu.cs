@@ -453,10 +453,11 @@ namespace Hanhua.Common
 
             //this.WriteTtfFontPics();
             //this.TestCharPngDat();
+            // create retroarch font
             //CheckPsZhTxt();
             //GetN64Name();
             //DecompressN64();
-            //CheckColorMap();
+            CheckColorMap(); // retroarch
             //CheckNgcCnGameTitle();
             //ResetSfcRomName();
             //CheckSkAscComand();
@@ -464,13 +465,119 @@ namespace Hanhua.Common
             //this.CheckJsonData();
             //this.CreateGameListFromFba();
             //this.WriteMgbaFont();
-            this.CopyBioFontWidthInfo();
+            //this.CopyBioFontWidthInfo();
             //this.ChangeNgcFileName();
+            //CopyTelNo();
         }
 
         #endregion
 
         #region " 私有方法 "
+
+        private void CopyTelNo()
+        {
+            Microsoft.Office.Interop.Excel.Application xApp = null;
+            Microsoft.Office.Interop.Excel.Workbook xBook = null;
+            Microsoft.Office.Interop.Excel.Worksheet xSheet = null;
+
+            try
+            {
+                Dictionary<string, string> telInfo = new Dictionary<string, string>();
+
+                // 创建Application对象 
+                xApp = new Microsoft.Office.Interop.Excel.ApplicationClass();
+
+                // 得到WorkBook对象, 打开已有的文件 
+                xBook = xApp.Workbooks._Open(
+                    @"F:\IPMsg\员工花名册（裕日）.xlsx",
+                    Missing.Value, Missing.Value, Missing.Value, Missing.Value
+                    , Missing.Value, Missing.Value, Missing.Value, Missing.Value
+                    , Missing.Value, Missing.Value, Missing.Value, Missing.Value);
+
+                // 取得相应的Sheet
+                for (int i = 1; i <= xBook.Sheets.Count; i++)
+                {
+                    xSheet = (Microsoft.Office.Interop.Excel.Worksheet)xBook.Sheets[i];
+                    if (!"员工花名册".Equals(xSheet.Name))
+                    {
+                        continue;
+                    }
+
+                    for (int j = 3; j <= 154; j++)
+                    {
+                        string strKey = xSheet.get_Range("C" + j, Missing.Value).Value2 as string;
+                        if (string.IsNullOrEmpty(strKey))
+                        {
+                            continue;
+                        }
+
+                        object strID = xSheet.get_Range("I" + j, Missing.Value).Value2;
+                        if (strID != null)
+                        {
+                            telInfo.Add(strKey.Replace(" ", ""), strID.ToString());
+                        }
+                        else
+                        {
+                            telInfo.Add(strKey.Replace(" ", ""), "");
+                        }
+                    }
+                }
+
+                xApp.Quit();
+                xApp = null;
+
+                // 创建Application对象 
+                xApp = new Microsoft.Office.Interop.Excel.ApplicationClass();
+
+                // 得到WorkBook对象, 打开已有的文件 
+                xBook = xApp.Workbooks._Open(
+                    @"F:\IPMsg\拟复工人员信息表（西安裕日软件有限公司）.xlsx",
+                    Missing.Value, Missing.Value, Missing.Value, Missing.Value
+                    , Missing.Value, Missing.Value, Missing.Value, Missing.Value
+                    , Missing.Value, Missing.Value, Missing.Value, Missing.Value);
+
+                // 取得相应的Sheet
+                for (int i = 1; i <= xBook.Sheets.Count; i++)
+                {
+                    xSheet = (Microsoft.Office.Interop.Excel.Worksheet)xBook.Sheets[i];
+                    if (!"Sheet1".Equals(xSheet.Name))
+                    {
+                        continue;
+                    }
+
+                    for (int j = 2; j <= 150; j++)
+                    {
+                        string strKey = xSheet.get_Range("B" + j, Missing.Value).Value2 as string;
+                        if (string.IsNullOrEmpty(strKey))
+                        {
+                            continue;
+                        }
+
+                        if (telInfo.ContainsKey(strKey))
+                        {
+                            xSheet.get_Range("C" + j, Missing.Value).Value2 = telInfo[strKey];
+                        }
+                    }
+                }
+
+                xBook.Save();
+            }
+            catch (Exception me)
+            {
+                MessageBox.Show(me.Message + "\n" + me.StackTrace);
+            }
+            finally
+            {
+                // 清空各种对象
+                xSheet = null;
+                xBook = null;
+                if (xApp != null)
+                {
+                    xApp.Quit();
+                    xApp = null;
+                }
+            }
+        }
 
         private void ChangeNgcFileName()
         {
@@ -823,9 +930,9 @@ namespace Hanhua.Common
         /// </summary>
         private void CheckColorMap()
         {
-            byte[] whiteColor = File.ReadAllBytes(@"E:\Study\MySelfProject\Hanhua\fontTest\ZhBufFont13X13NoBlock_RGB5A3.dat");
-            byte[] greenColor = File.ReadAllBytes(@"E:\Study\MySelfProject\Hanhua\fontTest\ZhBufFont13X13NoBlock_RGB5A3_R.dat");
-            int charImgSize = 338;
+            byte[] whiteColor = File.ReadAllBytes(@"H:\游戏汉化\fontTest\ZhBufFont14X14NoBlock_RGB5A3.dat");
+            byte[] greenColor = File.ReadAllBytes(@"H:\游戏汉化\fontTest\ZhBufFont14X14NoBlock_RGB5A3_R.dat");
+            int charImgSize = 14 * 14 * 2; // 13 * 13;
             StringBuilder sb = new StringBuilder();
             Dictionary<int, int> colorMap = new Dictionary<int, int>();
             for (int i = 4; i < whiteColor.Length; )
@@ -852,7 +959,7 @@ namespace Hanhua.Common
         private void AutoBuildRetroarch()
         {
             //string basePath = @"E:\Study\Emu\emuSrc\RetroArch\libretro-super-master\retroarch\";
-            string basePath = @"E:\Study\Emu\emuSrc\RetroArch\libretro-super-master\retroarch\";
+            string basePath = @"H:\down\game\emuSrc\RetroArch\libretro-super-master\RetroArch-1.8.4\";
             
             System.Diagnostics.Process exep = new System.Diagnostics.Process();
             exep.StartInfo.FileName = @"make";
@@ -964,19 +1071,61 @@ namespace Hanhua.Common
 
             // 生成Ascii码文字
             StringBuilder sb = new StringBuilder();
+            List<string> lstBuf = new List<string>();
             for (int i = 0x20; i <= 0x7e; i++)
             {
-                sb.Append(Encoding.GetEncoding(932).GetString(new byte[] { (byte)i }));
+                string tmpStr = Encoding.GetEncoding(932).GetString(new byte[] { (byte)i });
+                sb.Append(tmpStr);
+                lstBuf.Add(tmpStr);
             }
 
-            char[] chTxt = sb.Append(Util.CreateOneLevelHanzi()).Append(Util.CreateTwoLevelHanzi()).ToString().ToCharArray();
+            //char[] chTxt = sb.Append(Util.CreateOneLevelHanzi()).Append(Util.CreateTwoLevelHanzi()).ToString().ToCharArray();
+            //char[] chTxt = sb.Append(File.ReadAllText(@"H:\游戏汉化\fontTest\ComnCnChar.txt", Encoding.UTF8)).ToString().ToCharArray();
+
+            //this.ReadChChar(@"H:\游戏汉化\fontTest\ComnCnChar.txt", lstBuf);
+            this.ReadChChar(@"H:\down\game\emuSrc\RetroArch\libretro-super-master\RetroArch-1.8.4\intl\msg_hash_chs.c", lstBuf);
+            this.ReadChChar(@"H:\down\game\emuSrc\RetroArch\libretro-super-master\RetroArch-1.8.4\intl\msg_hash_chs.h", lstBuf);
+            this.ReadChChar(@"G:\GitHub\WiiEmuHanhua\Retroarch_CnSrc\hbc\zh.lang", lstBuf);
+            this.ReadChChar(@"H:\down\game\emu\Roms\retroarch\playlists\nintendo_fc.lpl", lstBuf);
+            this.ReadChChar(@"H:\down\game\emu\Roms\retroarch\playlists\nintendo_sfc.lpl", lstBuf);
+            this.ReadChChar(@"H:\down\game\emu\Roms\retroarch\playlists\nintendo_gba.lpl", lstBuf);
+            this.ReadChChar(@"H:\down\game\emu\Roms\retroarch\playlists\sega_md.lpl", lstBuf);
+            this.ReadChChar(@"H:\down\game\emu\Roms\retroarch\playlists\fba_Pgm_PSIKYO.lpl", lstBuf);
+            this.ReadChChar(@"H:\down\game\emu\Roms\retroarch\playlists\mame2003_coreA.lpl", lstBuf);
+            this.ReadChChar(@"H:\down\game\emu\Roms\retroarch\playlists\mame2003_coreB.lpl", lstBuf);
+            this.ReadChChar(@"H:\down\game\emu\Roms\retroarch\playlists\mame2003_coreC.lpl", lstBuf);
+            this.ReadChChar(@"H:\down\game\emu\Roms\retroarch\playlists\mame2003_coreD.lpl", lstBuf);
+            this.ReadChChar(@"H:\down\game\emu\Roms\retroarch\playlists\mame2003_coreE.lpl", lstBuf);
+            this.ReadChChar(@"H:\down\game\emu\Roms\retroarch\playlists\mame2003_coreF.lpl", lstBuf);
+            this.ReadChChar(@"H:\down\game\emu\Roms\retroarch\playlists\mame2003_coreG.lpl", lstBuf);
+            char[] chTxt = string.Join("", lstBuf.ToArray()).ToCharArray();
+
             foreach (char chChar in chTxt)
             {
                 byte[] byChar = Encoding.BigEndianUnicode.GetBytes(new char[] { chChar });
-                allZhTxt.Add(byChar[0] << 8 | byChar[1]);
+                int temp = byChar[0] << 8 | byChar[1];
+                if (temp < 0x20)
+                {
+                    continue;
+                }
+
+                allZhTxt.Add(temp);
             }
 
             return allZhTxt;
+        }
+
+        private void ReadChChar(string file, List<string> lstBuf)
+        {
+            string tmp = File.ReadAllText(file, Encoding.UTF8);
+            for (int i = 0; i < tmp.Length; i++)
+            {
+                string tmpChar = tmp.Substring(i, 1);
+                if (!lstBuf.Contains(tmpChar))
+                {
+                    lstBuf.Add(tmpChar);
+                }
+            }
         }
 
         /// <summary>
@@ -1047,10 +1196,9 @@ namespace Hanhua.Common
         {
             // 生成所有BigEndian的中文字符
             List<int> allZhTxt = this.GetBigEndianAllCnChars();
-
-
-            //string[] allLine = File.ReadAllLines(@"H:\游戏汉化\fontTest\zhChCount.xlsx.txt", Encoding.UTF8);
-            string[] allLine = File.ReadAllLines(@"E:\Study\MySelfProject\Hanhua\fontTest\zhChCount.xlsx.txt", Encoding.UTF8);
+            
+            string[] allLine = File.ReadAllLines(@"H:\游戏汉化\fontTest\zhChCount.xlsx.txt", Encoding.UTF8);
+            //string[] allLine = File.ReadAllLines(@"E:\Study\MySelfProject\Hanhua\fontTest\zhChCount.xlsx.txt", Encoding.UTF8);
             foreach (string zhTxt in allLine)
             {
                 string curChar = zhTxt.Substring(7, 1);
@@ -1092,13 +1240,14 @@ namespace Hanhua.Common
             //imgInfo.Brush = Brushes.White;
 
             // Retroarch font
-            ImgInfo imgInfo = new ImgInfo(13, 13);
-            imgInfo.BlockImgH = 13;
-            imgInfo.BlockImgW = 13;
+            ImgInfo imgInfo = new ImgInfo(14, 14);
+            imgInfo.BlockImgH = 14;
+            imgInfo.BlockImgW = 14;
             imgInfo.NeedBorder = false;
+            imgInfo.FontName = "微软雅黑";
             imgInfo.FontStyle = FontStyle.Regular;
-            imgInfo.FontSize = 8;
-            imgInfo.Brush = Brushes.Green;
+            imgInfo.FontSize = 7f;
+            imgInfo.Brush = Brushes.White;
             imgInfo.Pen = new Pen(Color.White, 0.1F);
 
             // 显示进度条
@@ -1111,7 +1260,7 @@ namespace Hanhua.Common
                 imgInfo.NewImg();
                 imgInfo.CharTxt = Encoding.BigEndianUnicode.GetString(new byte[] { (byte)(unicodeChar >> 8 & 0xFF), (byte)(unicodeChar & 0xFF) });
                 imgInfo.XPadding = 0;
-                imgInfo.YPadding = 0;
+                imgInfo.YPadding = -2;
                 imgInfo.Grp.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
                 ImgUtil.WriteTextBlockImg(imgInfo);
 
@@ -1136,7 +1285,7 @@ namespace Hanhua.Common
 
                 if (charIndex++ < 500)
                 {
-                    imgInfo.Bmp.Save(@"E:\Study\MySelfProject\Hanhua\fontTest\CharPng\" + unicodeChar + ".png");
+                    imgInfo.Bmp.Save(@"H:\游戏汉化\fontTest\CharPng\" + unicodeChar + ".png");
                 }
 
                 //charIndex = charPngData.Count;
@@ -1159,7 +1308,9 @@ namespace Hanhua.Common
             // 隐藏进度条
             this.CloseProcessBar();
 
-            File.WriteAllBytes(@"E:\Study\MySelfProject\Hanhua\fontTest\ZhBufFont13X13NoBlock_RGB5A3_R.dat", charIndexMap.ToArray());
+            //File.WriteAllBytes(@"E:\Study\MySelfProject\Hanhua\fontTest\ZhBufFont13X13NoBlock_RGB5A3_R.dat", charIndexMap.ToArray());
+            //File.WriteAllBytes(@"H:\游戏汉化\fontTest\ZhBufFont13X13NoBlock_RGB5A3_R.dat", charIndexMap.ToArray());
+            File.WriteAllBytes(@"H:\游戏汉化\fontTest\ZhBufFont14X14NoBlock_RGB5A3.dat", charIndexMap.ToArray());
             //File.WriteAllBytes(@"E:\Study\MySelfProject\Hanhua\fontTest\FontCn_IA8(N64).dat", charIndexMap.ToArray());
             //File.WriteAllBytes(@"E:\Study\MySelfProject\Hanhua\fontTest\FontCn_IA8.dat", Util.ImageEncode(cnFontData, "IA8").ToArray());
             //File.WriteAllBytes(@"E:\Study\MySelfProject\Hanhua\fontTest\FontCnCharInfo.dat", charInfoMap.ToArray());
