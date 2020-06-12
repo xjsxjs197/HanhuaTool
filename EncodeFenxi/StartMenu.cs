@@ -458,7 +458,8 @@ namespace Hanhua.Common
             //DecompressN64();
             //CheckColorMap();
             //CheckNgcCnGameTitle();
-            ResetSfcRomName();
+            //ResetSfcRomName();
+            ResetFcRomName();
             //CheckSkAscComand();
             //this.CreateCpsEnCnTitle();
             //this.CheckJsonData();
@@ -737,6 +738,42 @@ namespace Hanhua.Common
                 if (File.Exists(pngFile))
                 {
                     File.Copy(pngFile, pngFile.Replace(@"Sfc\", @"thumbnails\nintendo_sfc\").Replace(pathName.Value, cnNameMap[pathName.Key]), true);
+                }
+            }
+        }
+
+        private void ResetFcRomName()
+        {
+            this.baseFolder = @"E:\Study\Emu\Roms\Fc\FcAll\unZip\";
+            List<FilePosInfo> allFc = Util.GetAllFiles(baseFolder).Where(p => !p.IsFolder && p.File.EndsWith(".nes", StringComparison.OrdinalIgnoreCase)).ToList();
+            string pngPath = @"E:\Study\Emu\AllThumbnails\Fc\";
+
+            Dictionary<string, string> cnNameMap = new Dictionary<string, string>();
+            this.baseFolder = @"E:\Study\Emu\Roms\Fc\FcAll\nes\";
+            XmlDocument xmlDoc = new XmlDocument();
+
+            this.LoadSfcNameMap(xmlDoc, cnNameMap, @"gamelist(cn).xml");
+
+            foreach (FilePosInfo file in allFc)
+            {
+                string enName = Util.GetShortNameWithoutType(file.File);
+                string zipFile = file.File.Substring(file.File.IndexOf(enName) - 6, 5) + ".zip";
+                string pngFile = pngPath + @"Named_Titles\" + enName + ".png";
+                if (File.Exists(pngFile))
+                {
+                    File.Copy(pngFile, pngFile.Replace(@"Fc\", @"thumbnails\nintendo_fc\").Replace(enName, cnNameMap[zipFile]), true);
+                }
+
+                pngFile = pngPath + @"Named_Snaps\" + enName + ".png";
+                if (File.Exists(pngFile))
+                {
+                    File.Copy(pngFile, pngFile.Replace(@"Fc\", @"thumbnails\nintendo_fc\").Replace(enName, cnNameMap[zipFile]), true);
+                }
+
+                pngFile = pngPath + @"Named_Boxarts\" + enName + ".png";
+                if (File.Exists(pngFile))
+                {
+                    File.Copy(pngFile, pngFile.Replace(@"Fc\", @"thumbnails\nintendo_fc\").Replace(enName, cnNameMap[zipFile]), true);
                 }
             }
         }
