@@ -457,10 +457,11 @@ namespace Hanhua.Common
             //CheckPsZhTxt();
             //GetN64Name();
             //DecompressN64();
-            CheckColorMap(); // retroarch
+            //CheckColorMap();
+            // retroarch
             //CheckNgcCnGameTitle();
             //ResetSfcRomName();
-            ResetFcRomName();
+            //ResetFcRomName();
             //CheckSkAscComand();
             //this.CreateCpsEnCnTitle();
             //this.CheckJsonData();
@@ -469,11 +470,79 @@ namespace Hanhua.Common
             //this.CopyBioFontWidthInfo();
             //this.ChangeNgcFileName();
             //CopyTelNo();
+            this.CreatePiGameList();
         }
 
         #endregion
 
         #region " 私有方法 "
+
+        private void CreatePiGameList()
+        {
+            string path = @"I:\Games\WiiSd\Roms\Fc\";
+            string imgPath1 = @"I:\Games\WiiSd\WiiSd\retroarch\thumbnails\nintendo_fc\Named_Titles\";
+            string imgPath2 = @"I:\Games\WiiSd\WiiSd\retroarch\thumbnails\nintendo_fc\Named_Snaps\";
+            List<FilePosInfo> allFiles = Util.GetAllFiles(path);
+            List<FilePosInfo> allImg1 = Util.GetAllFiles(imgPath1);
+            List<FilePosInfo> allImg2 = Util.GetAllFiles(imgPath2);
+            StringBuilder sb = new StringBuilder();
+            sb.Append("<?xml version=\"1.0\"?>\r\n");
+            sb.Append("<gameList>\r\n");
+
+            foreach (FilePosInfo file in allFiles)
+            {
+                if (file.IsFolder)
+                {
+                    continue;
+                }
+
+                string fileName = Util.GetShortFileName(file.File);
+                string shortFileName = Util.GetShortNameWithoutType(file.File);
+                string imgFile = this.GetImgFile(shortFileName, allImg1);
+                if (string.IsNullOrEmpty(imgFile))
+                {
+                    imgFile = this.GetImgFile(shortFileName, allImg2);
+                }
+
+                sb.Append("    <game>\r\n");
+                sb.Append("        <path>./").Append(fileName).Append("</path>\r\n");
+                sb.Append("        <name>").Append(shortFileName).Append("</name>\r\n");
+
+                if (File.Exists(imgFile))
+                {
+                    string imgName = Util.GetShortFileName(imgFile);
+                    File.Move(imgFile, @"I:\Games\WiiSd\images\fc\images\" + imgName);
+                    sb.Append("        <image>./images/").Append(imgName).Append("</image>\r\n");
+                }
+                else
+                {
+                    sb.Append("        <image></image>\r\n");
+                }
+
+                sb.Append("    </game>\r\n");
+            }
+
+            sb.Append("</gameList>\r\n");
+            File.WriteAllText(@"I:\Games\WiiSd\images\fc\gamelist.xml", sb.ToString(), Encoding.UTF8);
+        }
+
+        private string GetImgFile(string imgName, List<FilePosInfo> allImg)
+        {
+            foreach (FilePosInfo file in allImg)
+            {
+                if (file.IsFolder)
+                {
+                    continue;
+                }
+
+                if (file.File.IndexOf(imgName) > 0) 
+                {
+                    return file.File;
+                }
+            }
+
+            return string.Empty;
+        }
 
         private void CopyTelNo()
         {
@@ -820,8 +889,10 @@ namespace Hanhua.Common
         {
             Dictionary<string, string> cnNameMap = new Dictionary<string, string>();
             Dictionary<string, string> enNameMap = new Dictionary<string, string>();
-            this.baseFolder = @"E:\Study\Emu\Roms\Sfc\SFC_Jp(1444个)\snes\";
-            string pngPath = @"E:\Study\Emu\AllThumbnails\Sfc\";
+            //this.baseFolder = @"E:\Study\Emu\Roms\Sfc\SFC_Jp(1444个)\snes\";
+            this.baseFolder = @"H:\down\game\emu\Roms\SFC\SFC_Jp(1444个)\";
+            //string pngPath = @"E:\Study\Emu\AllThumbnails\Sfc\";
+            string pngPath = @"E:\Game\AllThumbnails\Sfc\";
             XmlDocument xmlDoc = new XmlDocument();
 
             this.LoadSfcNameMap(xmlDoc, enNameMap, @"gamelist.xml.en");
@@ -1035,7 +1106,7 @@ namespace Hanhua.Common
         private void AutoBuildRetroarch()
         {
             //string basePath = @"E:\Study\Emu\emuSrc\RetroArch\libretro-super-master\retroarch\";
-            string basePath = @"H:\down\game\emuSrc\RetroArch\libretro-super-master\RetroArch-1.8.4\";
+            string basePath = @"H:\down\game\emuSrc\RetroArch\RetroArch-1.9.4\";
             
             System.Diagnostics.Process exep = new System.Diagnostics.Process();
             exep.StartInfo.FileName = @"make";
@@ -1075,7 +1146,7 @@ namespace Hanhua.Common
                 // move File
                 if (File.Exists(basePath + @"retroarch_wii.dol"))
                 {
-                    File.Move(basePath + @"retroarch_wii.dol", fileInfo.File.Replace("_libretro_wii.a", ".dol").Replace("dist-scripts", @"pkg\wii"));
+                    File.Move(basePath + @"retroarch_wii.dol", fileInfo.File.Replace(".a", ".dol").Replace("dist-scripts", @"pkg\wii"));
                 }
 
                 // 更新进度条
