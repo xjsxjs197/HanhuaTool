@@ -36,7 +36,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Ionic.Zip, Version=1.9.1.8, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.Office.Interop.Excel, Version=12.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" />
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=11.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c" />
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -56,6 +56,7 @@
   <ItemGroup>
     <Compile Include="CompressTools\BaseComp.cs" />
     <Compile Include="CompressTools\BaseCompTool.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="CompressTools\BaseCompTool.Designer.cs">
       <DependentUpon>BaseCompTool.cs</DependentUpon>
@@ -66,18 +67,27 @@
     <Compile Include="CompressTools\MarioYaz0Comp.cs" />
     <Compile Include="CompressTools\EternalDarknessSkArcComp.cs" />
     <Compile Include="CompressTools\ViewtifulJoeRleComp.cs" />
+    <Compile Include="RfoRunEfactoryEdit\RfoRunEfactoryTextEditor.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RfoRunEfactoryEdit\RfoRunEfactoryTextEditor.Designer.cs">
+      <DependentUpon>RfoRunEfactoryTextEditor.cs</DependentUpon>
+    </Compile>
     <Compile Include="TextEditTools\Bio0Edit\Bio0CharInfo.cs" />
     <Compile Include="TextEditTools\Bio0Edit\Bio0CnFontEditor.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="TextEditTools\Bio0Edit\Bio0CnFontEditor.Designer.cs">
       <DependentUpon>Bio0CnFontEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="TextEditTools\Bio0Edit\Bio0FontEditor.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="TextEditTools\Bio0Edit\Bio0FontEditor.Designer.cs">
       <DependentUpon>Bio0FontEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="TextEditTools\Bio0Edit\Bio0TextEditor.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="TextEditTools\Bio0Edit\Bio0TextEditor.Designer.cs">
       <DependentUpon>Bio0TextEditor.cs</DependentUpon>
@@ -89,57 +99,68 @@
       <DependentUpon>Bio1TextEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="TextEditTools\Bio2Edit\Bio2MovTxtEditor.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="TextEditTools\Bio2Edit\Bio2MovTxtEditor.Designer.cs">
       <DependentUpon>Bio2MovTxtEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="TextEditTools\Bio2Edit\Bio2TextEditor.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="TextEditTools\Bio2Edit\Bio2TextEditor.Designer.cs">
       <DependentUpon>Bio2TextEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="TextEditTools\Bio3Edit\Bio3TextEditor.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="TextEditTools\Bio3Edit\Bio3TextEditor.Designer.cs">
       <DependentUpon>Bio3TextEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="TextEditTools\Bio2Edit\BioAdtTool.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="TextEditTools\Bio2Edit\BioAdtTool.Designer.cs">
       <DependentUpon>BioAdtTool.cs</DependentUpon>
     </Compile>
     <Compile Include="TextEditTools\BioCvEdit\BioCvAfsEditor.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="TextEditTools\BioCvEdit\BioCvAfsEditor.Designer.cs">
       <DependentUpon>BioCvAfsEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="TextEditTools\BioCvEdit\BioCvConfigTxtEditor.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="TextEditTools\BioCvEdit\BioCvConfigTxtEditor.Designer.cs">
       <DependentUpon>BioCvConfigTxtEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="TextEditTools\BioCvEdit\BioCvTextEditor.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="TextEditTools\BioCvEdit\BioCvTextEditor.Designer.cs">
       <DependentUpon>BioCvTextEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="TextEditTools\Bio1Edit\FontCharInfo.cs" />
     <Compile Include="TextEditTools\BioCvEdit\BioCvTextAlignEdit.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="TextEditTools\BioCvEdit\BioCvTextAlignEdit.Designer.cs">
       <DependentUpon>BioCvTextAlignEdit.cs</DependentUpon>
     </Compile>
     <Compile Include="TextEditTools\TalesOfSymphonia\TalesOfSymphoniaTextEditor.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="TextEditTools\TalesOfSymphonia\TalesOfSymphoniaTextEditor.Designer.cs">
       <DependentUpon>TalesOfSymphoniaTextEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="TextEditTools\ViewtifulJoe\ViewtifulJoePicEditor.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="TextEditTools\ViewtifulJoe\ViewtifulJoePicEditor.Designer.cs">
       <DependentUpon>ViewtifulJoePicEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="TextEditTools\ViewtifulJoe\ViewtifulJoeTextEditor.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="TextEditTools\ViewtifulJoe\ViewtifulJoeTextEditor.Designer.cs">
       <DependentUpon>ViewtifulJoeTextEditor.cs</DependentUpon>
@@ -152,6 +173,7 @@
     </Compile>
     <Compile Include="ImgEditTools\ImgEditorTim2.cs" />
     <Compile Include="ImgEditTools\ImgEditor.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="ImgEditTools\ImgEditor.Designer.cs">
       <DependentUpon>ImgEditor.cs</DependentUpon>
@@ -169,11 +191,13 @@
     <Compile Include="TextSearchTools\DiffOneByteTypeSearch.cs" />
     <Compile Include="TextSearchTools\SearchBase.cs" />
     <Compile Include="TextSearchTools\SearchTools.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="TextSearchTools\SearchTools.Designer.cs">
       <DependentUpon>SearchTools.cs</DependentUpon>
     </Compile>
     <Compile Include="FontEditTools\NgcFontEditer.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="FontEditTools\NgcFontEditer.Designer.cs">
       <DependentUpon>NgcFontEditer.cs</DependentUpon>
@@ -183,6 +207,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="CompressTools\BaseCompTool.resx">
       <DependentUpon>BaseCompTool.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RfoRunEfactoryEdit\RfoRunEfactoryTextEditor.resx">
+      <DependentUpon>RfoRunEfactoryTextEditor.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="TextEditTools\Bio0Edit\Bio0CnFontEditor.resx">
@@ -319,6 +347,7 @@
     <Compile Include="TextSearchTools\ResultLine.cs" />
     <Compile Include="TextSearchTools\SearchType.cs" />
     <Compile Include="TextSearchTools\SingleFileResult.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="TextSearchTools\SingleFileResult.Designer.cs">
       <DependentUpon>SingleFileResult.cs</DependentUpon>
@@ -330,6 +359,7 @@
       <DependentUpon>StartMenu.cs</DependentUpon>
     </Compile>
     <Compile Include="FileViewer\SzsViewer.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="FileViewer\SzsViewer.Designer.cs">
       <DependentUpon>SzsViewer.cs</DependentUpon>
@@ -338,12 +368,14 @@
     <Compile Include="TextSearchTools\WiiFontTypeSearch.cs" />
     <Compile Include="TextSearchTools\NgcFontTypeSearch.cs" />
     <Compile Include="ImgEditTools\SampleImgCreater.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="ImgEditTools\SampleImgCreater.Designer.cs">
       <DependentUpon>SampleImgCreater.cs</DependentUpon>
     </Compile>
     <Compile Include="ImgEditTools\TplFileManager.cs" />
     <Compile Include="FileViewer\ImageViewer.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="FileViewer\ImageViewer.Designer.cs">
       <DependentUpon>ImageViewer.cs</DependentUpon>
@@ -361,11 +393,13 @@
       <DependentUpon>UcImageEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="TextEditTools\TxtresEdit\TresEditer.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="TextEditTools\TxtresEdit\TresEditer.Designer.cs">
       <DependentUpon>TresEditer.cs</DependentUpon>
     </Compile>
     <Compile Include="FontEditTools\WiiFontEditer.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="FontEditTools\WiiFontEditer.Designer.cs">
       <DependentUpon>WiiFontEditer.cs</DependentUpon>
@@ -381,16 +415,6 @@
   <ItemGroup>
     <Content Include="TextSearchTools\Shift-JisEncode.xml" />
     <Content Include="Wii side view.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <COMReference Include="VBIDE">
-      <Guid>{0002E157-0000-0000-C000-000000000046}</Guid>
-      <VersionMajor>5</VersionMajor>
-      <VersionMinor>3</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-    </COMReference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj">
