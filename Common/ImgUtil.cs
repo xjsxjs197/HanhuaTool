@@ -74,6 +74,18 @@ namespace Hanhua.Common
         /// <returns>写好文字的图片</returns>
         public static Bitmap WriteFontImg(ImgInfo imgInfo, List<string> txtList)
         {
+            return ImgUtil.WriteFontImg(imgInfo, txtList, 0);
+        }
+
+        /// <summary>
+        /// 写字库图片
+        /// </summary>
+        /// <param name="imgInfo">图片信息</param>
+        /// <param name="txtList">文字信息</param>
+        /// <param name="startIdx">文字的开始位置</param>
+        /// <returns>写好文字的图片</returns>
+        public static Bitmap WriteFontImg(ImgInfo imgInfo, List<string> txtList, int startIdx)
+        {
             // 参数检查
             ImgUtil.ImgInfoCheck(imgInfo);
 
@@ -81,14 +93,14 @@ namespace Hanhua.Common
             int xNum = imgInfo.ImgW / imgInfo.BlockImgW;
             int yNum = imgInfo.ImgH / imgInfo.BlockImgH;
             int maxCharCount = xNum * yNum;
-            for (int i = 0; i < maxCharCount; i++)
+            for (int i = 0; i < maxCharCount && (startIdx + i) < txtList.Count; i++)
             {
                 // 设置当前字符
-                imgInfo.CharTxt = txtList[i];
+                imgInfo.CharTxt = txtList[startIdx + i];
 
                 // 计算位置
-                imgInfo.PosX = (i % xNum);
-                imgInfo.PosY = (i / xNum);
+                imgInfo.PosX = (i % xNum) * imgInfo.BlockImgW;
+                imgInfo.PosY = (i / xNum) * imgInfo.BlockImgH;
 
                 // 生成当前块图片
                 ImgUtil.WriteBlockImg(imgInfo);
@@ -96,6 +108,7 @@ namespace Hanhua.Common
 
             return imgInfo.Bmp;
         }
+
 
         /// <summary>
         /// 写整行文字的图片

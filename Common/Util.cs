@@ -2630,7 +2630,7 @@ namespace Hanhua.Common
                     {
                         // 设置后4位
                         intColor = imageData[byIndex];
-                        imageData[byIndex] = (byte)(intColor | (intRed & 0xF0 >> 4));
+                        imageData[byIndex] = (byte)(intColor | ((intRed & 0xF0) >> 4));
                         byIndex++;
                     }
                     break;
