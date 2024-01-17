@@ -476,13 +476,15 @@ namespace Hanhua.Common
             //this.GetGodOfHandFont();
             //this.WriteGteConsts();
             //this.CheckTmpFont();
-            //this.ImportRfoText();
+            //this.ImportRfo00905Text();
+            this.ImportRfo01718Text();
             //this.CreateRfoFont();
             //this.CreateRfoFontCharMap();
             //this.CheckRfoFontInf();
             //this.CreateRfoFontImg();
-            this.CheckBof4Text();
+            //this.CheckBof4Text();
             //this.ExportRfoText();
+            //this.CheckRfoText();
 
         }
 
@@ -556,7 +558,7 @@ namespace Hanhua.Common
         /// </summary>
         private void ExportRfoText()
         {
-            byte[] byOldTxt = File.ReadAllBytes(@"D:\游戏汉化\Wii\符文工房边境\00905Old.bin");
+            byte[] byOldTxt = File.ReadAllBytes(@"D:\游戏汉化\Wii\符文工房边境\01718.bin");
             int txtTableStart = 0x054e38; // 当前位置的值(0x02ba18) + 0x054e18)
             int txtTableEnd = 0x080828;
 
@@ -584,7 +586,7 @@ namespace Hanhua.Common
         /// <summary>
         /// 导入符文工房中文文本
         /// </summary>
-        private void ImportRfoText()
+        private void ImportRfo00905Text()
         {
             byte[] byOldTxt = File.ReadAllBytes(@"D:\游戏汉化\Wii\符文工房边境\00905Old.bin");
             int txtTableStart = 0x054e38; // 当前位置的值(0x02ba18) + 0x054e18)
@@ -592,7 +594,7 @@ namespace Hanhua.Common
             int maxCnLen = 0x1a0f50 - 0x080830;
             int chTxtPos = 0x080830; // 减去0x054e18，结果放入Table表
 
-            string[] cnTxtList = File.ReadAllLines(@"D:\游戏汉化\Wii\符文工房边境\cnTxt.txt", Encoding.UTF8);
+            string[] cnTxtList = File.ReadAllLines(@"D:\游戏汉化\Wii\符文工房边境\cnTxt00905.txt", Encoding.UTF8);
 
             StringBuilder sb = new StringBuilder();
             List<byte> byCnData = new List<byte>();
@@ -602,6 +604,10 @@ namespace Hanhua.Common
                 if (string.IsNullOrEmpty(strCnTxt))
                 {
                     break;
+                }
+                if (strCnTxt.Length <= 11)
+                {
+                    continue;
                 }
                 string chkKey = strCnTxt.Substring(11, 1);
                 int chStartPos;
@@ -659,6 +665,88 @@ namespace Hanhua.Common
             }
 
         }
+
+        /// <summary>
+        /// 导入符文工房中文文本
+        /// </summary>
+        private void ImportRfo01718Text()
+        {
+            byte[] byOldTxt = File.ReadAllBytes(@"D:\游戏汉化\Wii\符文工房边境\01718Old.bin");
+            int txtTableStart = 0xf8;
+            int maxCnLen = 0x1a0f50 - 0x080830;
+            int chTxtPos = 0xc8c;
+
+            string[] cnTxtList = File.ReadAllLines(@"D:\游戏汉化\Wii\符文工房边境\cnTxt01718.txt", Encoding.UTF8);
+
+            StringBuilder sb = new StringBuilder();
+            List<byte> byCnData = new List<byte>();
+            for (int i = 0; i < ((0xc8c - 0xf8) / 4 - 1) * 2; i += 2)
+            {
+                string strCnTxt = cnTxtList[i];
+                if (string.IsNullOrEmpty(strCnTxt))
+                {
+                    break;
+                }
+                if (strCnTxt.Length <= 11)
+                {
+                    continue;
+                }
+                string chkKey = strCnTxt.Substring(11, 1);
+                int chStartPos;
+                if (chkKey == "," || chkKey == "，")
+                {
+                    chStartPos = 11;
+                }
+                else
+                {
+                    chkKey = strCnTxt.Substring(10, 1);
+                    if (chkKey == "," || chkKey == "，")
+                    {
+                        chStartPos = 10;
+                    }
+                    else
+                    {
+                        chkKey = strCnTxt.Substring(12, 1);
+                        if (chkKey == "," || chkKey == "，")
+                        {
+                            chStartPos = 12;
+                        }
+                        else
+                        {
+                            MessageBox.Show("没有找到开始位置 " + strCnTxt);
+                            break;
+                        }
+                    }
+                }
+
+                string newChTxt = strCnTxt.Substring(chStartPos + 1);
+                //sb.Append(newChTxt).Append("\r\n");
+                //byCnData.AddRange(this.EncodeLineText(newChTxt));
+                // 写入中文文本
+                byte[] curCnData = this.EncodeLineText(newChTxt);
+                Array.Copy(curCnData, 0, byOldTxt, chTxtPos, curCnData.Length);
+
+                // 写入中文Index位置
+                txtTableStart += 4;
+                chTxtPos += curCnData.Length;
+                int tableIdx = chTxtPos + 0x20;
+                byOldTxt[txtTableStart + 0] = (byte)((tableIdx >> 24) & 0xff);
+                byOldTxt[txtTableStart + 1] = (byte)((tableIdx >> 16) & 0xff);
+                byOldTxt[txtTableStart + 2] = (byte)((tableIdx >> 8) & 0xff);
+                byOldTxt[txtTableStart + 3] = (byte)((tableIdx >> 0) & 0xff);
+            }
+
+            if (byCnData.Count > maxCnLen)
+            {
+                MessageBox.Show("中文个数超长了 " + (byCnData.Count - maxCnLen));
+            }
+            else
+            {
+                File.WriteAllBytes(@"D:\游戏汉化\Wii\符文工房边境\01718.bin", byOldTxt);
+                MessageBox.Show("正常写入中文翻译 ");
+            }
+
+        }
         
         /// <summary>
         /// 将当前行文本编码
@@ -711,7 +799,7 @@ namespace Hanhua.Common
         /// </summary>
         private List<string> CheckRfoText()
         {
-            string[] cnTxtList = File.ReadAllLines(@"D:\游戏汉化\Wii\符文工房边境\cnTxt.txt", Encoding.UTF8);
+            string[] cnTxtList = File.ReadAllLines(@"D:\游戏汉化\Wii\符文工房边境\allCnText.txt", Encoding.UTF8);
             List<string> lstCnTxt = new List<string>();
             for (int i = 0; i < cnTxtList.Length; i += 2)
             {
@@ -720,6 +808,12 @@ namespace Hanhua.Common
                 {
                     break;
                 }
+                if (strCnTxt.Length <= 11)
+                {
+                    continue;
+                }
+
+
                 string chkKey = strCnTxt.Substring(11, 1);
                 int chStartPos;
                 if (chkKey == "," || chkKey == "，")
@@ -760,6 +854,9 @@ namespace Hanhua.Common
             }
 
             lstCnTxt.Sort();
+
+            File.WriteAllLines(@"D:\游戏汉化\Wii\符文工房边境\fontChar.txt", lstCnTxt.ToArray(), Encoding.UTF8);
+
             return lstCnTxt;
         }
 
@@ -770,7 +867,7 @@ namespace Hanhua.Common
         {
             string[] allFontChar = File.ReadAllLines(@"D:\游戏汉化\Wii\符文工房边境\fontChar.txt", Encoding.UTF8);
             int fileSize = allFontChar.Length * 12 + 10;
-            int fontImgCount = 25;
+            int fontImgCount = 27;
             byte[] byNewCharMap = new byte[fileSize];
             byNewCharMap[0] = 0;
             byNewCharMap[1] = 0;
@@ -800,7 +897,7 @@ namespace Hanhua.Common
                 byCharMap[3] = (byte)(fontImgIdx & 0xff);
                 if (!isLoadBmp)
                 {
-                    fontBmp = (Bitmap)(Bitmap.FromFile(@"D:\游戏汉化\Wii\符文工房边境\rfo\rfo\tmpFont530\cnimportNew\tmpCnFont" + fontImgIdx + ".png"));
+                    fontBmp = (Bitmap)(Bitmap.FromFile(@"D:\游戏汉化\Wii\符文工房边境\font\cnimportNew\tmpCnFont" + fontImgIdx + ".png"));
                     isLoadBmp = true;
                 }
                 if ((byChar[0] == 0 && tmpChar != " " && tmpChar != "　")
@@ -898,7 +995,7 @@ namespace Hanhua.Common
         {
             int imgWH = 256;
             byte[] by00530 = File.ReadAllBytes(@"D:\游戏汉化\Wii\符文工房边境\00530Old.bin");
-            int fontImgCnt = 25;
+            int fontImgCnt = 27;
             byte[] byNewFont = new byte[0x20 + 0x20 + 0x10 + (imgWH * imgWH / 2 + 0x20 + 0x10) * fontImgCnt];
 
             // set header
@@ -968,7 +1065,7 @@ namespace Hanhua.Common
                 byNewFont[tmpImgPos + 0x3] = (byte)((fontInfoPos >> 0) & 0xff);
 
                 // set image data
-                byte[] byAddedImgData = Util.ImageEncode((Bitmap)(Bitmap.FromFile(@"D:\游戏汉化\Wii\符文工房边境\rfo\rfo\tmpFont530\cnimportNew\tmpCnFont" + i + ".png")), "I4");
+                byte[] byAddedImgData = Util.ImageEncode((Bitmap)(Bitmap.FromFile(@"D:\游戏汉化\Wii\符文工房边境\Font\cnimportNew\tmpCnFont" + i + ".png")), "I4");
                 Array.Copy(byAddedImgData, 0, byNewFont, fontInfoPos, byAddedImgData.Length);
             }
 
@@ -1016,7 +1113,7 @@ namespace Hanhua.Common
                 imgInfo.Grp.SmoothingMode = SmoothingMode.HighQuality;
                 imgInfo.Grp.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
                 Bitmap tmpFontImg = ImgUtil.WriteFontImg(imgInfo, lstBuf, i);
-                tmpFontImg.Save(@"D:\游戏汉化\Wii\符文工房边境\rfo\rfo\tmpFont530\cnimportOld\tmpCnFont" + (fontIdx++) + ".png");
+                tmpFontImg.Save(@"D:\游戏汉化\Wii\符文工房边境\Font\cnimportOld\tmpCnFont" + (fontIdx++) + ".png");
             }
         }
 
@@ -2710,7 +2807,8 @@ namespace Hanhua.Common
                 for (int i = 0; i < chChars.Count; i++)
                 {
                     KeyValuePair<string, int> item = chChars[i];
-                    pageChars[i] = (i + 1).ToString().PadLeft(4, '0') + " : " + item.Key + "  " + item.Value;
+                    //pageChars[i] = (i + 1).ToString().PadLeft(4, '0') + " : " + item.Key + "  " + item.Value;
+                    pageChars[i] = item.Key;
                 }
             }
             catch (Exception me)
