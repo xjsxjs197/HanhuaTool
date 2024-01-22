@@ -26,6 +26,9 @@ using Hanhua.Common;
 using System.Drawing.Drawing2D;
 using Hanhua.Common.TextEditTools.RfoEdit;
 
+using System.Threading;
+using System.Runtime.InteropServices;
+
 namespace Hanhua.Common
 {
     /// <summary>
@@ -33,6 +36,22 @@ namespace Hanhua.Common
     /// </summary>
     public partial class StartMenu : BaseForm
     {
+        [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true)]
+        public static extern IntPtr GetForegroundWindow();
+        [DllImport("user32.dll", EntryPoint = "keybd_event", SetLastError = true)]
+        public static extern void keybd_event(byte bVk, byte bScan, int dwFlags, int dwExtraInfo);
+
+        [DllImport("user32.dll")]
+        private static extern int SendMessage(IntPtr hWnd, int Msg, int wParam, int lParam);
+
+        //SendMessage参数
+        private const int WM_KEYDOWN = 0X100;
+        private const int WM_KEYUP = 0X101;
+        private const int WM_SYSCHAR = 0X106;
+        private const int WM_SYSKEYUP = 0X105;
+        private const int WM_SYSKEYDOWN = 0X104;
+        private const int WM_CHAR = 0X102;
+
         #region " 私有变量 "
 
         /// <summary>
@@ -489,7 +508,73 @@ namespace Hanhua.Common
 
         #region " 私有方法 "
 
-        private void CheckBof4Text()
+        private void CheckPcBio2()
+        {
+            byte[] byPcBio2 = File.ReadAllBytes(@"G:\Study\MySelfProject\Hanhua\TodoCn\HanhuaProject\Bio2\helpPc\bio2.exe");
+            byte[] byJpBio2 = File.ReadAllBytes(@"G:\Study\MySelfProject\Hanhua\TodoCn\HanhuaProject\Bio2\helpPc\jp\leon.rel");
+
+            byte[] byJpBio2Search = new byte[0x1a89b8 - 0x1a8990];
+            Array.Copy(byJpBio2, 0x1a8990, byJpBio2Search, 0, byJpBio2Search.Length);
+            bool searchOk = false;
+            int chkIdx = 1;
+            int maxIdx = 0;
+            for (int i = 0; i < byPcBio2.Length; i++)
+            {
+                if (byPcBio2[i] == byJpBio2Search[0])
+                {
+                    chkIdx = 1;
+                    for (; chkIdx < byJpBio2Search.Length && i + chkIdx < byPcBio2.Length; chkIdx++)
+                    {
+                        if (byPcBio2[i + chkIdx] != byJpBio2Search[chkIdx])
+                        {
+                            break;
+                        }
+                    }
+                    maxIdx = Math.Max(maxIdx, chkIdx);
+                    if (chkIdx >= byJpBio2Search.Length)
+                    {
+                        searchOk = true;
+                        break;
+                    }
+                }
+            }
+
+            if (searchOk)
+            {
+                MessageBox.Show("找到日文文本了！");
+            }
+            else
+            {
+                MessageBox.Show("没有找到日文文本 " + maxIdx + " " + byJpBio2Search.Length);
+            }
+        }
+		
+		private void InitADSR()                                    // INIT ADSR
+        {
+            int[] RateTableSub = new int[128];
+            int[] RateTableAdd = new int[128];
+            int lcv;
+            int denom;
+
+            // Optimize table - Dr. Hell ADSR math
+            for (lcv = 0; lcv < 48; lcv++)
+            {
+                RateTableAdd[lcv] = (int)((7 - (lcv & 3)) << (11 - (lcv >> 2)));
+                RateTableSub[lcv] = (int)((-8 + (lcv & 3)) << (11 - (lcv >> 2)));
+            }
+
+            for (; lcv < 128; lcv++)
+            {
+                denom = (int)(1 << ((lcv >> 2) - 11));
+
+                RateTableAdd[lcv] = (int)(((int)(7) - (int)(lcv & 7)) << 16) / denom;
+                RateTableSub[lcv] = (int)(((int)(-8) + (int)(lcv & 7)) << 16) / denom;
+
+            }
+
+        }
+		
+		private void CheckBof4Text()
         {
             List<FilePosInfo> allBof4Files = Util.GetAllFiles(@"G:\游戏汉化\Bof4\BIN");
             List<string> txtFile = new List<string>();
@@ -1207,7 +1292,7 @@ namespace Hanhua.Common
         {
             byte[] whiteColor = File.ReadAllBytes(@"H:\游戏汉化\fontTest\ZhBufFont14X14NoBlock_RGB5A3.dat");
             byte[] greenColor = File.ReadAllBytes(@"H:\游戏汉化\fontTest\ZhBufFont14X14NoBlock_RGB5A3_R.dat");
-            int charImgSize = 14 * 14 * 2; // 13 * 13;
+            int charImgSize = 13 * 13 * 2; // 13 * 13;
             StringBuilder sb = new StringBuilder();
             Dictionary<int, int> colorMap = new Dictionary<int, int>();
             for (int i = 4; i < whiteColor.Length; )
@@ -1358,21 +1443,23 @@ namespace Hanhua.Common
             //char[] chTxt = sb.Append(File.ReadAllText(@"H:\游戏汉化\fontTest\ComnCnChar.txt", Encoding.UTF8)).ToString().ToCharArray();
 
             //this.ReadChChar(@"H:\游戏汉化\fontTest\ComnCnChar.txt", lstBuf);
-            this.ReadChChar(@"H:\down\game\emuSrc\RetroArch\libretro-super-master\RetroArch-1.8.4\intl\msg_hash_chs.c", lstBuf);
-            this.ReadChChar(@"H:\down\game\emuSrc\RetroArch\libretro-super-master\RetroArch-1.8.4\intl\msg_hash_chs.h", lstBuf);
-            this.ReadChChar(@"G:\GitHub\WiiEmuHanhua\Retroarch_CnSrc\hbc\zh.lang", lstBuf);
-            this.ReadChChar(@"H:\down\game\emu\Roms\retroarch\playlists\nintendo_fc.lpl", lstBuf);
-            this.ReadChChar(@"H:\down\game\emu\Roms\retroarch\playlists\nintendo_sfc.lpl", lstBuf);
-            this.ReadChChar(@"H:\down\game\emu\Roms\retroarch\playlists\nintendo_gba.lpl", lstBuf);
-            this.ReadChChar(@"H:\down\game\emu\Roms\retroarch\playlists\sega_md.lpl", lstBuf);
-            this.ReadChChar(@"H:\down\game\emu\Roms\retroarch\playlists\fba_Pgm_PSIKYO.lpl", lstBuf);
-            this.ReadChChar(@"H:\down\game\emu\Roms\retroarch\playlists\mame2003_coreA.lpl", lstBuf);
-            this.ReadChChar(@"H:\down\game\emu\Roms\retroarch\playlists\mame2003_coreB.lpl", lstBuf);
-            this.ReadChChar(@"H:\down\game\emu\Roms\retroarch\playlists\mame2003_coreC.lpl", lstBuf);
-            this.ReadChChar(@"H:\down\game\emu\Roms\retroarch\playlists\mame2003_coreD.lpl", lstBuf);
-            this.ReadChChar(@"H:\down\game\emu\Roms\retroarch\playlists\mame2003_coreE.lpl", lstBuf);
-            this.ReadChChar(@"H:\down\game\emu\Roms\retroarch\playlists\mame2003_coreF.lpl", lstBuf);
-            this.ReadChChar(@"H:\down\game\emu\Roms\retroarch\playlists\mame2003_coreG.lpl", lstBuf);
+            this.ReadChChar(@"G:\Study\Emu\emuSrc\RetroArch\RetroArch-1.9.6\intl\msg_hash_de.c", lstBuf);
+            this.ReadChChar(@"G:\Study\Emu\emuSrc\RetroArch\RetroArch-1.9.6\intl\msg_hash_de.h", lstBuf);
+            //this.ReadChChar(@"G:\Study\Emu\emuSrc\RetroArch\RetroArch-1.9.6\intl\msg_hash_it_pt.c", lstBuf);
+            //this.ReadChChar(@"G:\Study\Emu\emuSrc\RetroArch\RetroArch-1.9.6\intl\msg_hash_it_pt.h", lstBuf);
+            this.ReadChChar(@"G:\Study\de.lang", lstBuf);
+            //this.ReadChChar(@"E:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\nintendo_fc.lpl", lstBuf);
+            //this.ReadChChar(@"E:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\nintendo_sfc.lpl", lstBuf);
+            //this.ReadChChar(@"E:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\nintendo_gba.lpl", lstBuf);
+            //this.ReadChChar(@"E:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\sega_md.lpl", lstBuf);
+            //this.ReadChChar(@"E:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\fba_Pgm_PSIKYO.lpl", lstBuf);
+            //this.ReadChChar(@"E:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\mame2003_coreA.lpl", lstBuf);
+            //this.ReadChChar(@"E:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\mame2003_coreB.lpl", lstBuf);
+            //this.ReadChChar(@"E:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\mame2003_coreC.lpl", lstBuf);
+            //this.ReadChChar(@"E:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\mame2003_coreD.lpl", lstBuf);
+            //this.ReadChChar(@"E:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\mame2003_coreE.lpl", lstBuf);
+            //this.ReadChChar(@"E:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\mame2003_coreF.lpl", lstBuf);
+            //this.ReadChChar(@"E:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\mame2003_coreG.lpl", lstBuf);
             char[] chTxt = string.Join("", lstBuf.ToArray()).ToCharArray();
 
             foreach (char chChar in chTxt)
@@ -1506,24 +1593,28 @@ namespace Hanhua.Common
             List<byte> charIndexMap = new List<byte>();
             //List<byte> charInfoMap = new List<byte>();
 
-            //ImgInfo imgInfo = new ImgInfo(24, 24);
-            //imgInfo.BlockImgH = 24;
-            //imgInfo.BlockImgW = 24;
-            //imgInfo.NeedBorder = false;
-            //imgInfo.FontStyle = FontStyle.Regular;
-            //imgInfo.FontSize = 22;
-            //imgInfo.Brush = Brushes.White;
+            ImgInfo imgInfo = new ImgInfo(24, 24);
+            imgInfo.BlockImgH = 24;
+            imgInfo.BlockImgW = 22;
+            imgInfo.NeedBorder = false;
+            //imgInfo.FontStyle = FontStyle.Bold;
+            imgInfo.FontSize = 19;
+            //imgInfo.FontName = "gulim";
+            imgInfo.FontName = "Times New Roman";
+            imgInfo.Brush = Brushes.White;
+            //imgInfo.Sf.LineAlignment = StringAlignment.Far;
 
             // Retroarch font
-            ImgInfo imgInfo = new ImgInfo(14, 14);
-            imgInfo.BlockImgH = 14;
-            imgInfo.BlockImgW = 14;
-            imgInfo.NeedBorder = false;
-            imgInfo.FontName = "微软雅黑";
-            imgInfo.FontStyle = FontStyle.Regular;
-            imgInfo.FontSize = 7f;
-            imgInfo.Brush = Brushes.White;
-            imgInfo.Pen = new Pen(Color.White, 0.1F);
+            //ImgInfo imgInfo = new ImgInfo(13, 13);
+            //imgInfo.BlockImgH = 13;
+            //imgInfo.BlockImgW = 13;
+            //imgInfo.NeedBorder = false;
+            //imgInfo.FontName = "微软雅黑";
+            //imgInfo.FontName = "Futura";
+            //imgInfo.FontStyle = FontStyle.Regular;
+            //imgInfo.FontSize = 8f;
+            //imgInfo.Brush = Brushes.White;
+            //imgInfo.Pen = new Pen(Color.White, 0.1F);
 
             // 显示进度条
             this.ResetProcessBar(allZhTxt.Count);
@@ -1534,10 +1625,23 @@ namespace Hanhua.Common
             {
                 imgInfo.NewImg();
                 imgInfo.CharTxt = Encoding.BigEndianUnicode.GetString(new byte[] { (byte)(unicodeChar >> 8 & 0xFF), (byte)(unicodeChar & 0xFF) });
+                //if ("G".Equals(imgInfo.CharTxt) || "g".Equals(imgInfo.CharTxt))
+                //{
+                //    //imgInfo.YPadding = -3;
+                //}
+                //else
+                {
+                    imgInfo.YPadding = 0;
+                }
+                imgInfo.PosX = 0;
+                imgInfo.PosY = 1;
                 imgInfo.XPadding = 0;
-                imgInfo.YPadding = -2;
+                
+                imgInfo.Sf.Alignment = StringAlignment.Center;
+                imgInfo.Sf.LineAlignment = StringAlignment.Center;
+
                 imgInfo.Grp.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
-                ImgUtil.WriteTextBlockImg(imgInfo);
+                ImgUtil.WriteBlockImg(imgInfo);
 
                 // 保存字符映射表信息
                 byte[] byChar = Encoding.BigEndianUnicode.GetBytes(imgInfo.CharTxt);
@@ -1545,6 +1649,7 @@ namespace Hanhua.Common
                 Array.Copy(byChar, 0, byCurChar, 0, byChar.Length);
                 //this.SetCharPadding(byCurChar, imgInfo.Bmp);
                 imgInfo.Bmp = this.SetCharPadding(byCurChar, imgInfo.Bmp);
+                //this.SetCharPadding(byCurChar, imgInfo.Bmp);
                 charIndexMap.AddRange(byCurChar);
                 //charInfoMap.AddRange(byCurChar);
 
@@ -1558,9 +1663,10 @@ namespace Hanhua.Common
                 //}
 
 
-                if (charIndex++ < 500)
+                //if (charIndex++ < 500)
                 {
-                    imgInfo.Bmp.Save(@"H:\游戏汉化\fontTest\CharPng\" + unicodeChar + ".png");
+                    //imgInfo.Bmp.Save(@"H:\游戏汉化\fontTest\CharPng\" + unicodeChar + ".png");
+                    imgInfo.Bmp.Save(@"G:\Study\MySelfProject\Hanhua\fontTest\CharPng\" + unicodeChar + ".png");
                 }
 
                 //charIndex = charPngData.Count;
@@ -1570,8 +1676,8 @@ namespace Hanhua.Common
                 //charIndexMap.Add((byte)(charIndex & 0xFF));
 
                 // 保存文字图片信息
-                //byte[] byCharFont = Util.ImageEncode(imgInfo.Bmp, "IA8");
-                byte[] byCharFont = Util.ImageEncodeNoBlock(imgInfo.Bmp, "RGB5A3");
+                byte[] byCharFont = Util.ImageEncode(imgInfo.Bmp, "IA8");
+                //byte[] byCharFont = Util.ImageEncodeNoBlock(imgInfo.Bmp, "RGB5A3");
                 //charPngData.AddRange(byCharFont);
 
                 charIndexMap.AddRange(byCharFont);
@@ -1583,12 +1689,13 @@ namespace Hanhua.Common
             // 隐藏进度条
             this.CloseProcessBar();
 
-            //File.WriteAllBytes(@"E:\Study\MySelfProject\Hanhua\fontTest\ZhBufFont13X13NoBlock_RGB5A3_R.dat", charIndexMap.ToArray());
+            //File.WriteAllBytes(@"E:\Study\MySelfProject\Hanhua\fontTest\ZhBufFont13X13NoBlock_RGB5A3.dat", charIndexMap.ToArray());
             //File.WriteAllBytes(@"H:\游戏汉化\fontTest\ZhBufFont13X13NoBlock_RGB5A3_R.dat", charIndexMap.ToArray());
-            File.WriteAllBytes(@"H:\游戏汉化\fontTest\ZhBufFont14X14NoBlock_RGB5A3.dat", charIndexMap.ToArray());
+            //File.WriteAllBytes(@"H:\游戏汉化\fontTest\ZhBufFont14X14NoBlock_RGB5A3.dat", charIndexMap.ToArray());
+
             //File.WriteAllBytes(@"E:\Study\MySelfProject\Hanhua\fontTest\FontCn_IA8(N64).dat", charIndexMap.ToArray());
             //File.WriteAllBytes(@"E:\Study\MySelfProject\Hanhua\fontTest\FontCn_IA8.dat", Util.ImageEncode(cnFontData, "IA8").ToArray());
-            //File.WriteAllBytes(@"E:\Study\MySelfProject\Hanhua\fontTest\FontCnCharInfo.dat", charInfoMap.ToArray());
+            File.WriteAllBytes(@"G:\Study\MySelfProject\Hanhua\fontTest\De.dat", charIndexMap.ToArray());
             //File.WriteAllBytes(@"H:\游戏汉化\fontTest\ZhBufFont_IA8.dat", charIndexMap.ToArray());
         }
 
@@ -1701,9 +1808,13 @@ namespace Hanhua.Common
             {
                 rightPos = img.Width / 2 + 1;
             }
-            else if (rightPos >= img.Width)
+            else
             {
-                rightPos = img.Width - 1;
+                rightPos++;
+                if (rightPos >= img.Width)
+                {
+                    rightPos = img.Width - 1;
+                }
             }
 
             //byCurChar[2] = (byte)leftPos;
