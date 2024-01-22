@@ -147,6 +147,12 @@
     <Compile Include="TextEditTools\BioCvEdit\BioCvTextAlignEdit.Designer.cs">
       <DependentUpon>BioCvTextAlignEdit.cs</DependentUpon>
     </Compile>
+    <Compile Include="TextEditTools\RfoEdit\RfoEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TextEditTools\RfoEdit\RfoEdit.Designer.cs">
+      <DependentUpon>RfoEdit.cs</DependentUpon>
+    </Compile>
     <Compile Include="TextEditTools\TalesOfSymphonia\TalesOfSymphoniaTextEditor.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -260,6 +266,9 @@
     <EmbeddedResource Include="TextEditTools\BioCvEdit\BioCvTextAlignEdit.resx">
       <DependentUpon>BioCvTextAlignEdit.cs</DependentUpon>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TextEditTools\RfoEdit\RfoEdit.resx">
+      <DependentUpon>RfoEdit.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="TextEditTools\TalesOfSymphonia\TalesOfSymphoniaTextEditor.resx">
       <DependentUpon>TalesOfSymphoniaTextEditor.cs</DependentUpon>

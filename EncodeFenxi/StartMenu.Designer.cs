@@ -32,11 +32,11 @@
             this.btnFntTool = new System.Windows.Forms.Button();
             this.btnTxtTool = new System.Windows.Forms.Button();
             this.commandPanel = new System.Windows.Forms.Panel();
+            this.btnAutoBuild = new System.Windows.Forms.Button();
             this.btnTest = new System.Windows.Forms.Button();
             this.btnFileEdit = new System.Windows.Forms.Button();
             this.btnNgcIso = new System.Windows.Forms.Button();
             this.btnImgTool = new System.Windows.Forms.Button();
-            this.btnAutoBuild = new System.Windows.Forms.Button();
             this.commandPanel.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -79,6 +79,16 @@
             this.commandPanel.Size = new System.Drawing.Size(273, 156);
             this.commandPanel.TabIndex = 7;
             // 
+            // btnAutoBuild
+            // 
+            this.btnAutoBuild.Location = new System.Drawing.Point(14, 116);
+            this.btnAutoBuild.Name = "btnAutoBuild";
+            this.btnAutoBuild.Size = new System.Drawing.Size(112, 29);
+            this.btnAutoBuild.TabIndex = 26;
+            this.btnAutoBuild.Text = "编译Retroarch";
+            this.btnAutoBuild.UseVisualStyleBackColor = true;
+            this.btnAutoBuild.Click += new System.EventHandler(this.btnAutoBuild_Click);
+            // 
             // btnTest
             // 
             this.btnTest.Location = new System.Drawing.Point(141, 81);
@@ -119,16 +129,6 @@
             this.btnImgTool.UseVisualStyleBackColor = true;
             this.btnImgTool.Click += new System.EventHandler(this.btnImgTool_Click);
             // 
-            // btnAutoBuild
-            // 
-            this.btnAutoBuild.Location = new System.Drawing.Point(14, 116);
-            this.btnAutoBuild.Name = "btnAutoBuild";
-            this.btnAutoBuild.Size = new System.Drawing.Size(112, 29);
-            this.btnAutoBuild.TabIndex = 26;
-            this.btnAutoBuild.Text = "编译Retroarch";
-            this.btnAutoBuild.UseVisualStyleBackColor = true;
-            this.btnAutoBuild.Click += new System.EventHandler(this.btnAutoBuild_Click);
-            // 
             // StartMenu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -137,8 +137,7 @@
             this.Controls.Add(this.commandPanel);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
-            this.MinimizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(279, 28);
+            this.MinimumSize = new System.Drawing.Size(279, 29);
             this.Name = "StartMenu";
             this.Text = "Wii/Ngc 汉化入口";
             this.Controls.SetChildIndex(this.pnlTopBody, 0);

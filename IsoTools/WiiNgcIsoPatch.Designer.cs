@@ -129,9 +129,9 @@
             this.chkNoDec.AutoSize = true;
             this.chkNoDec.Location = new System.Drawing.Point(126, 68);
             this.chkNoDec.Name = "chkNoDec";
-            this.chkNoDec.Size = new System.Drawing.Size(147, 16);
+            this.chkNoDec.Size = new System.Drawing.Size(135, 16);
             this.chkNoDec.TabIndex = 18;
-            this.chkNoDec.Text = "已存在加Wii解压缩文件";
+            this.chkNoDec.Text = "已存在Wii解压缩文件";
             this.chkNoDec.UseVisualStyleBackColor = true;
             // 
             // chkSaveTemp
@@ -159,7 +159,6 @@
             this.Controls.Add(this.label1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
-            this.MinimizeBox = false;
             this.Name = "WiiNgcIsoPatch";
             this.Text = "Wii/Ngc Iso打补丁工具(2017/01/19)";
             this.Controls.SetChildIndex(this.pnlTopBody, 0);
