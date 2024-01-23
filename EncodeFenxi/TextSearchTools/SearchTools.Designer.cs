@@ -70,6 +70,7 @@
             this.btnLook = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.rdoChgStr = new System.Windows.Forms.RadioButton();
             this.grbCondition.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.gbxDecoder.SuspendLayout();
@@ -104,6 +105,7 @@
             // 
             // grbCondition
             // 
+            this.grbCondition.Controls.Add(this.rdoChgStr);
             this.grbCondition.Controls.Add(this.rdoToByte);
             this.grbCondition.Controls.Add(this.rdoToPos);
             this.grbCondition.Controls.Add(this.cmbTxtToByte);
@@ -230,7 +232,7 @@
             this.rdoDiffSearch2.Checked = true;
             this.rdoDiffSearch2.Location = new System.Drawing.Point(257, 39);
             this.rdoDiffSearch2.Name = "rdoDiffSearch2";
-            this.rdoDiffSearch2.Size = new System.Drawing.Size(143, 16);
+            this.rdoDiffSearch2.Size = new System.Drawing.Size(139, 16);
             this.rdoDiffSearch2.TabIndex = 3;
             this.rdoDiffSearch2.TabStop = true;
             this.rdoDiffSearch2.Text = "差值格式查找(双字节)";
@@ -241,7 +243,7 @@
             this.rdoDiffSearch.AutoSize = true;
             this.rdoDiffSearch.Location = new System.Drawing.Point(257, 17);
             this.rdoDiffSearch.Name = "rdoDiffSearch";
-            this.rdoDiffSearch.Size = new System.Drawing.Size(143, 16);
+            this.rdoDiffSearch.Size = new System.Drawing.Size(139, 16);
             this.rdoDiffSearch.TabIndex = 2;
             this.rdoDiffSearch.Text = "差值格式查找(单字节)";
             this.rdoDiffSearch.UseVisualStyleBackColor = true;
@@ -272,7 +274,7 @@
             // 
             this.txtKeyWord.Location = new System.Drawing.Point(186, 25);
             this.txtKeyWord.Name = "txtKeyWord";
-            this.txtKeyWord.Size = new System.Drawing.Size(242, 21);
+            this.txtKeyWord.Size = new System.Drawing.Size(242, 19);
             this.txtKeyWord.TabIndex = 1;
             this.txtKeyWord.Text = "61 62 85 86 93 94 254 89";
             // 
@@ -281,7 +283,7 @@
             this.lblKeyWord.AutoSize = true;
             this.lblKeyWord.Location = new System.Drawing.Point(19, 28);
             this.lblKeyWord.Name = "lblKeyWord";
-            this.lblKeyWord.Size = new System.Drawing.Size(137, 12);
+            this.lblKeyWord.Size = new System.Drawing.Size(133, 12);
             this.lblKeyWord.TabIndex = 0;
             this.lblKeyWord.Text = "查找的关键字(逗号分隔)";
             // 
@@ -309,7 +311,7 @@
             this.chk10001.AutoSize = true;
             this.chk10001.Location = new System.Drawing.Point(15, 194);
             this.chk10001.Name = "chk10001";
-            this.chk10001.Size = new System.Drawing.Size(102, 16);
+            this.chk10001.Size = new System.Drawing.Size(96, 16);
             this.chk10001.TabIndex = 9;
             this.chk10001.Text = "Mac_jp(50222)";
             this.chk10001.UseVisualStyleBackColor = true;
@@ -319,7 +321,7 @@
             this.chk50221.AutoSize = true;
             this.chk50221.Location = new System.Drawing.Point(15, 150);
             this.chk50221.Name = "chk50221";
-            this.chk50221.Size = new System.Drawing.Size(198, 16);
+            this.chk50221.Size = new System.Drawing.Size(181, 16);
             this.chk50221.TabIndex = 8;
             this.chk50221.Text = "Jis1 Allow 1 byte Kana(50221)";
             this.chk50221.UseVisualStyleBackColor = true;
@@ -329,7 +331,7 @@
             this.chk50222.AutoSize = true;
             this.chk50222.Location = new System.Drawing.Point(15, 172);
             this.chk50222.Name = "chk50222";
-            this.chk50222.Size = new System.Drawing.Size(246, 16);
+            this.chk50222.Size = new System.Drawing.Size(226, 16);
             this.chk50222.TabIndex = 7;
             this.chk50222.Text = "Jis1 Allow 1 byte Kana - SO/SI(50222)";
             this.chk50222.UseVisualStyleBackColor = true;
@@ -351,7 +353,7 @@
             this.chk51932.AutoSize = true;
             this.chk51932.Location = new System.Drawing.Point(15, 106);
             this.chk51932.Name = "chk51932";
-            this.chk51932.Size = new System.Drawing.Size(102, 16);
+            this.chk51932.Size = new System.Drawing.Size(95, 16);
             this.chk51932.TabIndex = 5;
             this.chk51932.Text = "euc-jp(51932)";
             this.chk51932.UseVisualStyleBackColor = true;
@@ -361,7 +363,7 @@
             this.chk50220.AutoSize = true;
             this.chk50220.Location = new System.Drawing.Point(15, 128);
             this.chk50220.Name = "chk50220";
-            this.chk50220.Size = new System.Drawing.Size(132, 16);
+            this.chk50220.Size = new System.Drawing.Size(122, 16);
             this.chk50220.TabIndex = 4;
             this.chk50220.Text = "iso-2022-jp(50220)";
             this.chk50220.UseVisualStyleBackColor = true;
@@ -371,7 +373,7 @@
             this.chk20932.AutoSize = true;
             this.chk20932.Location = new System.Drawing.Point(15, 62);
             this.chk20932.Name = "chk20932";
-            this.chk20932.Size = new System.Drawing.Size(84, 16);
+            this.chk20932.Size = new System.Drawing.Size(79, 16);
             this.chk20932.TabIndex = 3;
             this.chk20932.Text = "JIS(20932)";
             this.chk20932.UseVisualStyleBackColor = true;
@@ -381,7 +383,7 @@
             this.chkUtf8.AutoSize = true;
             this.chkUtf8.Location = new System.Drawing.Point(15, 40);
             this.chkUtf8.Name = "chkUtf8";
-            this.chkUtf8.Size = new System.Drawing.Size(54, 16);
+            this.chkUtf8.Size = new System.Drawing.Size(52, 16);
             this.chkUtf8.TabIndex = 2;
             this.chkUtf8.Text = "Utf-8";
             this.chkUtf8.UseVisualStyleBackColor = true;
@@ -391,7 +393,7 @@
             this.chkUnicode.AutoSize = true;
             this.chkUnicode.Location = new System.Drawing.Point(15, 84);
             this.chkUnicode.Name = "chkUnicode";
-            this.chkUnicode.Size = new System.Drawing.Size(66, 16);
+            this.chkUnicode.Size = new System.Drawing.Size(65, 16);
             this.chkUnicode.TabIndex = 1;
             this.chkUnicode.Text = "Unicode";
             this.chkUnicode.UseVisualStyleBackColor = true;
@@ -403,7 +405,7 @@
             this.chkShiftJis.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkShiftJis.Location = new System.Drawing.Point(15, 18);
             this.chkShiftJis.Name = "chkShiftJis";
-            this.chkShiftJis.Size = new System.Drawing.Size(108, 16);
+            this.chkShiftJis.Size = new System.Drawing.Size(96, 16);
             this.chkShiftJis.TabIndex = 0;
             this.chkShiftJis.Text = "Shift-Jis(932)";
             this.chkShiftJis.UseVisualStyleBackColor = true;
@@ -517,6 +519,16 @@
             this.panel2.Size = new System.Drawing.Size(847, 171);
             this.panel2.TabIndex = 8;
             // 
+            // rdoChgStr
+            // 
+            this.rdoChgStr.AutoSize = true;
+            this.rdoChgStr.Location = new System.Drawing.Point(334, 90);
+            this.rdoChgStr.Name = "rdoChgStr";
+            this.rdoChgStr.Size = new System.Drawing.Size(59, 16);
+            this.rdoChgStr.TabIndex = 14;
+            this.rdoChgStr.Text = "转文字";
+            this.rdoChgStr.UseVisualStyleBackColor = true;
+            // 
             // Fenxi
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -583,6 +595,7 @@
         private System.Windows.Forms.ComboBox cmbTxtToByte;
         private System.Windows.Forms.RadioButton rdoToPos;
         private System.Windows.Forms.RadioButton rdoToByte;
+        private System.Windows.Forms.RadioButton rdoChgStr;
     }
 }
 

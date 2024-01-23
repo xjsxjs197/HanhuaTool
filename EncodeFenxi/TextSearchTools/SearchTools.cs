@@ -616,12 +616,12 @@ namespace Hanhua.Common
                 {
                     // 通常文本转换（Shift-Jis）
                     case 0:
-                        chgText = this.TextChgHelpCom(Encoding.GetEncoding("Shift-Jis"), this.rdoToPos.Checked);
+                        chgText = this.TextChgHelpCom(Encoding.GetEncoding("Shift-Jis"), this.rdoToPos.Checked, this.rdoChgStr.Checked);
                         break;
 
                     // 通常文本转换（Utf-8）
                     case 1:
-                        chgText = this.TextChgHelpCom(Encoding.UTF8, this.rdoToPos.Checked);
+                        chgText = this.TextChgHelpCom(Encoding.UTF8, this.rdoToPos.Checked, this.rdoChgStr.Checked);
                         break;
 
                     // 生化1文件文本转换
@@ -642,12 +642,12 @@ namespace Hanhua.Common
 
                     // 通常文本转换（Unicode Big end）
                     case 5:
-                        chgText = this.TextChgHelpCom(Encoding.BigEndianUnicode, this.rdoToPos.Checked);
+                        chgText = this.TextChgHelpCom(Encoding.BigEndianUnicode, this.rdoToPos.Checked, this.rdoChgStr.Checked);
                         break;
 
                     // 通常文本转换（Unicode Little end）
                     case 6:
-                        chgText = this.TextChgHelpCom(Encoding.Unicode, this.rdoToPos.Checked);
+                        chgText = this.TextChgHelpCom(Encoding.Unicode, this.rdoToPos.Checked, this.rdoChgStr.Checked);
                         break;
                 }
 
@@ -659,9 +659,10 @@ namespace Hanhua.Common
         /// 通常文本变换协助
         /// </summary>
         /// <param name="encoder">编码格式</param>
-        /// <param name="isChgPos">转位置还是转二进制</param>
+        /// <param name="isChgPos">是否转位置</param>
+        /// <param name="isChgStr">是否转字符串</param>
         /// <returns></returns>
-        private string TextChgHelpCom(Encoding encoder, bool isChgPos)
+        private string TextChgHelpCom(Encoding encoder, bool isChgPos, bool isChgStr)
         {
             StringBuilder sb = new StringBuilder();
 
@@ -672,6 +673,16 @@ namespace Hanhua.Common
                 {
                     sb.Append(" " + test.IndexOf(this.baseKeyWords.Substring(i, 1)).ToString());
                 }
+            }
+            else if (isChgStr)
+            {
+                List<byte> byList = new List<byte>();
+                string[] keys = this.baseKeyWords.Trim().Split(' ');
+                foreach (string key in keys)
+                {
+                    byList.Add(Convert.ToByte(key, 16));
+                }
+                return encoder.GetString(byList.ToArray());
             }
             else
             {
