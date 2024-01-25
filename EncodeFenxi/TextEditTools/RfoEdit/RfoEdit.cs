@@ -15,7 +15,7 @@ namespace Hanhua.Common.TextEditTools.RfoEdit
     public partial class RfoEdit : Form
     {
         private string baseFolder = @"G:\Study\MySelfProject\Hanhua\TodoCn\Rfo\";
-        private int fontImgCnt = 25;
+        private int fontImgCnt = 26;
 
         public RfoEdit()
         {
@@ -153,6 +153,7 @@ namespace Hanhua.Common.TextEditTools.RfoEdit
             string[] allFontChar = File.ReadAllLines(this.baseFolder + @"fontChar.txt", Encoding.UTF8);
             int fileSize = allFontChar.Length * 12 + 10;
             byte[] byNewCharMap = new byte[fileSize];
+            int minTmp = 255;
             byNewCharMap[0] = 0;
             byNewCharMap[1] = 0;
             byNewCharMap[2] = 0;
@@ -184,8 +185,9 @@ namespace Hanhua.Common.TextEditTools.RfoEdit
                     fontBmp = (Bitmap)(Bitmap.FromFile(this.baseFolder + @"font\cnimportNew\tmpCnFont" + fontImgIdx + ".png"));
                     isLoadBmp = true;
                 }
+
                 if ((byChar[0] == 0 && tmpChar != " " && tmpChar != "　")
-                    || tmpChar.Equals("。"))
+                    || "·×αβγװ—―‘’“”…※┃┏└┗┝┠□△◆◇○★☆♪、。々《》「」『』【】！％＆（）＊＋，－／０１２３４５６７８９：；＜＞？＠ＡＢＣＤＦＧＨＫＬＭＯＰＲＳＸＺａｂｃｇｊｍｑｒｕｖｘｙ～".IndexOf(tmpChar) >= 0)
                 {
                     // 半角字符宽度需要动态计算，其他的直接写死
                     int leftX = startX;
@@ -233,10 +235,52 @@ namespace Hanhua.Common.TextEditTools.RfoEdit
                         }
                     }
 
-                    byCharMap[4] = (byte)((leftX >> 8) & 0xff);
-                    byCharMap[5] = (byte)((leftX >> 0) & 0xff);
-                    byCharMap[8] = (byte)(((rightX) >> 8) & 0xff);
-                    byCharMap[9] = (byte)(((rightX) >> 0) & 0xff);
+                    if ("0123456789".IndexOf(tmpChar) >= 0)
+                    {
+                        int fixWidth = 13;
+                        if (leftX > startX)
+                        {
+                            leftX--;
+                        }
+                        if (tmpChar == "1")
+                        {
+                            leftX -= 2;
+                        }
+                        byCharMap[4] = (byte)((leftX >> 8) & 0xff);
+                        byCharMap[5] = (byte)((leftX >> 0) & 0xff);
+                        byCharMap[8] = (byte)(((leftX + fixWidth) >> 8) & 0xff);
+                        byCharMap[9] = (byte)(((leftX + fixWidth) >> 0) & 0xff);
+                    }
+                    else if (tmpChar == "【")
+                    {
+                        leftX -= 8;
+                        byCharMap[4] = (byte)((leftX >> 8) & 0xff);
+                        byCharMap[5] = (byte)((leftX >> 0) & 0xff);
+                        byCharMap[8] = (byte)(((rightX) >> 8) & 0xff);
+                        byCharMap[9] = (byte)(((rightX) >> 0) & 0xff);
+                    }
+                    else if (tmpChar == "】")
+                    {
+                        rightX += 2;
+                        byCharMap[4] = (byte)((leftX >> 8) & 0xff);
+                        byCharMap[5] = (byte)((leftX >> 0) & 0xff);
+                        byCharMap[8] = (byte)(((rightX) >> 8) & 0xff);
+                        byCharMap[9] = (byte)(((rightX) >> 0) & 0xff);
+                    }
+                    else
+                    {
+                        byCharMap[4] = (byte)((leftX >> 8) & 0xff);
+                        byCharMap[5] = (byte)((leftX >> 0) & 0xff);
+                        byCharMap[8] = (byte)(((rightX) >> 8) & 0xff);
+                        byCharMap[9] = (byte)(((rightX) >> 0) & 0xff);
+                    }
+                }
+                else if (tmpChar == " ")
+                {
+                    byCharMap[4] = (byte)((startX >> 8) & 0xff);
+                    byCharMap[5] = (byte)((startX >> 0) & 0xff);
+                    byCharMap[8] = (byte)(((startX + 10) >> 8) & 0xff);
+                    byCharMap[9] = (byte)(((startX + 10) >> 0) & 0xff);
                 }
                 else
                 {
@@ -293,6 +337,7 @@ namespace Hanhua.Common.TextEditTools.RfoEdit
                 string strCnTxt = cnTxtList[i];
                 if (string.IsNullOrEmpty(strCnTxt))
                 {
+                    MessageBox.Show("长度有问题，需要加空格 " + (i + 1));
                     break;
                 }
                 if (strCnTxt.Length <= 11)
@@ -372,11 +417,12 @@ namespace Hanhua.Common.TextEditTools.RfoEdit
 
             StringBuilder sb = new StringBuilder();
             List<byte> byCnData = new List<byte>();
-            for (int i = 0; i < ((0xc8c - 0xf8) / 4 - 1) * 2; i += 2)
+            for (int i = 0; i < cnTxtList.Length; i += 2)
             {
                 string strCnTxt = cnTxtList[i];
                 if (string.IsNullOrEmpty(strCnTxt))
                 {
+                    MessageBox.Show("这里有问题，需要加空格 " + (i + 1));
                     break;
                 }
                 if (strCnTxt.Length <= 11)
@@ -417,16 +463,46 @@ namespace Hanhua.Common.TextEditTools.RfoEdit
                 //byCnData.AddRange(this.EncodeLineText(newChTxt));
                 // 写入中文文本
                 byte[] curCnData = this.EncodeLineText(newChTxt);
+                chTxtPos = Convert.ToInt32(strCnTxt.Substring(0, 8), 16);
                 Array.Copy(curCnData, 0, byOldTxt, chTxtPos, curCnData.Length);
 
                 // 写入中文Index位置
-                txtTableStart += 4;
-                chTxtPos += curCnData.Length;
-                int tableIdx = chTxtPos + 0x20;
-                byOldTxt[txtTableStart + 0] = (byte)((tableIdx >> 24) & 0xff);
-                byOldTxt[txtTableStart + 1] = (byte)((tableIdx >> 16) & 0xff);
-                byOldTxt[txtTableStart + 2] = (byte)((tableIdx >> 8) & 0xff);
-                byOldTxt[txtTableStart + 3] = (byte)((tableIdx >> 0) & 0xff);
+                //txtTableStart += 4;
+                //chTxtPos += curCnData.Length;
+                //int tableIdx = chTxtPos + 0x20;
+                //byOldTxt[txtTableStart + 0] = (byte)((tableIdx >> 24) & 0xff);
+                //byOldTxt[txtTableStart + 1] = (byte)((tableIdx >> 16) & 0xff);
+                //byOldTxt[txtTableStart + 2] = (byte)((tableIdx >> 8) & 0xff);
+                //byOldTxt[txtTableStart + 3] = (byte)((tableIdx >> 0) & 0xff);
+            }
+
+            // 检查映射表内容不能变更
+            byte[] byOldChk = File.ReadAllBytes(this.baseFolder + @"01718Old.bin");
+            int chkStart = 0x18;
+            for (int x = 0; x < 26;  x++)
+            {
+                int startPos = Util.GetOffset(byOldChk, chkStart, chkStart + 3) + 0xE8;
+                int lenInfoPos = startPos + Util.GetOffset(byOldChk, startPos + 4, startPos + 7);
+                int lenInfo = Util.GetOffset(byOldChk, lenInfoPos, lenInfoPos + 3);
+                bool chkOk = true;
+                int tmp = startPos;
+                while (tmp < (startPos + lenInfo))
+                {
+                    if (byOldChk[tmp] != byOldTxt[tmp])
+                    {
+                        chkOk = false;
+                        break;
+                    }
+                    tmp++;
+                }
+                if (!chkOk)
+                {
+                    MessageBox.Show("这个区域的内容不能动 " + startPos.ToString("X") + " " + (startPos + lenInfo).ToString("X"));
+                    break;
+                }
+
+
+                chkStart += 8;
             }
 
             if (byCnData.Count > maxCnLen)
@@ -530,10 +606,12 @@ namespace Hanhua.Common.TextEditTools.RfoEdit
                 string strCnTxt = cnTxtList[i];
                 if (string.IsNullOrEmpty(strCnTxt))
                 {
+                    MessageBox.Show("长度有问题，需要加空格 " + (i + 1));
                     break;
                 }
                 if (strCnTxt.Length <= 11)
                 {
+                    MessageBox.Show("长度有问题，需要加空格 " + (i + 1));
                     continue;
                 }
 
@@ -629,6 +707,74 @@ namespace Hanhua.Common.TextEditTools.RfoEdit
                     img.Save(fi.File.Replace(".tif", ".png").Replace("Tif", "Png"), ImageFormat.Png);
                 }
             }
+        }
+
+        /// <summary>
+        /// 功能测试
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnTest_Click(object sender, EventArgs e)
+        {
+            byte[] byOldTxt = File.ReadAllBytes(this.baseFolder + @"01718Old.bin");
+            int txtTableStart = 0xF8;
+            int txtTableEnd = 0xC8C;
+
+            List<string> jpTxt = new List<string>();
+            for (int i = txtTableStart; i < txtTableEnd; i += 4)
+            {
+                int jpTxtPos = Util.GetOffset(byOldTxt, i, i + 3);
+                int jpEndPos = 0;
+                if (i < 0xC88)
+                {
+                    jpEndPos = Util.GetOffset(byOldTxt, i + 4, i + 4 + 3);
+                }
+                else
+                {
+                    jpEndPos = 0xEF20;
+                }
+
+                string jpLine = Encoding.BigEndianUnicode.GetString(byOldTxt, jpTxtPos, jpEndPos - jpTxtPos);
+                jpTxt.Add(jpTxtPos.ToString("x").ToUpper().PadLeft(8, '0') + "," + (jpEndPos - jpTxtPos) + "," + jpLine.Replace("\n", "^00 0a^") + "\n");
+            }
+
+            File.WriteAllLines(this.baseFolder + @"jpTxt01718.txt", jpTxt.ToArray(), Encoding.UTF8);
+        }
+
+        /// <summary>
+        /// 一键打包
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnPatchFile_Click(object sender, EventArgs e)
+        {
+            // 复制字库，翻译文件
+            File.Copy(this.baseFolder + @"00529.bin", this.baseFolder + @"rfo\rfo\RUNEFACTORY\00529.bin", true);
+            File.Copy(this.baseFolder + @"00530.bin", this.baseFolder + @"rfo\rfo\RUNEFACTORY\00530.bin", true);
+            File.Copy(this.baseFolder + @"00905.bin", this.baseFolder + @"rfo\rfo\RUNEFACTORY\00905.bin", true);
+            File.Copy(this.baseFolder + @"01718.bin", this.baseFolder + @"rfo\rfo\RUNEFACTORY\01718.bin", true);
+
+            // 复制图片文件
+            List<FilePosInfo> allPicFiles = Util.GetAllFiles(this.baseFolder + @"rfo\rfo\PicHanhua\bin\").Where(p => !p.IsFolder).ToList();
+            foreach (FilePosInfo fi in allPicFiles)
+            {
+                File.Copy(fi.File, fi.File.Replace(@"\PicHanhua\bin\", @"\RUNEFACTORY\"), true);
+            }
+
+            // 打包
+            System.Diagnostics.Process exep = new System.Diagnostics.Process();
+            exep.StartInfo.FileName = this.baseFolder + @"rfo\rfo\rfo.exe";
+            exep.StartInfo.CreateNoWindow = true;
+            exep.StartInfo.UseShellExecute = false;
+            exep.StartInfo.Arguments = @" -r " + this.baseFolder + @"\rfo\rfo\RUNEFACTORY";
+            exep.Start();
+            exep.WaitForExit();
+
+            // 复制补丁
+            File.Copy(this.baseFolder + @"rfo\rfo\RUNEFACTORY.repack.bin", this.baseFolder + @"测试补丁\files\RUNEFACTORY.bin", true);
+            File.Copy(this.baseFolder + @"rfo\rfo\RUNEFACTORY.repack.dat", this.baseFolder + @"测试补丁\files\RUNEFACTORY.dat", true);
+
+            MessageBox.Show("一键打包完成");
         }
     }
 }

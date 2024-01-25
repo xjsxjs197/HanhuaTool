@@ -35,6 +35,8 @@
             this.btnFontImg = new System.Windows.Forms.Button();
             this.btnSortChar = new System.Windows.Forms.Button();
             this.btnChgPic = new System.Windows.Forms.Button();
+            this.btnTest = new System.Windows.Forms.Button();
+            this.btnPatchFile = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnCreateFont
@@ -107,11 +109,33 @@
             this.btnChgPic.UseVisualStyleBackColor = true;
             this.btnChgPic.Click += new System.EventHandler(this.btnChgPic_Click);
             // 
+            // btnTest
+            // 
+            this.btnTest.Location = new System.Drawing.Point(322, 84);
+            this.btnTest.Name = "btnTest";
+            this.btnTest.Size = new System.Drawing.Size(143, 30);
+            this.btnTest.TabIndex = 7;
+            this.btnTest.Text = "测试按钮";
+            this.btnTest.UseVisualStyleBackColor = true;
+            this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
+            // 
+            // btnPatchFile
+            // 
+            this.btnPatchFile.Location = new System.Drawing.Point(28, 156);
+            this.btnPatchFile.Name = "btnPatchFile";
+            this.btnPatchFile.Size = new System.Drawing.Size(143, 30);
+            this.btnPatchFile.TabIndex = 8;
+            this.btnPatchFile.Text = "一键打包";
+            this.btnPatchFile.UseVisualStyleBackColor = true;
+            this.btnPatchFile.Click += new System.EventHandler(this.btnPatchFile_Click);
+            // 
             // RfoEdit
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(496, 168);
+            this.ClientSize = new System.Drawing.Size(496, 200);
+            this.Controls.Add(this.btnPatchFile);
+            this.Controls.Add(this.btnTest);
             this.Controls.Add(this.btnChgPic);
             this.Controls.Add(this.btnSortChar);
             this.Controls.Add(this.btnFontImg);
@@ -135,5 +159,7 @@
         private System.Windows.Forms.Button btnFontImg;
         private System.Windows.Forms.Button btnSortChar;
         private System.Windows.Forms.Button btnChgPic;
+        private System.Windows.Forms.Button btnTest;
+        private System.Windows.Forms.Button btnPatchFile;
     }
 }
