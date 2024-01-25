@@ -755,7 +755,7 @@ namespace Hanhua.Common.TextEditTools.RfoEdit
             File.Copy(this.baseFolder + @"01718.bin", this.baseFolder + @"rfo\rfo\RUNEFACTORY\01718.bin", true);
 
             // 复制图片文件
-            List<FilePosInfo> allPicFiles = Util.GetAllFiles(this.baseFolder + @"rfo\rfo\PicHanhua\bin\").Where(p => !p.IsFolder).ToList();
+            List<FilePosInfo> allPicFiles = Util.GetAllFiles(this.baseFolder + @"rfo\rfo\PicHanhua\OKBin\").Where(p => !p.IsFolder).ToList();
             foreach (FilePosInfo fi in allPicFiles)
             {
                 File.Copy(fi.File, fi.File.Replace(@"\PicHanhua\bin\", @"\RUNEFACTORY\"), true);
