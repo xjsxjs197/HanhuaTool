@@ -553,7 +553,7 @@ namespace Hanhua.TextEditTools.Bio2Edit
 
             this.gameName = "Bio2";
             //this.baseFolder = @"E:\Study\Hanhua\TodoCn\Bio2";
-            this.baseFolder = @"E:\游戏汉化\NgcBio2";
+            this.baseFolder = @"G:\Study\MySelfProject\Hanhua\TodoCn\HanhuaProject\Bio2";
             this.subDisk = "A";
             
             this.SetPsLoadStatus(false);
@@ -696,7 +696,8 @@ namespace Hanhua.TextEditTools.Bio2Edit
             // 添加Ngc start.dol文件
             if (this.chkNgcDol.Checked)
             {
-                string ngcStartDol = this.baseFolder + @"\Bio2NgcJp\root\leon.rel";
+                //string ngcStartDol = this.baseFolder + @"\Bio2NgcJp\root\leon.rel";
+                string ngcStartDol = this.baseFolder + @"\helpPc\jp\bio2.exe";
                 if ("B".Equals(this.subDisk))
                 {
                     ngcStartDol = this.baseFolder + @"\Bio2NgcJp\root\claire.rel";
@@ -2285,7 +2286,8 @@ namespace Hanhua.TextEditTools.Bio2Edit
             {
                 if (this.chkNgcDol.Checked)
                 {
-                    needCopyFiles.AddRange(this.LoadFiles(this.baseFolder + @"\Bio2NgcRel" + this.subDisk + ".txt"));
+                    //needCopyFiles.AddRange(this.LoadFiles(this.baseFolder + @"\Bio2NgcRel" + this.subDisk + ".txt"));
+                    needCopyFiles.AddRange(this.LoadFiles(this.baseFolder + @"\Bio2PcAddr.txt"));
                 }
 
                 if (this.chkNgcRdt.Checked)
@@ -2719,5 +2721,55 @@ namespace Hanhua.TextEditTools.Bio2Edit
         }
 
         #endregion
+
+        private void btnPcHelper_Click(object sender, EventArgs e)
+        {
+            this.baseFolder = @"G:\Study\MySelfProject\Hanhua\TodoCn\HanhuaProject\Bio2";
+            this.ResetFontChar(1);
+
+            string testStr = "しばらくお待ちください";
+            StringBuilder chkStr = new StringBuilder();
+            int idx = 0;
+            for (int i = 0; i < testStr.Length - 1; i++)
+            {
+                byte[] byTst = this.EncodeJpChar(testStr.Substring(i, 1));
+                idx = 0;
+                while (idx < byTst.Length)
+                {
+                    chkStr.Append(byTst[idx].ToString("X").PadLeft(2, '0'));
+                    idx++;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 取得当前文字的编码
+        /// </summary>
+        /// <param name="currenChar">当前文字</param>
+        /// <returns>当前文字的编码</returns>
+        private byte[] EncodeJpChar(string currentChar)
+        {
+            // 在字库中查找
+            foreach (int fontPage in this.jpFontCharPage.Keys)
+            {
+                string[] pageFonts = this.jpFontCharPage[fontPage];
+                for (int i = 0; i < pageFonts.Length; i++)
+                {
+                    if (currentChar == pageFonts[i])
+                    {
+                        if (fontPage == 0)
+                        {
+                            return new byte[] { (byte)i };
+                        }
+                        else
+                        {
+                            return new byte[] { (byte)fontPage, (byte)i };
+                        }
+                    }
+                }
+            }
+
+            throw new Exception("未查询到相应的日文字符 : " + currentChar);
+        }
     }
 }

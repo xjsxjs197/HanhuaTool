@@ -35,11 +35,13 @@ namespace Hanhua.TextEditTools.Bio2Edit
             this.chkPsBin = new System.Windows.Forms.CheckBox();
             this.btnCopyFromPs = new System.Windows.Forms.Button();
             this.chkNgcRdt = new System.Windows.Forms.CheckBox();
+            this.btnPcHelper = new System.Windows.Forms.Button();
             this.pnlCommand.SuspendLayout();
             this.SuspendLayout();
             // 
             // pnlCommand
             // 
+            this.pnlCommand.Controls.Add(this.btnPcHelper);
             this.pnlCommand.Controls.Add(this.chkNgcRdt);
             this.pnlCommand.Controls.Add(this.btnCopyFromPs);
             this.pnlCommand.Controls.Add(this.chkPsBin);
@@ -53,6 +55,7 @@ namespace Hanhua.TextEditTools.Bio2Edit
             this.pnlCommand.Controls.SetChildIndex(this.chkPsBin, 0);
             this.pnlCommand.Controls.SetChildIndex(this.btnCopyFromPs, 0);
             this.pnlCommand.Controls.SetChildIndex(this.chkNgcRdt, 0);
+            this.pnlCommand.Controls.SetChildIndex(this.btnPcHelper, 0);
             // 
             // pnlTopBody
             // 
@@ -84,6 +87,8 @@ namespace Hanhua.TextEditTools.Bio2Edit
             // chkNgcDol
             // 
             this.chkNgcDol.AutoSize = true;
+            this.chkNgcDol.Checked = true;
+            this.chkNgcDol.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkNgcDol.Location = new System.Drawing.Point(74, 10);
             this.chkNgcDol.Name = "chkNgcDol";
             this.chkNgcDol.Size = new System.Drawing.Size(66, 16);
@@ -103,7 +108,7 @@ namespace Hanhua.TextEditTools.Bio2Edit
             // 
             // btnCopyFromPs
             // 
-            this.btnCopyFromPs.Location = new System.Drawing.Point(335, 4);
+            this.btnCopyFromPs.Location = new System.Drawing.Point(369, 4);
             this.btnCopyFromPs.Name = "btnCopyFromPs";
             this.btnCopyFromPs.Size = new System.Drawing.Size(60, 26);
             this.btnCopyFromPs.TabIndex = 15;
@@ -114,14 +119,22 @@ namespace Hanhua.TextEditTools.Bio2Edit
             // chkNgcRdt
             // 
             this.chkNgcRdt.AutoSize = true;
-            this.chkNgcRdt.Checked = true;
-            this.chkNgcRdt.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkNgcRdt.Location = new System.Drawing.Point(154, 10);
             this.chkNgcRdt.Name = "chkNgcRdt";
             this.chkNgcRdt.Size = new System.Drawing.Size(42, 16);
             this.chkNgcRdt.TabIndex = 19;
             this.chkNgcRdt.Text = "Rdt";
             this.chkNgcRdt.UseVisualStyleBackColor = true;
+            // 
+            // btnPcHelper
+            // 
+            this.btnPcHelper.Location = new System.Drawing.Point(303, 4);
+            this.btnPcHelper.Name = "btnPcHelper";
+            this.btnPcHelper.Size = new System.Drawing.Size(60, 26);
+            this.btnPcHelper.TabIndex = 20;
+            this.btnPcHelper.Text = "PcBio2";
+            this.btnPcHelper.UseVisualStyleBackColor = true;
+            this.btnPcHelper.Click += new System.EventHandler(this.btnPcHelper_Click);
             // 
             // Bio2TextEditor
             // 
@@ -145,6 +158,7 @@ namespace Hanhua.TextEditTools.Bio2Edit
         private System.Windows.Forms.CheckBox chkPsBin;
         private System.Windows.Forms.Button btnCopyFromPs;
         private System.Windows.Forms.CheckBox chkNgcRdt;
+        private System.Windows.Forms.Button btnPcHelper;
 
     }
 }
