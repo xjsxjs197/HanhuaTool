@@ -875,6 +875,22 @@ namespace Hanhua.TextEditTools.Bio2Edit
         }
 
         /// <summary>
+        /// 重新设置Entry位置信息
+        /// </summary>
+        /// <param name="currentFileInfo">当前选择的文件</param>
+        /// <param name="cnTxtLen">当前行中文文本字节长度</param>
+        /// <param name="prevEntryPos">前一个Entry位置信息</param>
+        /// <returns>当前Entry位置信息</returns>
+        protected override int ResetEntryPosInfo(FilePosInfo currentFileInfo, int cnTxtLen, int prevEntryPos)
+        {
+            // 保存Entry的偏移
+            int nextEntryPos = prevEntryPos + cnTxtLen;
+            currentFileInfo.TextEntrys.Add(nextEntryPos);
+
+            return nextEntryPos;
+        }
+
+        /// <summary>
         /// 重新设置带Entry信息的翻译后的数据
         /// </summary>
         /// <param name="currentFileInfo">当前选择的文件</param>
@@ -907,16 +923,58 @@ namespace Hanhua.TextEditTools.Bio2Edit
             }
             else
             {
+                // 重新组织Pos信息
+                int entryStart = currentFileInfo.TextEnd;
+                int entryEnd = currentFileInfo.EntryPos;
+                List<int> entryList = new List<int>();
+                Dictionary<int, int> insertPosInfo = new Dictionary<int, int>();
+                for (int i = entryStart; i < entryEnd; i += 2)
+                {
+                    entryList.Add(currentFileInfo.TextStart + Util.GetOffset(byData, i, i + 1));
+                }
+
+                int startPos;
+                for (int i = 0; i < entryList.Count - 1; i++)
+                {
+                    startPos = entryList[i];
+                    int endPos = entryList[i + 1];
+                    if (endPos < startPos)
+                    {
+                        int tmp = i;
+                        while (tmp >= 0)
+                        {
+                            if (endPos >= entryList[tmp])
+                            {
+                                insertPosInfo.Add(i + 1, tmp);
+                                break;
+                            }
+                            tmp--;
+                        }
+                    }
+                }
+
                 // 带Entry的文本，先保存文本数据
                 Array.Copy(cnBytes.ToArray(), 0, byCnData, 0, cnBytes.Count);
 
                 // 再保存修改后的各个Entry
-                int entryStart = cnBytes.Count;
+                int entryStartPos = cnBytes.Count;
+                int posIdx = 0;
                 for (int i = 0; i < currentFileInfo.TextEntrys.Count; i++)
                 {
                     int entryPos = currentFileInfo.TextEntrys[i];
-                    byCnData[entryStart + i * 2] = (byte)((entryPos >> 8) & 0xFF);
-                    byCnData[entryStart + i * 2 + 1] = (byte)(entryPos & 0xFF);
+                    if (insertPosInfo.Count > 0 && insertPosInfo.ContainsKey(i))
+                    {
+                        int insertPos = currentFileInfo.TextEntrys[insertPosInfo[i]] + 2;
+                        //int insertPos = 0;
+                        byCnData[entryStartPos + posIdx * 2] = (byte)((insertPos >> 8) & 0xFF);
+                        byCnData[entryStartPos + posIdx * 2 + 1] = (byte)(insertPos & 0xFF);
+                    }
+                    else
+                    {
+                        byCnData[entryStartPos + posIdx * 2] = (byte)((entryPos >> 8) & 0xFF);
+                        byCnData[entryStartPos + posIdx * 2 + 1] = (byte)(entryPos & 0xFF);
+                    }
+                    posIdx++;
                 }
             }
 
@@ -2287,7 +2345,7 @@ namespace Hanhua.TextEditTools.Bio2Edit
                 if (this.chkNgcDol.Checked)
                 {
                     //needCopyFiles.AddRange(this.LoadFiles(this.baseFolder + @"\Bio2NgcRel" + this.subDisk + ".txt"));
-                    needCopyFiles.AddRange(this.LoadFiles(this.baseFolder + @"\Bio2PcAddr.txt"));
+                    needCopyFiles.AddRange(this.LoadFiles(this.baseFolder + @"\helpPc\Bio2PcAddr.txt"));
                 }
 
                 if (this.chkNgcRdt.Checked)
@@ -2369,9 +2427,27 @@ namespace Hanhua.TextEditTools.Bio2Edit
                 }
 
                 StringBuilder sb = new StringBuilder();
+                int startPos;
                 for (int i = 0; i < entryList.Count - 1; i++)
                 {
-                    sb.Append(this.DecodeText(byData, fontCharPage, entryList[i], entryList[i + 1]));
+                    startPos = entryList[i];
+                    int endPos = entryList[i + 1];
+                    if (endPos < startPos)
+                    {
+                        //sb.Append(startPos.ToString("X").PadLeft(2, '0')).Append(" ").Append(endPos.ToString("X").PadLeft(2, '0')).Append(" ");
+                        if (i < entryList.Count - 2)
+                        {
+                            i++;
+                            endPos = entryList[i + 1];
+                            sb.Append("^fe 00^ \n");
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                    //sb.Append(startPos.ToString("X").PadLeft(2, '0')).Append(" ").Append(endPos.ToString("X").PadLeft(2, '0')).Append(" ");
+                    sb.Append(this.DecodeText(byData, fontCharPage, startPos, endPos));
                 }
 
                 // 取得最后一句
@@ -2392,6 +2468,7 @@ namespace Hanhua.TextEditTools.Bio2Edit
 
                     textEndPos++;
                 }
+                //sb.Append(entryList[entryList.Count - 1].ToString("X").PadLeft(2, '0')).Append(" ").Append(textEndPos.ToString("X").PadLeft(2, '0')).Append(" ");
                 sb.Append(this.DecodeText(byData, fontCharPage, entryList[entryList.Count - 1], textEndPos));
 
                 return sb.ToString();
@@ -2416,7 +2493,7 @@ namespace Hanhua.TextEditTools.Bio2Edit
                 switch (byData[j])
                 {
                     case 0xF7:
-                        sb.Append("^f7^\n");
+                        sb.Append("^f7^");
                         continue;
 
                     case 0xF4:
@@ -2476,12 +2553,12 @@ namespace Hanhua.TextEditTools.Bio2Edit
                     case 0xFE:
                         if (byData[j + 1] == 0)
                         {
-                            sb.Append("^fe 00^\n");
+                            sb.Append("^fe 00^");
                             j += 1;
                         }
                         else
                         {
-                            sb.Append("^fe^\n");
+                            sb.Append("^fe^");
                         }
                         continue;
 
