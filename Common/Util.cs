@@ -973,6 +973,10 @@ namespace Hanhua.Common
                     return Color.FromArgb(0xFF, intRed, intGreen, intBlue);
 
                 case "RGB5A3":
+                    if (pixelNum * 2 > imageByte.Length - 1)
+                    {
+                        return Color.Black;
+                    }
                     intColor = imageByte[pixelNum * 2] << 8 | imageByte[pixelNum * 2 + 1];
                     if ((intColor & 0x8000) == 0x8000)
                     {
@@ -980,7 +984,8 @@ namespace Hanhua.Common
                         intRed = Convert5To8((byte)((intColor >> 10) & 0x1F));
                         intGreen = Convert5To8((byte)((intColor >> 5) & 0x1F));
                         intBlue = Convert5To8((byte)(intColor & 0x1F));
-                        return Color.FromArgb(0xFF, intRed, intGreen, intBlue);
+                        //return Color.FromArgb(0xFF, intRed, intGreen, intBlue);
+                        return Color.FromArgb(0xFF, intBlue, intGreen, intRed);
                     }
                     else
                     {
@@ -989,16 +994,18 @@ namespace Hanhua.Common
                         intRed = Util.Convert4To8((byte)((intColor >> 8) & 0xF));
                         intGreen = Util.Convert4To8((byte)((intColor >> 4) & 0xF));
                         intBlue = Util.Convert4To8((byte)(intColor & 0xF));
-                        return Color.FromArgb(intAlpha, intRed, intGreen, intBlue);
+                        //return Color.FromArgb(intAlpha, intRed, intGreen, intBlue);
+                        return Color.FromArgb(intAlpha, intBlue, intGreen, intRed);
                     }
 
                 case "RGBA32_RGBA8":
-                    int blockStartNum = pixelNum / 16 * 32;
-                    intAlpha = imageByte[blockStartNum + pixelNum * 2];
-                    intRed = imageByte[blockStartNum + pixelNum * 2 + 1];
-                    intGreen = imageByte[blockStartNum + pixelNum * 2 + 32];
-                    intBlue = imageByte[blockStartNum + pixelNum * 2 + 1 + 32];
-                    return Color.FromArgb(intAlpha, intRed, intGreen, intBlue);
+                    int blockStartNum = (pixelNum / 16) * 64;
+                    int blockPosIdx = pixelNum % 16;
+                    intAlpha = imageByte[blockStartNum + (blockPosIdx * 2)];
+                    intRed = imageByte[blockStartNum + (blockPosIdx * 2) + 1];
+                    intGreen = imageByte[blockStartNum + (blockPosIdx * 2) + 32];
+                    intBlue = imageByte[blockStartNum + (blockPosIdx * 2) + 33];
+                    return Color.FromArgb(intAlpha, intBlue, intGreen, intRed);
 
                 case "C4_CI4":
                     if (pixelNum % 2 == 0)

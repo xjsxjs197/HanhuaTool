@@ -964,7 +964,7 @@ namespace Hanhua.TextEditTools.Bio2Edit
                     int entryPos = currentFileInfo.TextEntrys[i];
                     if (insertPosInfo.Count > 0 && insertPosInfo.ContainsKey(i))
                     {
-                        int insertPos = currentFileInfo.TextEntrys[insertPosInfo[i]] + 2;
+                        int insertPos = currentFileInfo.TextEntrys[insertPosInfo[i]];
                         //int insertPos = 0;
                         byCnData[entryStartPos + posIdx * 2] = (byte)((insertPos >> 8) & 0xFF);
                         byCnData[entryStartPos + posIdx * 2 + 1] = (byte)(insertPos & 0xFF);
@@ -2432,21 +2432,21 @@ namespace Hanhua.TextEditTools.Bio2Edit
                 {
                     startPos = entryList[i];
                     int endPos = entryList[i + 1];
-                    if (endPos < startPos)
-                    {
-                        //sb.Append(startPos.ToString("X").PadLeft(2, '0')).Append(" ").Append(endPos.ToString("X").PadLeft(2, '0')).Append(" ");
-                        if (i < entryList.Count - 2)
-                        {
-                            i++;
-                            endPos = entryList[i + 1];
-                            sb.Append("^fe 00^ \n");
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-                    //sb.Append(startPos.ToString("X").PadLeft(2, '0')).Append(" ").Append(endPos.ToString("X").PadLeft(2, '0')).Append(" ");
+                    //if (endPos < startPos)
+                    //{
+                    //    //sb.Append(startPos.ToString("X").PadLeft(2, '0')).Append(" ").Append(endPos.ToString("X").PadLeft(2, '0')).Append(" ");
+                    //    if (i < entryList.Count - 2)
+                    //    {
+                    //        i++;
+                    //        endPos = entryList[i + 1];
+                    //        sb.Append("^fe 00^ \n");
+                    //    }
+                    //    else
+                    //    {
+                    //        break;
+                    //    }
+                    //}
+                    sb.Append((startPos - filePosInfo.TextStart).ToString("X").PadLeft(2, '0')).Append(" ").Append((endPos - filePosInfo.TextStart).ToString("X").PadLeft(2, '0')).Append(" ");
                     sb.Append(this.DecodeText(byData, fontCharPage, startPos, endPos));
                 }
 
@@ -2468,7 +2468,7 @@ namespace Hanhua.TextEditTools.Bio2Edit
 
                     textEndPos++;
                 }
-                //sb.Append(entryList[entryList.Count - 1].ToString("X").PadLeft(2, '0')).Append(" ").Append(textEndPos.ToString("X").PadLeft(2, '0')).Append(" ");
+                sb.Append((entryList[entryList.Count - 1] - filePosInfo.TextStart).ToString("X").PadLeft(2, '0')).Append(" ").Append((textEndPos - filePosInfo.TextStart).ToString("X").PadLeft(2, '0')).Append(" ");
                 sb.Append(this.DecodeText(byData, fontCharPage, entryList[entryList.Count - 1], textEndPos));
 
                 return sb.ToString();

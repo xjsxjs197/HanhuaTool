@@ -119,13 +119,12 @@ namespace Hanhua.ImgEditTools
         /// <returns></returns>
         public override Image[] ImageDecode(byte[] byData, string fileInfo)
         {
-            if (this.IsTimData(byData) == -1)
+            // 取得类型
+            timType = this.IsTimData(byData);
+            if (timType == -1)
             {
                 return null;
             }
-
-            // 取得类型
-            timType = byData[4];
 
             // 读取Tim图片信息
             switch (timType)
@@ -141,6 +140,9 @@ namespace Hanhua.ImgEditTools
 
                 case 9:
                     return new Image[] { this.Read8bppTimPic(byData) };
+
+                case 10:
+                    return null;
             }
 
             return null;
@@ -169,6 +171,10 @@ namespace Hanhua.ImgEditTools
 
                 case 9:
                     bppInfo = "8BPP";
+                    break;
+
+                case 10:
+                    bppInfo = "XBPP";
                     break;
             }
 
@@ -245,6 +251,10 @@ namespace Hanhua.ImgEditTools
                     else if (byData[4] == 9 && byData[5] == 0 && byData[6] == 0 && byData[7] == 0)
                     {
                         return 9;
+                    }
+                    else if (byData[4] == 0xD8)
+                    {
+                        return 10;
                     }
                 }
             }

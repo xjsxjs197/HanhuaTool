@@ -37,6 +37,8 @@
             this.btnChgPic = new System.Windows.Forms.Button();
             this.btnTest = new System.Windows.Forms.Button();
             this.btnPatchFile = new System.Windows.Forms.Button();
+            this.btnExpSpecialImg = new System.Windows.Forms.Button();
+            this.btnImpSpecialImg = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnCreateFont
@@ -129,11 +131,33 @@
             this.btnPatchFile.UseVisualStyleBackColor = true;
             this.btnPatchFile.Click += new System.EventHandler(this.btnPatchFile_Click);
             // 
+            // btnExpSpecialImg
+            // 
+            this.btnExpSpecialImg.Location = new System.Drawing.Point(173, 120);
+            this.btnExpSpecialImg.Name = "btnExpSpecialImg";
+            this.btnExpSpecialImg.Size = new System.Drawing.Size(143, 30);
+            this.btnExpSpecialImg.TabIndex = 9;
+            this.btnExpSpecialImg.Text = "导出特殊图片";
+            this.btnExpSpecialImg.UseVisualStyleBackColor = true;
+            this.btnExpSpecialImg.Click += new System.EventHandler(this.btnExpSpecialImg_Click);
+            // 
+            // btnImpSpecialImg
+            // 
+            this.btnImpSpecialImg.Location = new System.Drawing.Point(322, 120);
+            this.btnImpSpecialImg.Name = "btnImpSpecialImg";
+            this.btnImpSpecialImg.Size = new System.Drawing.Size(143, 30);
+            this.btnImpSpecialImg.TabIndex = 10;
+            this.btnImpSpecialImg.Text = "导入特殊图片";
+            this.btnImpSpecialImg.UseVisualStyleBackColor = true;
+            this.btnImpSpecialImg.Click += new System.EventHandler(this.btnImpSpecialImg_Click);
+            // 
             // RfoEdit
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(496, 200);
+            this.Controls.Add(this.btnImpSpecialImg);
+            this.Controls.Add(this.btnExpSpecialImg);
             this.Controls.Add(this.btnPatchFile);
             this.Controls.Add(this.btnTest);
             this.Controls.Add(this.btnChgPic);
@@ -161,5 +185,7 @@
         private System.Windows.Forms.Button btnChgPic;
         private System.Windows.Forms.Button btnTest;
         private System.Windows.Forms.Button btnPatchFile;
+        private System.Windows.Forms.Button btnExpSpecialImg;
+        private System.Windows.Forms.Button btnImpSpecialImg;
     }
 }

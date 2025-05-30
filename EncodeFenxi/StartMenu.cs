@@ -389,7 +389,7 @@ namespace Hanhua.Common
                         return;
                     }
 
-                    this.Do(this.ShowRarcView);
+                    this.ShowRarcView();
                     break;
 
                 case "btnBio0LzEdit":
@@ -427,6 +427,16 @@ namespace Hanhua.Common
         private void btnAutoBuild_Click(object sender, EventArgs e)
         {
             this.AutoBuildRetroarch();
+        }
+
+        /// <summary>
+        /// 纹理测试
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnTexTest_Click(object sender, EventArgs e)
+        {
+            this.CheckTexPng();
         }
 
         /// <summary>
@@ -501,12 +511,226 @@ namespace Hanhua.Common
             //this.GetGodOfHandFont();
             //this.WriteGteConsts();
             //this.CheckBof4Text();
-
+            //this.TestEternalDarkness();
+            //this.Check3DSFont();
+            //this.GetBigEndianAllCnChars();
+            //this.CheckDino2Tex();
+            //this.CheckRpgTxt();
+            this.DecodeTex();
         }
 
         #endregion
 
         #region " 私有方法 "
+
+        private void CheckRpgTxt()
+        {
+            string[] allChkLines = File.ReadAllLines(@"D:\RPG\workspace\10.RPG-SQL化\02.E_営業\第５弾(D2510U_D540U1_D610U1_DJ010U1_DJ010U3_DJ010U4_DJ010U2)\【営業】DJ010UCL_04_DJ010U2_営業初受注ファイル作成\test1.txt", Encoding.UTF8);
+            string[] allRpgLines = File.ReadAllLines(@"D:\RPG\workspace\10.RPG-SQL化\02.E_営業\第５弾(D2510U_D540U1_D610U1_DJ010U1_DJ010U3_DJ010U4_DJ010U2)\【営業】DJ010UCL_04_DJ010U2_営業初受注ファイル作成\DJ010U2S_tool生成.sql", Encoding.UTF8);
+            StringBuilder sb = new StringBuilder();
+            foreach (string chkLine in allChkLines)
+            {
+                if (string.IsNullOrEmpty(chkLine))
+                {
+                    break;
+                }
+
+                int lineCnt = 0;
+                foreach (string rpgkLine in allRpgLines)
+                {
+                    if (rpgkLine.IndexOf(chkLine.Substring(4, 8)) > 0)
+                    {
+                        lineCnt++;
+                    }
+                }
+
+                if (lineCnt <= 1)
+                {
+                    sb.Append("--");
+                }
+                sb.Append(chkLine).Append("\r\n");
+            }
+
+            int b = 0;
+        }
+
+        private void CheckDino2Tex()
+        {
+            //byte[] byData = File.ReadAllBytes(@"G:\Study\MySelfProject\Hanhua\TodoCn\Dino2\PSX\DATA\CAPLOGO.PXL");
+            //// 初始化图片
+            //Bitmap img = new Bitmap(320, 240, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+            //// 生成图片
+            //int byIndex = 0;
+            //for (int y = 0; y < img.Height; y++)
+            //{
+            //    for (int x = 0; x < img.Width; x++)
+            //    {
+            //        int pixelColor = byData[byIndex + 1] << 8 | byData[byIndex];
+            //        int colorR = Util.Convert5To8((byte)(pixelColor & 0x1F));
+            //        int colorG = Util.Convert5To8((byte)((pixelColor >> 5) & 0x1F));
+            //        int colorB = Util.Convert5To8((byte)((pixelColor >> 10) & 0x1F));
+            //        img.SetPixel(x, y, Color.FromArgb(colorR, colorG, colorB));
+
+            //        byIndex += 2;
+            //    }
+            //}
+            //img.Save(@"G:\Study\MySelfProject\Hanhua\TodoCn\Dino2\PSX\DATA\CAPLOGO.bmp");
+
+            List<FilePosInfo> allTexFiles = Util.GetAllFiles(@"G:\Study\MySelfProject\Hanhua\TodoCn\Dino2\PSX\DATA\");
+            foreach (FilePosInfo fi in allTexFiles)
+            {
+                if (!fi.File.EndsWith(".PXL", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+
+                // 初始化图片
+                byte[] byData = File.ReadAllBytes(fi.File);
+                Bitmap img = new Bitmap(320, 240, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+                // 生成图片
+                int byIndex = 0;
+                for (int y = 0; y < img.Height; y++)
+                {
+                    for (int x = 0; x < img.Width; x++)
+                    {
+                        int pixelColor = byData[byIndex + 1] << 8 | byData[byIndex];
+                        int colorR = Util.Convert5To8((byte)(pixelColor & 0x1F));
+                        int colorG = Util.Convert5To8((byte)((pixelColor >> 5) & 0x1F));
+                        int colorB = Util.Convert5To8((byte)((pixelColor >> 10) & 0x1F));
+                        img.SetPixel(x, y, Color.FromArgb(colorR, colorG, colorB));
+
+                        byIndex += 2;
+                    }
+                }
+                img.Save(fi.File.Replace(".PXL", ".bmp"));
+            }
+        }
+
+        private void DecodeTex()
+        {
+            // 打开要分析的文件
+            this.baseFile = Util.SetOpenDailog("Txt Log文件（*.txt）|*.txt|所有文件|*.*", string.Empty);
+            if (string.IsNullOrEmpty(this.baseFile))
+            {
+                return;
+            }
+
+            string[] allLine = File.ReadAllLines(this.baseFile);
+            TexTestView texView = new TexTestView(allLine);
+            texView.Show();
+        }
+
+        private void CheckTexPng()
+        {
+            string openFolder = Util.OpenFolder(@"D:\WiiStationDebug\TexTest");
+            if (string.Empty.Equals(openFolder))
+            {
+                return;
+            }
+
+            List<FilePosInfo> allTexFiles = Util.GetAllFiles(openFolder);
+            foreach (FilePosInfo fi in allTexFiles)
+            {
+                if (fi.IsFolder)
+                {
+                    continue;
+                }
+
+                byte[] byCnFont = File.ReadAllBytes(fi.File);
+                string[] names = fi.File.Split('_');
+                int w = Convert.ToInt32(names[1]);
+                int h = Convert.ToInt32(names[2]);
+                Bitmap chkBmp = new Bitmap(w, h);
+                int pixelIdx = 0;
+                chkBmp = Util.ImageDecode(chkBmp, byCnFont, "RGB5A3");
+                //for (int y = 0; y < chkBmp.Height; y += 1)
+                //{
+                //    // 开始循环Image的宽(每次递增一个Block的宽)
+                //    for (int x = 0; x < chkBmp.Width; x += 1)
+                //    {
+                //        chkBmp.SetPixel(x, y, Color.FromArgb(byCnFont[pixelIdx], byCnFont[pixelIdx + 1], byCnFont[pixelIdx + 2], byCnFont[pixelIdx + 3]));
+                //        pixelIdx += 4;
+                //    }
+                //}
+                chkBmp.Save(fi.File + ".png");
+            }
+        }
+        
+        private void Check3DSFont()
+        {
+            //Dictionary<int, int> testMap = new Dictionary<int, int>();
+            //for (int y = 0; y < 418; y++)
+            //{
+            //    for (int x = 0; x < 440; x++)
+            //    {
+            //        testMap.Add(ctrgu_swizzle_coords(x, y, 440), x + y * 440);
+            //    }
+            //}
+
+            byte[] byCnFont = File.ReadAllBytes(@"C:\Users\xiao.jiansheng\AppData\Roaming\Citra\sdmc\retroarch\cnFontStb");
+            int wh = 42 * 14;
+            Bitmap chkBmp = new Bitmap(wh, wh);
+            for (int y = 0; y < wh; y++)
+            {
+                for (int x = 0; x < wh; x++)
+                {
+                    //if ((byCnFont[y * 440 + x]) == 0xFF)
+                    //{
+                    //    chkBmp.SetPixel(x, y, Color.White);
+                    //}
+                    //else
+                    //{
+                    //    chkBmp.SetPixel(x, y, Color.Black);
+                    //}
+                    chkBmp.SetPixel(x, y, Color.FromArgb(byCnFont[y * wh + x], byCnFont[y * wh + x], byCnFont[y * wh + x]));
+
+                }
+            }
+            chkBmp.Save(@"C:\Users\xiao.jiansheng\AppData\Roaming\Citra\sdmc\retroarch\cnFontStb.bmp");
+
+            //int tmp = this.next_pow2(1023);
+        }
+
+        private int ctrgu_swizzle_coords(int x, int y, int width)
+        {
+           int pos = (x & 0x1) << 0 | ((x & 0x2) << 1) | ((x & 0x4) << 2) |
+                     (y & 0x1) << 1 | ((y & 0x2) << 2) | ((y & 0x4) << 3);
+
+           return ((x >> 3) << 6) + ((y >> 3) * ((width >> 3) << 6)) + pos;
+
+        }
+
+        private int next_pow2(int x)
+        {
+            x--;
+            x = (x >> 1) | x;
+            x = (x >> 2) | x;
+            x = (x >> 4) | x;
+            x = (x >> 8) | x;
+            x = (x >> 16) | x;
+            return ++x;
+        }
+
+        private void TestEternalDarkness()
+        {
+            List<FilePosInfo> allFiles = Util.GetAllFiles(@"G:\Study\MySelfProject\Hanhua\TodoCn\HanhuaProject\EternalDarkness\cn\root");
+            foreach (FilePosInfo fi in allFiles)
+            {
+                if (fi.IsFolder)
+                {
+                    continue;
+                }
+
+                if (fi.File.EndsWith(".decompressed"))
+                {
+                    //File.Copy(fi.File, fi.File.Replace(@"\cn\", @"\cnBak\"), true);
+                    File.Copy(fi.File, fi.File.Replace(@".decompressed", ""), true);
+                    File.Delete(fi.File);
+                }
+            }
+        }
 
         private void CheckPcBio2()
         {
@@ -1319,47 +1543,65 @@ namespace Hanhua.Common
         private void AutoBuildRetroarch()
         {
             //string basePath = @"E:\Study\Emu\emuSrc\RetroArch\libretro-super-master\retroarch\";
-            string basePath = @"H:\down\game\emuSrc\RetroArch\RetroArch-1.9.4\";
-            
+            string basePath = @"G:\Study\Emu\emuSrc\RetroArch\RetroArch-master20240426Old\RetroArch-master\";
+
+            //string targetPath = @"G:\Study\Emu\emuSrc\WiiEmuHanhua\Release\apps\RetroArch_1.18.0Cn\Src\";
+            //string[] allLines = File.ReadAllLines(basePath + "updFiles.txt", Encoding.UTF8);
+            //for (int i = 0; i < allLines.Length; i++)
+            //{
+            //    if (string.IsNullOrEmpty(allLines[i]))
+            //    {
+            //        break;
+            //    }
+
+            //    string targetFile = allLines[i].Replace(basePath, targetPath);
+            //    string fileName = Util.GetShortFileName(targetFile);
+            //    if (!Directory.Exists(targetFile.Replace(fileName, "")))
+            //    {
+            //        Directory.CreateDirectory(targetFile.Replace(fileName, ""));
+            //    }
+            //    File.Copy(allLines[i], targetFile, true);
+            //}
+
             System.Diagnostics.Process exep = new System.Diagnostics.Process();
             exep.StartInfo.FileName = @"make";
             exep.StartInfo.CreateNoWindow = true;
             exep.StartInfo.UseShellExecute = false;
             exep.StartInfo.WorkingDirectory = basePath;
-            exep.StartInfo.Arguments = @"-f Makefile.griffin platform=wii";
+            exep.StartInfo.Arguments = @"-f Makefile.ctr";
 
-            List<FilePosInfo> allWiiLib = Util.GetAllFiles(basePath + @"dist-scripts\").Where(p => p.File.EndsWith("_wii.a", StringComparison.OrdinalIgnoreCase)).ToList();
+            List<FilePosInfo> allWiiLib = Util.GetAllFiles(basePath + @"dist-scripts\").Where(p => p.File.EndsWith("_ctr.a", StringComparison.OrdinalIgnoreCase)).ToList();
             // 显示进度条
             this.ResetProcessBar(allWiiLib.Count);
 
             foreach (FilePosInfo fileInfo in allWiiLib)
             {
                 // Delete file
-                File.Delete(basePath + @"libretro_wii.a");
-                if (File.Exists(basePath + @"retroarch_wii.dol"))
+                File.Delete(basePath + @"libretro_ctr.a");
+                if (File.Exists(basePath + @"retroarch_3ds.cia"))
                 {
-                    File.Delete(basePath + @"retroarch_wii.dol");
+                    File.Delete(basePath + @"retroarch_3ds.cia");
                 }
-                if (File.Exists(basePath + @"retroarch_wii.elf"))
+                if (File.Exists(basePath + @"retroarch_3ds.elf"))
                 {
-                    File.Delete(basePath + @"retroarch_wii.elf");
+                    File.Delete(basePath + @"retroarch_3ds.elf");
                 }
-                if (File.Exists(basePath + @"retroarch_wii.elf.map"))
+                if (File.Exists(basePath + @"retroarch_3ds.smdh"))
                 {
-                    File.Delete(basePath + @"retroarch_wii.elf.map");
+                    File.Delete(basePath + @"retroarch_3ds.smdh");
                 }
 
                 // copy File
-                File.Copy(fileInfo.File, basePath + @"libretro_wii.a", true);
+                File.Copy(fileInfo.File, basePath + @"libretro_ctr.a", true);
 
                 // build file
                 exep.Start();
                 exep.WaitForExit();
 
                 // move File
-                if (File.Exists(basePath + @"retroarch_wii.dol"))
+                if (File.Exists(basePath + @"retroarch_3ds.cia"))
                 {
-                    File.Move(basePath + @"retroarch_wii.dol", fileInfo.File.Replace(".a", ".dol").Replace("dist-scripts", @"pkg\wii"));
+                    File.Move(basePath + @"retroarch_3ds.cia", fileInfo.File.Replace(".a", ".cia").Replace("dist-scripts", @"pkg\ctr").Replace("_ctr", ""));
                 }
 
                 // 更新进度条
@@ -1443,29 +1685,58 @@ namespace Hanhua.Common
             //char[] chTxt = sb.Append(File.ReadAllText(@"H:\游戏汉化\fontTest\ComnCnChar.txt", Encoding.UTF8)).ToString().ToCharArray();
 
             //this.ReadChChar(@"H:\游戏汉化\fontTest\ComnCnChar.txt", lstBuf);
-            this.ReadChChar(@"G:\Study\Emu\emuSrc\RetroArch\RetroArch-1.9.6\intl\msg_hash_de.c", lstBuf);
-            this.ReadChChar(@"G:\Study\Emu\emuSrc\RetroArch\RetroArch-1.9.6\intl\msg_hash_de.h", lstBuf);
+            this.ReadChChar(@"G:\Study\Emu\emuSrc\RetroArch\RetroArch-1.18.0_3DS\intl\googleplay_chs.json", lstBuf);
+            this.ReadChChar(@"G:\Study\Emu\emuSrc\RetroArch\RetroArch-1.18.0_3DS\intl\steam_chs.json", lstBuf);
+            this.ReadChChar(@"G:\Study\Emu\emuSrc\RetroArch\RetroArch-1.18.0_3DS\intl\msg_hash_chs.h", lstBuf);
             //this.ReadChChar(@"G:\Study\Emu\emuSrc\RetroArch\RetroArch-1.9.6\intl\msg_hash_it_pt.c", lstBuf);
             //this.ReadChChar(@"G:\Study\Emu\emuSrc\RetroArch\RetroArch-1.9.6\intl\msg_hash_it_pt.h", lstBuf);
-            this.ReadChChar(@"G:\Study\de.lang", lstBuf);
-            //this.ReadChChar(@"E:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\nintendo_fc.lpl", lstBuf);
-            //this.ReadChChar(@"E:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\nintendo_sfc.lpl", lstBuf);
-            //this.ReadChChar(@"E:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\nintendo_gba.lpl", lstBuf);
-            //this.ReadChChar(@"E:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\sega_md.lpl", lstBuf);
-            //this.ReadChChar(@"E:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\fba_Pgm_PSIKYO.lpl", lstBuf);
-            //this.ReadChChar(@"E:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\mame2003_coreA.lpl", lstBuf);
-            //this.ReadChChar(@"E:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\mame2003_coreB.lpl", lstBuf);
-            //this.ReadChChar(@"E:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\mame2003_coreC.lpl", lstBuf);
-            //this.ReadChChar(@"E:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\mame2003_coreD.lpl", lstBuf);
-            //this.ReadChChar(@"E:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\mame2003_coreE.lpl", lstBuf);
-            //this.ReadChChar(@"E:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\mame2003_coreF.lpl", lstBuf);
-            //this.ReadChChar(@"E:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\mame2003_coreG.lpl", lstBuf);
+            //this.ReadChChar(@"G:\Study\de.lang", lstBuf);
+            this.ReadChChar(@"G:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\fba_cps1.lpl", lstBuf);
+            this.ReadChChar(@"G:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\fba_cps2.lpl", lstBuf);
+            this.ReadChChar(@"G:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\fba_cps3.lpl", lstBuf);
+            this.ReadChChar(@"G:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\fba_neogeo.lpl", lstBuf);
+            this.ReadChChar(@"G:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\nintendo_fc.lpl", lstBuf);
+            this.ReadChChar(@"G:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\nintendo_sfc.lpl", lstBuf);
+            this.ReadChChar(@"G:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\nintendo_gba.lpl", lstBuf);
+            this.ReadChChar(@"G:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\sega_md.lpl", lstBuf);
+            this.ReadChChar(@"G:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\fba_Pgm_PSIKYO.lpl", lstBuf);
+            this.ReadChChar(@"G:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\mame2003_coreA.lpl", lstBuf);
+            this.ReadChChar(@"G:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\mame2003_coreB.lpl", lstBuf);
+            this.ReadChChar(@"G:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\mame2003_coreC.lpl", lstBuf);
+            this.ReadChChar(@"G:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\mame2003_coreD.lpl", lstBuf);
+            this.ReadChChar(@"G:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\mame2003_coreE.lpl", lstBuf);
+            this.ReadChChar(@"G:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\mame2003_coreF.lpl", lstBuf);
+            this.ReadChChar(@"G:\Study\Emu\emuSrc\WiiEmuHanhua\Retroarch_CnSrc\hbc\playlists\mame2003_coreG.lpl", lstBuf);
+
+            string[] allLine = File.ReadAllLines(@"G:\Study\MySelfProject\Hanhua\fontTest\zhChCount.xlsx.txt", Encoding.UTF8);
+            foreach (string zhTxt in allLine)
+            {
+                string curChar = zhTxt.Substring(7, 1);
+                if (!lstBuf.Contains(curChar))
+                {
+                    lstBuf.Add(curChar);
+                }
+            }
+
             char[] chTxt = string.Join("", lstBuf.ToArray()).ToCharArray();
 
             foreach (char chChar in chTxt)
             {
-                byte[] byChar = Encoding.BigEndianUnicode.GetBytes(new char[] { chChar });
-                int temp = byChar[0] << 8 | byChar[1];
+                //byte[] byChar = Encoding.BigEndianUnicode.GetBytes(new char[] { chChar });
+                //int temp = byChar[0] << 8 | byChar[1];
+                //if (temp < 0x20)
+                //{
+                //    continue;
+                //}
+                //byte[] byChar = Encoding.UTF8.GetBytes(new char[] { chChar });
+                //int shift = 0;
+                //int temp = 0;
+                //for (int i = byChar.Length - 1; i >= 0; i--)
+                //{
+                //    temp += byChar[i] << shift;
+                //    shift += 8;
+                //}
+                int temp = chChar;
                 if (temp < 0x20)
                 {
                     continue;
@@ -1473,6 +1744,21 @@ namespace Hanhua.Common
 
                 allZhTxt.Add(temp);
             }
+            allZhTxt.Sort();
+            //string.Join("", allZhTxt.ToArray());
+            sb.Length = 0;
+            int tmpLine = 20;
+            sb.Append("int minCnChar[] = {");
+            foreach (int tmp in allZhTxt)
+            {
+                sb.Append(tmp).Append(",");
+                if (tmpLine-- == 0)
+                {
+                    tmpLine = 20;
+                    sb.Append("\r\n");
+                }
+            }
+            sb.Append("};");
 
             return allZhTxt;
         }

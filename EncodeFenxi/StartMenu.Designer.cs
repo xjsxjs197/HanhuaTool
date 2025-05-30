@@ -37,6 +37,7 @@
             this.btnFileEdit = new System.Windows.Forms.Button();
             this.btnNgcIso = new System.Windows.Forms.Button();
             this.btnImgTool = new System.Windows.Forms.Button();
+            this.btnTexTest = new System.Windows.Forms.Button();
             this.commandPanel.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -66,6 +67,7 @@
             // 
             // commandPanel
             // 
+            this.commandPanel.Controls.Add(this.btnTexTest);
             this.commandPanel.Controls.Add(this.btnAutoBuild);
             this.commandPanel.Controls.Add(this.btnTest);
             this.commandPanel.Controls.Add(this.btnFileEdit);
@@ -91,7 +93,7 @@
             // 
             // btnTest
             // 
-            this.btnTest.Location = new System.Drawing.Point(141, 81);
+            this.btnTest.Location = new System.Drawing.Point(141, 116);
             this.btnTest.Name = "btnTest";
             this.btnTest.Size = new System.Drawing.Size(112, 29);
             this.btnTest.TabIndex = 25;
@@ -129,6 +131,16 @@
             this.btnImgTool.UseVisualStyleBackColor = true;
             this.btnImgTool.Click += new System.EventHandler(this.btnImgTool_Click);
             // 
+            // btnTexTest
+            // 
+            this.btnTexTest.Location = new System.Drawing.Point(141, 81);
+            this.btnTexTest.Name = "btnTexTest";
+            this.btnTexTest.Size = new System.Drawing.Size(112, 29);
+            this.btnTexTest.TabIndex = 27;
+            this.btnTexTest.Text = "纹理 测试";
+            this.btnTexTest.UseVisualStyleBackColor = true;
+            this.btnTexTest.Click += new System.EventHandler(this.btnTexTest_Click);
+            // 
             // StartMenu
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -157,5 +169,6 @@
         private System.Windows.Forms.Button btnFileEdit;
         private System.Windows.Forms.Button btnTest;
         private System.Windows.Forms.Button btnAutoBuild;
+        private System.Windows.Forms.Button btnTexTest;
     }
 }
