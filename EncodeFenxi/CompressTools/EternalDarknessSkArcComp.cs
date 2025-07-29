@@ -75,7 +75,8 @@ namespace Hanhua.CompressTools
         /// <returns></returns>
         public override byte[] Compress(string file)
         {
-            return null;
+            byte[] raw = File.ReadAllBytes(file);
+            return SKASCCompressor.Compress(raw);
         }
 
         /// <summary>
@@ -95,20 +96,26 @@ namespace Hanhua.CompressTools
         /// <summary>
         /// 解压缩文件
         /// </summary>
-        /// <param name="rleFile"></param>
+        /// <param name="skAscFile"></param>
         /// <returns></returns>
-        private byte[] SkAscDeCompress(string rleFile)
+        private byte[] SkAscDeCompress(string skAscFile)
         {
-            // 将文件中的数据，读取到byData中
-            byte[] byData = File.ReadAllBytes(rleFile);
-            if (!"*SK_ASC*".Equals(Util.GetHeaderString(byData, 0, 7, Encoding.ASCII))) 
+            // 将文件中的数据，读取到fileData中
+            byte[] fileData = File.ReadAllBytes(skAscFile);
+            if (!"*SK_ASC*".Equals(Util.GetHeaderString(fileData, 0, 7, Encoding.ASCII))) 
             {
                 return null;
             }
 
-            
+            // Skip SK_ASC header (64 bytes)
+            byte[] compressedData = new byte[fileData.Length - 0x40];
+            Array.Copy(fileData, 0x40, compressedData, 0, compressedData.Length);
 
-            return null;
+            // 从header读取原始长度
+            int rawSize = (fileData[0x10] << 24) | (fileData[0x11] << 16) | (fileData[0x12] << 8) | fileData[0x13];
+
+            var decompressor = new SK_ASCDecompressor(compressedData);
+            return decompressor.Decompress(rawSize);
         }
 
         #endregion

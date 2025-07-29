@@ -28,6 +28,7 @@ using Hanhua.Common.TextEditTools.RfoEdit;
 
 using System.Threading;
 using System.Runtime.InteropServices;
+using System.Net;
 
 namespace Hanhua.Common
 {
@@ -416,6 +417,11 @@ namespace Hanhua.Common
                     compTool = new BaseCompTool(new MarioYay0Comp());
                     compTool.Show();
                     break;
+
+                case "btnSkAscEdit":
+                    compTool = new BaseCompTool(new EternalDarknessSkArcComp());
+                    compTool.Show();
+                    break;
             }
         }
 
@@ -516,12 +522,59 @@ namespace Hanhua.Common
             //this.GetBigEndianAllCnChars();
             //this.CheckDino2Tex();
             //this.CheckRpgTxt();
-            this.DecodeTex();
+            //this.DecodeTex();
+            this.ChkCopyBuf();
+            //this.ChkDomainIp();
         }
 
         #endregion
 
         #region " 私有方法 "
+
+        private void ChkDomainIp()
+        {
+            string[] allDomain = File.ReadAllLines(@"G:\会社関連\网_委_会\Juniper\DMZ_Url_Black_White_list\blacklist");
+            StringBuilder sb = new StringBuilder();
+            StringBuilder errSb = new StringBuilder();
+            foreach (string domain in allDomain)
+            {
+                if (string.IsNullOrEmpty(domain))
+                {
+                    break;
+                }
+
+                try
+                {
+                    IPAddress[] addresses = Dns.GetHostAddresses(domain);
+
+                    foreach (IPAddress ip in addresses)
+                    {
+                        sb.Append("address ").Append(ip.ToString().PadRight(15, ' ')).Append(" ").Append(ip.ToString()).Append("/32").Append("; ## ").Append(domain).Append("\r\n");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    errSb.Append(domain).Append("\r\n");
+                }
+            }
+        }
+
+        private void ChkCopyBuf()
+        {
+            Bitmap tmpImg = new Bitmap(640, 480);
+            byte[] byImg = File.ReadAllBytes(@"D:\WiiStationDebug\tmpCpy.bin");
+            int idx = 0;
+            for (int y = 0; y < 480; y++)
+            {
+                for (int x = 0; x < 640; x++)
+                {
+                    int tmpPix = ((int)(byImg[idx]) << 8) + byImg[idx + 1];
+                    idx += 2;
+                    tmpImg.SetPixel(x, y, Color.FromArgb((tmpPix & 0xf800) >> 8, (tmpPix & 0x7e0) >> 3, (tmpPix & 0x1f) << 3));
+                }
+            }
+            tmpImg.Save(@"D:\WiiStationDebug\tmpCpyImg.png");
+        }
 
         private void CheckRpgTxt()
         {
@@ -2299,6 +2352,7 @@ namespace Hanhua.Common
                 {"btnSzsEdit", "SZS类型文件处理"},
                 {"btnArcEdit", "ARC类型文件处理"},
                 {"btnYayEdit", "Yay0类型文件处理"},
+                {"btnSkAscEdit", "SkAsc类型文件处理"},
                 {"", ""}, 
                 {"btnBio0LzEdit", "生化0 Lz类型文件处理"},
                 {"btnBioCvRdxEdit", "生化维罗妮卡 Rdx类型文件处理"},

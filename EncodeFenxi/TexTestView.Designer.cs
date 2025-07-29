@@ -33,6 +33,8 @@
             this.noCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.textCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.imgCol = new System.Windows.Forms.DataGridViewImageColumn();
+            this.btnCeckInfo = new System.Windows.Forms.DataGridViewButtonColumn();
+            this.texPosCol = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.gdvLog)).BeginInit();
             this.SuspendLayout();
@@ -43,7 +45,7 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(0, 0);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1165, 253);
+            this.panel1.Size = new System.Drawing.Size(1214, 253);
             this.panel1.TabIndex = 0;
             // 
             // gdvLog
@@ -52,14 +54,16 @@
             this.gdvLog.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.noCol,
             this.textCol,
-            this.imgCol});
+            this.imgCol,
+            this.btnCeckInfo,
+            this.texPosCol});
             this.gdvLog.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gdvLog.Location = new System.Drawing.Point(0, 0);
             this.gdvLog.Name = "gdvLog";
             this.gdvLog.RowHeadersVisible = false;
             this.gdvLog.RowTemplate.Height = 21;
             this.gdvLog.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
-            this.gdvLog.Size = new System.Drawing.Size(1165, 253);
+            this.gdvLog.Size = new System.Drawing.Size(1214, 253);
             this.gdvLog.TabIndex = 0;
             // 
             // noCol
@@ -83,11 +87,22 @@
             this.imgCol.ReadOnly = true;
             this.imgCol.Width = 640;
             // 
+            // btnCeckInfo
+            // 
+            this.btnCeckInfo.HeaderText = "CheckInfo";
+            this.btnCeckInfo.Name = "btnCeckInfo";
+            // 
+            // texPosCol
+            // 
+            this.texPosCol.HeaderText = "TexPos";
+            this.texPosCol.Name = "texPosCol";
+            this.texPosCol.Visible = false;
+            // 
             // TexTestView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1165, 253);
+            this.ClientSize = new System.Drawing.Size(1214, 253);
             this.Controls.Add(this.panel1);
             this.Name = "TexTestView";
             this.Text = "TexTestView";
@@ -104,5 +119,7 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn noCol;
         private System.Windows.Forms.DataGridViewTextBoxColumn textCol;
         private System.Windows.Forms.DataGridViewImageColumn imgCol;
+        private System.Windows.Forms.DataGridViewButtonColumn btnCeckInfo;
+        private System.Windows.Forms.DataGridViewTextBoxColumn texPosCol;
     }
 }

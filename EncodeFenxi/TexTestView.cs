@@ -76,6 +76,8 @@ namespace Hanhua.Common
 
                             this.gdvLog.Rows[rowIndex].Cells["textCol"].Style.BackColor = Color.Pink;
                             this.gdvLog.Rows[rowIndex].Height = 240;
+
+                            this.gdvLog.Rows[rowIndex].Cells["texPosCol"].Value = logLines[lineIdx + 2];
                         }
                         else
                         {
