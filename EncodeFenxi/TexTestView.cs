@@ -18,7 +18,19 @@ namespace Hanhua.Common
         {
             InitializeComponent();
 
+            this.gdvLog.CellContentClick += new DataGridViewCellEventHandler(this.gdvLog_CellContentClick);
+
             this.ChkLogTex(logLines);
+        }
+
+        private void gdvLog_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.ColumnIndex != 3 || this.gdvLog[e.ColumnIndex, e.RowIndex].Value == null)
+            {
+                return;
+            }
+
+            MessageBox.Show("aaaaaaaaaaa");
         }
 
         private void ChkLogTex(string[] logLines)
@@ -78,6 +90,8 @@ namespace Hanhua.Common
                             this.gdvLog.Rows[rowIndex].Height = 240;
 
                             this.gdvLog.Rows[rowIndex].Cells["texPosCol"].Value = logLines[lineIdx + 2];
+
+                            this.gdvLog.Rows[rowIndex].Cells["btnCeckInfo"].Value = "ViewTex";
                         }
                         else
                         {

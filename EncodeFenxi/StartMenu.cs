@@ -29,6 +29,7 @@ using Hanhua.Common.TextEditTools.RfoEdit;
 using System.Threading;
 using System.Runtime.InteropServices;
 using System.Net;
+using Hanhua.Common.TextEditTools.Dino;
 
 namespace Hanhua.Common
 {
@@ -523,13 +524,64 @@ namespace Hanhua.Common
             //this.CheckDino2Tex();
             //this.CheckRpgTxt();
             //this.DecodeTex();
-            this.ChkCopyBuf();
+            //this.ChkCopyBuf();
             //this.ChkDomainIp();
+            //this.ChkSvnHtpasswd();
+            //this.CheckCopyTexPng();
+            DinoEdit dinoEdit = new DinoEdit();
+            dinoEdit.Show();
         }
 
         #endregion
 
         #region " 私有方法 "
+
+        private void CheckCopyTexPng()
+        {
+            //string path = @"D:\WiiStationDebug\CopyTex_640_480.bin";
+            //byte[] byCnFont = File.ReadAllBytes(path);
+            //int w = Convert.ToInt32("640");
+            //int h = Convert.ToInt32("480");
+            //Bitmap chkBmp = new Bitmap(w, h);
+            //chkBmp = Util.ImageDecode(chkBmp, byCnFont, "RGB565");
+            //chkBmp.Save(path + ".png");
+
+            string path = @"D:\WiiStationDebug\OldVramTex_320_240.bin";
+            byte[] byCnFont = File.ReadAllBytes(path);
+            int w = Convert.ToInt32("320");
+            int h = Convert.ToInt32("240");
+            Bitmap chkBmp = new Bitmap(w, h);
+            int idx = 0;
+            for (int y = 0; y < h; y++)
+            {
+                for (int x = 0; x < w; x++)
+                {
+                    int tmpPixel = (((int)(byCnFont[idx + 1]) << 8) + (int)(byCnFont[idx])) & 0x7fff;
+                    chkBmp.SetPixel(x, y, Color.FromArgb(Util.Convert5To8((byte)(tmpPixel & 0x1f)), Util.Convert5To8((byte)((tmpPixel >> 5) & 0x1f)), Util.Convert5To8((byte)(tmpPixel >> 10))));
+                    idx += 2;
+                }
+            }
+            chkBmp.Save(path + ".png");
+        }
+
+        private void ChkSvnHtpasswd()
+        {
+            string[] passwd = File.ReadAllLines(@"G:\NewWebSvn\htpasswd145Svn20250729");
+            StringBuilder sb = new StringBuilder();
+            foreach (string userInfo in passwd)
+            {
+                if (string.IsNullOrEmpty(userInfo))
+                {
+                    break;
+                }
+
+                string[] userPw = userInfo.Split(':');
+                //string pw = userPw[1].Replace(".", "").Replace("/", "");
+                //sb.Append("Xayr!234").Append(pw.Substring(pw.Length - 5)).Append(",");
+                //sb.Append(userPw[0]).Append(",");
+                sb.Append(userPw[1]).Append(",");
+            }
+        }
 
         private void ChkDomainIp()
         {

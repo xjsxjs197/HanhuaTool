@@ -71,7 +71,6 @@
     <Compile Include="CompressTools\SK_ASCDecompressor.cs" />
     <Compile Include="CompressTools\ViewtifulJoeRleComp.cs" />
     <Compile Include="RfoRunEfactoryEdit\RfoRunEfactoryTextEditor.cs">
-      <SubType>Form</SubType>
     </Compile>
     <Compile Include="RfoRunEfactoryEdit\RfoRunEfactoryTextEditor.Designer.cs">
       <DependentUpon>RfoRunEfactoryTextEditor.cs</DependentUpon>
@@ -150,6 +149,12 @@
     <Compile Include="TextEditTools\BioCvEdit\BioCvTextAlignEdit.Designer.cs">
       <DependentUpon>BioCvTextAlignEdit.cs</DependentUpon>
     </Compile>
+    <Compile Include="TextEditTools\Dino\DinoEdit.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TextEditTools\Dino\DinoEdit.Designer.cs">
+      <DependentUpon>DinoEdit.cs</DependentUpon>
+    </Compile>
     <Compile Include="TextEditTools\RfoEdit\RfoEdit.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -157,7 +162,6 @@
       <DependentUpon>RfoEdit.cs</DependentUpon>
     </Compile>
     <Compile Include="TextEditTools\TalesOfSymphonia\TalesOfSymphoniaTextEditor.cs">
-      <SubType>Form</SubType>
     </Compile>
     <Compile Include="TextEditTools\TalesOfSymphonia\TalesOfSymphoniaTextEditor.Designer.cs">
       <DependentUpon>TalesOfSymphoniaTextEditor.cs</DependentUpon>
@@ -274,6 +278,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="TextEditTools\BioCvEdit\BioCvTextAlignEdit.resx">
       <DependentUpon>BioCvTextAlignEdit.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TextEditTools\Dino\DinoEdit.resx">
+      <DependentUpon>DinoEdit.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="TextEditTools\RfoEdit\RfoEdit.resx">
