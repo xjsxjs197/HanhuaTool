@@ -9,51 +9,51 @@ namespace Hanhua.Common.TextEditTools.Dino
 {
     public enum GEntryType
     {
-        GET_DATA,     // Generic literal data
-        GET_TEXTURE,  // Stripped TIM pixel data
-        GET_PALETTE,  // Stripped TIM CLUT (palette)
-        GET_SNDH,     // VAG header ('Gian')
-        GET_SNDB,     // VAG body
-        GET_SNDE,     // Configuration for sound samples
-        GET_UNK,      // Unknown type
-        GET_LZSS0,    // LZSS-compressed data
-        GET_LZSS1     // LZSS-compressed texture
+        GET_DATA,       // generic literal data
+        GET_TEXTURE,    // stripped TIM pixel
+        GET_PALETTE,    // stripped TIM clut
+        GET_SNDH,       // VAG header 'Gian'
+        GET_SNDB,       // VAG body
+        GET_SNDE,       // configuration for sound samples?
+        GET_UNK,
+        GET_LZSS0,
+        GET_LZSS1       // compressed texture
     }
 
-    public struct DC2_ENTRY_GENERIC
-    {
-        public uint type;      // Entry type (GEntryType)
-        public uint size;      // Actual data size
-        public uint[] reserve; // Padding (6 words for DC2, 2 words for DC1)
-    }
-
-    public struct DC2_ENTRY_GFX
+    // Generic entry (32 bytes)
+    public class DC2_ENTRY_GENERIC
     {
         public uint type;
         public uint size;
-        public ushort x, y;    // Framebuffer coordinates
-        public ushort w, h;    // Framebuffer dimensions
+        public uint[] reserve = new uint[6];
     }
 
-    public struct GIAN_ENTRY
+    // GFX entry
+    public class DC2_ENTRY_GFX
     {
-        public byte reverb;     // Only bit 1<<3 is checked
-        public byte unk1;
-        public byte unk2;
-        public byte sample_note; // Multiply by 8 for actual value
-        public ushort note;
-        public ushort note_copy; // Unused, same as note>>8
-        public ushort reserved;  // Unused
-        public ushort adsr1;     // Always 0x80FF
-        public ushort adsr2;
-        public ushort addr;      // Sample address (multiply by 8)
+        public uint type;
+        public uint size;
+        public ushort x, y;
+        public ushort w, h;
+    }
+
+    public class EntryInfo
+    {
+        public int Index;
+        public GEntryType Type;
+        public string FileName;    // relative path to file in folder
+        public uint Size;          // logical size (after any packing/processing this will be overwritten)
+        // gfx fields (if applicable)
+        public ushort x, y, w, h;
+        // raw bytes to be written into .dat (after processing)
+        public byte[] Data;
     }
 
     public partial class DinoEdit : Form
     {
-        public List<DC2_ENTRY_GENERIC> Entries { get; private set; }
-        public List<byte[]> Segments { get; private set; }
-        public int PackType { get; private set; }
+        public List<DC2_ENTRY_GENERIC> Entries = new List<DC2_ENTRY_GENERIC>();
+        public List<byte[]> Segments = new List<byte[]>();
+        public int PackType;
 
         public const int Type_DC1 = 0;
         public const int Type_DC2 = 1;
@@ -74,8 +74,6 @@ namespace Hanhua.Common.TextEditTools.Dino
         public DinoEdit()
         {
             InitializeComponent();
-            Entries = new List<DC2_ENTRY_GENERIC>();
-            Segments = new List<byte[]>();
         }
 
         private void btnViewDat_Click(object sender, EventArgs e)
@@ -89,103 +87,211 @@ namespace Hanhua.Common.TextEditTools.Dino
 
             this.Open(baseFile);
 
-            this.ExtractRaw(@".\");
+            this.ExtractRaw(@"G:\Study\MySelfProject\Hanhua\Dino2\DatDeCom\");
         }
 
-        private void btnComDat_Click(object sender, EventArgs e)
-        {
-            this.RepackDat(@".\", @".\DinoTest.dat");
-        }
-
-        private void Reset()
+        public void Reset()
         {
             Entries.Clear();
             Segments.Clear();
         }
 
-        private void Open(string filename)
+        public void Open(string filename)
         {
             byte[] data = File.ReadAllBytes(filename);
             Open(data);
         }
 
-        private void Open(byte[] data)
+        public void Open(byte[] data)
         {
             Reset();
 
-            int entrySize = 16; // Default for DC1
+            int entrySize = 16;
             PackType = Type_DC1;
 
-            // Check if it's DC2 format (reserve fields are zero)
-            bool isDC2 = true;
-            for (int i = 16; i < 32; i += 4)
-            {
-                if (BitConverter.ToUInt32(data, i) != 0)
-                {
-                    isDC2 = false;
-                    break;
-                }
-            }
-
-            if (isDC2)
+            // 判断是否是DC2结构（32字节entry）
+            uint[] check = new uint[4];
+            Buffer.BlockCopy(data, 16, check, 0, 16);
+            if (check[0] == 0 && check[1] == 0 && check[2] == 0 && check[3] == 0)
             {
                 PackType = Type_DC2;
                 entrySize = 32;
             }
 
-            int pos = 2048; // Start reading after header
-            int entryCount = 2048 / entrySize;
+            int pos = 2048;
+            int si = 2048 / entrySize;
+            int i = 0;
 
-            for (int i = 0; i < entryCount; i++)
+            while (true)
             {
-                int entryOffset = i * entrySize;
-                uint type = BitConverter.ToUInt32(data, entryOffset);
-                uint size = BitConverter.ToUInt32(data, entryOffset + 4);
-
-                if (type >= (uint)GEntryType.GET_UNK && type != (uint)GEntryType.GET_LZSS0 && type != (uint)GEntryType.GET_LZSS1)
-                    break; // Stop if unknown type (except LZSS)
+                DC2_ENTRY_GENERIC entry = ReadEntry(data, i * entrySize, entrySize);
+                if (entry == null) break;
 
                 byte[] buffer = null;
-                int alignedSize = Align(size, 2048);
+                int ssize = Align((int)entry.size, 2048);
+                if (pos + ssize > data.Length) break;
 
-                switch ((GEntryType)type)
+                byte[] segmentData = new byte[entry.size];
+                Array.Copy(data, pos, segmentData, 0, entry.size);
+
+                switch ((GEntryType)entry.type)
                 {
                     case GEntryType.GET_TEXTURE:
-                        buffer = new byte[alignedSize];
-                        Array.Copy(data, pos, buffer, 0, size);
-                        UnswizzleGfx(ref buffer, BitConverter.ToUInt16(data, entryOffset + 8), BitConverter.ToUInt16(data, entryOffset + 10));
+                        {
+                            buffer = new byte[ssize];
+                            Array.Clear(buffer, 0, ssize);
+                            Array.Copy(segmentData, buffer, entry.size);
+                            entry.size = (uint)ssize;
+                            UnswizzleGfx(buffer, entry);
+                        }
                         break;
 
                     case GEntryType.GET_LZSS0:
-                        buffer = LzssDec(data, pos, (int)size);
+                        {
+                            byte[] dst;
+                            entry.size = Dc2LzssDec(segmentData, out dst);
+                            buffer = dst;
+                        }
                         break;
 
                     case GEntryType.GET_LZSS1:
-                        byte[] temp = LzssDec(data, pos, (int)size);
-                        buffer = new byte[Align((uint)temp.Length, 2048)];
-                        Array.Copy(temp, buffer, temp.Length);
-                        UnswizzleGfx(ref buffer, BitConverter.ToUInt16(data, entryOffset + 8), BitConverter.ToUInt16(data, entryOffset + 10));
+                        {
+                            byte[] temp;
+                            entry.size = Dc2LzssDec(segmentData, out temp);
+                            buffer = new byte[Align((int)entry.size, 2048)];
+                            Array.Clear(buffer, 0, buffer.Length);
+                            Array.Copy(temp, buffer, entry.size);
+                            entry.size = (uint)buffer.Length;
+                            UnswizzleGfx(buffer, entry);
+                        }
+                        break;
+
+                    case GEntryType.GET_DATA:
+                    case GEntryType.GET_PALETTE:
+                    case GEntryType.GET_SNDH:
+                    case GEntryType.GET_SNDB:
+                    case GEntryType.GET_SNDE:
+                    case GEntryType.GET_UNK:
+                        buffer = segmentData;
                         break;
 
                     default:
-                        buffer = new byte[size];
-                        Array.Copy(data, pos, buffer, 0, size);
+                        i = si;
                         break;
                 }
 
-                var entry = new DC2_ENTRY_GENERIC
-                {
-                    type = type,
-                    size = (uint)buffer.Length,
-                    reserve = new uint[isDC2 ? 6 : 2]
-                };
+                if (i == si) break;
 
                 Entries.Add(entry);
                 Segments.Add(buffer);
-                pos += alignedSize;
+                pos += ssize;
+                i++;
             }
         }
 
+        private DC2_ENTRY_GENERIC ReadEntry(byte[] data, int offset, int size)
+        {
+            if (offset + size > data.Length) return null;
+            DC2_ENTRY_GENERIC e = new DC2_ENTRY_GENERIC();
+            e.type = BitConverter.ToUInt32(data, offset);
+            e.size = BitConverter.ToUInt32(data, offset + 4);
+
+            int reserveCount = (size - 8) / 4;
+            e.reserve = new uint[reserveCount];
+            for (int i = 0; i < reserveCount; i++)
+            {
+                e.reserve[i] = BitConverter.ToUInt32(data, offset + 8 + i * 4);
+            }
+            return e;
+        }
+
+        private int Align(int val, int align)
+        {
+            return (val + align - 1) / align * align;
+        }
+
+        /// <summary>
+        /// 解交错图像数据 (unswizzle)
+        /// </summary>
+        private void UnswizzleGfx(byte[] buf, DC2_ENTRY_GENERIC entry)
+        {
+            // 解释entry为DC2_ENTRY_GFX
+            ushort x = (ushort)(entry.reserve[0] & 0xFFFF);
+            ushort y = (ushort)((entry.reserve[0] >> 16) & 0xFFFF);
+            ushort w = (ushort)(entry.reserve[1] & 0xFFFF);
+            ushort h = (ushort)((entry.reserve[1] >> 16) & 0xFFFF);
+
+            int tw = w / 32;
+            int bw = tw * 64;
+            byte[] buffer = new byte[entry.size];
+            Array.Copy(buf, buffer, entry.size);
+
+            int bIndex = 0;
+            for (int yi = 0; yi < h; yi += 32)
+            {
+                for (int xi = 0; xi < tw; xi++)
+                {
+                    int scanlineIndex = yi * bw + xi * 64;
+                    for (int j = 0; j < 32; j++)
+                    {
+                        Array.Copy(buffer, bIndex, buf, scanlineIndex, 64);
+                        bIndex += 64;
+                        scanlineIndex += bw;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// LZSS解压
+        /// </summary>
+        private uint Dc2LzssDec(byte[] src, out byte[] dst)
+        {
+            int flag = 1;
+            dst = new byte[src.Length * 8];
+            int srcIndex = 0;
+            int dstIndex = 0;
+
+            while (srcIndex < src.Length)
+            {
+                if (flag == 1)
+                {
+                    if (srcIndex >= src.Length) break;
+                    flag = src[srcIndex++] | 0x100;
+                }
+
+                if (srcIndex >= src.Length) break;
+                byte ch = src[srcIndex++];
+
+                if ((flag & 1) != 0)
+                {
+                    dst[dstIndex++] = ch;
+                }
+                else
+                {
+                    if (srcIndex >= src.Length) break;
+                    byte t = src[srcIndex++];
+
+                    int jump = ((t & 0xF) << 8) | ch;
+                    int size = (t >> 4) + 2;
+
+                    int srcDecIndex = dstIndex - jump;
+                    for (int i = 0; i < size; i++)
+                    {
+                        if (srcDecIndex < 0 || srcDecIndex >= dst.Length) break;
+                        dst[dstIndex++] = dst[srcDecIndex++];
+                    }
+                }
+                flag >>= 1;
+            }
+
+            Array.Resize(ref dst, dstIndex);
+            return (uint)dstIndex;
+        }
+
+        /// <summary>
+        /// 导出所有资源为文件（和原C++ ExtractRaw类似，但简化）
+        /// </summary>
         private void ExtractRaw(string outputDir)
         {
             if (!Directory.Exists(outputDir))
@@ -194,7 +300,7 @@ namespace Hanhua.Common.TextEditTools.Dino
             // Create XML document (using System.Xml for .NET 3.5)
             XmlDocument xml = new XmlDocument();
             XmlElement root = xml.CreateElement("DinoCrisisPackage");
-            root.SetAttribute("type", PackType == Type_DC1 ? "DC1" : "DC2");
+            root.SetAttribute("type", PackType == Type_DC1 ? "0" : "1");
             xml.AppendChild(root);
 
             for (int i = 0; i < Entries.Count; i++)
@@ -211,10 +317,16 @@ namespace Hanhua.Common.TextEditTools.Dino
                     Entries[i].type == (uint)GEntryType.GET_PALETTE ||
                     Entries[i].type == (uint)GEntryType.GET_LZSS1)
                 {
-                    entryElement.SetAttribute("x", BitConverter.ToUInt16(Segments[i], 8).ToString());
-                    entryElement.SetAttribute("y", BitConverter.ToUInt16(Segments[i], 10).ToString());
-                    entryElement.SetAttribute("w", BitConverter.ToUInt16(Segments[i], 12).ToString());
-                    entryElement.SetAttribute("h", BitConverter.ToUInt16(Segments[i], 14).ToString());
+                    // 解释entry为DC2_ENTRY_GFX
+                    ushort x = (ushort)(Entries[i].reserve[0] & 0xFFFF);
+                    ushort y = (ushort)((Entries[i].reserve[0] >> 16) & 0xFFFF);
+                    ushort w = (ushort)(Entries[i].reserve[1] & 0xFFFF);
+                    ushort h = (ushort)((Entries[i].reserve[1] >> 16) & 0xFFFF);
+
+                    entryElement.SetAttribute("x", x.ToString());
+                    entryElement.SetAttribute("y", y.ToString());
+                    entryElement.SetAttribute("w", w.ToString());
+                    entryElement.SetAttribute("h", h.ToString());
                 }
                 else
                 {
@@ -228,310 +340,204 @@ namespace Hanhua.Common.TextEditTools.Dino
             xml.Save(Path.Combine(outputDir, "manifest.xml"));
         }
 
-        private void RepackDat(string inputDir, string outputDatPath)
+        private void btnComDat_Click(object sender, EventArgs e)
         {
-            // 1. 读取 manifest.xml
-            string manifestPath = Path.Combine(inputDir, "manifest.xml");
-            if (!File.Exists(manifestPath))
-                throw new FileNotFoundException("manifest.xml not found.");
+            // 选择已解压文件的目录
+            string folder = @"G:\Study\MySelfProject\Hanhua\Dino2\DatDeCom";
+            if (string.IsNullOrEmpty(folder)) return;
 
-            XmlDocument xml = new XmlDocument();
-            xml.Load(manifestPath);
-
-            // 2. 解析 XML
-            bool isDC2 = xml.DocumentElement.Attributes["type"].Value == "DC2";
-            int entrySize = isDC2 ? 32 : 16;
-
-            XmlNodeList entries = xml.SelectNodes("/DinoCrisisPackage/Entry");
-            if (entries == null || entries.Count == 0)
-                throw new InvalidDataException("No entries found in manifest.xml.");
-
-            // 3. 处理所有条目
-            List<byte[]> entryData = new List<byte[]>();
-            List<DC2_ENTRY_GENERIC> entriesInfo = new List<DC2_ENTRY_GENERIC>();
-
-            foreach (XmlNode entry in entries)
+            // 获取 XML 索引
+            string xmlPath = Path.Combine(folder, "package.xml");
+            if (!File.Exists(xmlPath))
             {
-                string fileName = entry.InnerText;
-                string filePath = Path.Combine(inputDir, fileName);
-
-                if (!File.Exists(filePath))
-                    throw new FileNotFoundException(string.Format("File not found: {0}", fileName));
-
-                // 读取文件内容
-                byte[] data = File.ReadAllBytes(filePath);
-                uint type = uint.Parse(entry.Attributes["type"].Value);
-
-                // 根据类型处理数据
-                switch ((GEntryType)type)
-                {
-                    case GEntryType.GET_LZSS0:
-                    case GEntryType.GET_LZSS1:
-                        data = LzssEnc(data); // LZSS 压缩
-                        break;
-
-                    case GEntryType.GET_TEXTURE:
-                    case GEntryType.GET_PALETTE:
-                        // 重新 Swizzle 纹理
-                        ushort w = ushort.Parse(entry.Attributes["w"].Value);
-                        ushort h = ushort.Parse(entry.Attributes["h"].Value);
-                        data = SwizzleGfx(data, w, h);
-                        break;
-                }
-
-                entryData.Add(data);
-
-                // 构建条目信息
-                var entryInfo = new DC2_ENTRY_GENERIC
-                {
-                    type = type,
-                    size = (uint)data.Length,
-                    reserve = new uint[isDC2 ? 6 : 2]
-                };
-
-                // 如果是图形数据，设置坐标（写入 reserve 字段）
-                if (type == (uint)GEntryType.GET_TEXTURE ||
-                    type == (uint)GEntryType.GET_PALETTE ||
-                    type == (uint)GEntryType.GET_LZSS1)
-                {
-                    // 将坐标信息写入 reserve（如果需要）
-                    entryInfo.reserve[0] = ushort.Parse(entry.Attributes["x"].Value);
-                    entryInfo.reserve[1] = ushort.Parse(entry.Attributes["y"].Value);
-                    entryInfo.reserve[2] = ushort.Parse(entry.Attributes["w"].Value);
-                    entryInfo.reserve[3] = ushort.Parse(entry.Attributes["h"].Value);
-                }
-
-                entriesInfo.Add(entryInfo);
+                MessageBox.Show("未找到 package.xml 文件！");
+                return;
             }
 
-            // 4. 计算总大小（2048 对齐）
-            int totalSize = 2048; // 文件头
-            foreach (var data in entryData)
-            {
-                totalSize += Align((uint)(data.Length), 2048);
-            }
+            XmlDocument doc = new XmlDocument();
+            doc.Load(xmlPath);
+            XmlNodeList nodes = doc.SelectNodes("/DinoCrisisPackage/Entry");
 
-            // 5. 写入 .dat 文件
-            using (FileStream fs = new FileStream(outputDatPath, FileMode.Create))
-            using (BinaryWriter writer = new BinaryWriter(fs))
+            string outputDat = Path.Combine(folder, "DinoRepacked.dat");
+            using (FileStream fs = new FileStream(outputDat, FileMode.Create, FileAccess.Write))
+            using (BinaryWriter bw = new BinaryWriter(fs))
             {
-                // 6. 写入文件头（DC2: 32字节/条目，DC1: 16字节/条目）
-                writer.Write(new byte[2048]); // 预留头部
+                // 写 2048 字节头
+                byte[] header = new byte[2048];
+                bw.Write(header, 0, header.Length);
 
-                // 7. 写入所有条目数据
-                for (int i = 0; i < entryData.Count; i++)
+                int dataOffset = 2048;
+                List<DC2_ENTRY_GENERIC> newEntries = new List<DC2_ENTRY_GENERIC>();
+
+                foreach (XmlNode node in nodes)
                 {
-                    byte[] data = entryData[i];
-                    writer.Write(data);
+                    int index = int.Parse(node.Attributes["index"].Value);
+                    int type = int.Parse(node.Attributes["type"].Value);
+                    string file = node.Attributes["file"].Value;
 
-                    // 填充对齐字节
-                    int padding = Align((uint)(data.Length), 2048) - data.Length;
-                    if (padding > 0)
+                    string path = Path.Combine(folder, file);
+                    if (!File.Exists(path)) continue;
+
+                    byte[] rawData = File.ReadAllBytes(path);
+                    byte[] outputData = null;
+
+                    DC2_ENTRY_GENERIC entry = new DC2_ENTRY_GENERIC();
+                    entry.type = (uint)type;
+                    entry.size = (uint)rawData.Length;
+                    entry.reserve = new uint[6]; // 可根据需要填充 reserve
+
+                    switch ((GEntryType)type)
                     {
-                        writer.Write(new byte[padding]);
+                        case GEntryType.GET_LZSS0:
+                            outputData = Dc2LzssEnc(rawData);
+                            outputData = AlignData(outputData, 2048);
+                            break;
+
+                        case GEntryType.GET_LZSS1:
+                            SwizzleGfx(rawData, entry);
+                            outputData = Dc2LzssEnc(rawData);
+                            outputData = AlignData(outputData, 2048);
+                            break;
+
+                        case GEntryType.GET_TEXTURE:
+                            SwizzleGfx(rawData, entry);
+                            outputData = AlignData(rawData, 2048);
+                            break;
+
+                        default:
+                            outputData = AlignData(rawData, 2048);
+                            break;
+                    }
+
+                    // 写入数据段
+                    bw.Seek(dataOffset, SeekOrigin.Begin);
+                    bw.Write(outputData, 0, outputData.Length);
+
+                    newEntries.Add(entry);
+                    dataOffset += outputData.Length;
+                }
+
+                // 回写条目表
+                bw.Seek(0, SeekOrigin.Begin); // 假设条目表从文件头开始
+                foreach (DC2_ENTRY_GENERIC entry in newEntries)
+                {
+                    bw.Write(entry.type);
+                    bw.Write(entry.size);
+                    if (PackType == Type_DC2)
+                    {
+                        for (int i = 0; i < 6; i++) bw.Write(entry.reserve[i]);
                     }
                 }
             }
+
+            MessageBox.Show("打包完成: " + outputDat);
         }
 
-        private void UnswizzleGfx(ref byte[] data, ushort width, ushort height)
+        /// <summary>
+        /// LZSS 压缩 (bit-level 与 Capcom 完全一致)
+        /// </summary>
+        private byte[] Dc2LzssEnc(byte[] src)
         {
-            // 1. 检查输入数据是否有效
-            if (data == null || data.Length == 0)
-                throw new ArgumentException("Input data is empty.");
+            List<byte> dst = new List<byte>();
+            int srcIndex = 0;
+            int flag = 0;
+            int flagBit = 0;
+            int flagPos = 0;
 
-            // 2. 计算反 Swizzle 后所需的总大小（假设每像素 4 字节，如 16bpp TIM）
-            int destSize = width * height * 4;
-            if (data.Length < destSize)
+            dst.Add(0); // flag 占位
+            flagPos = dst.Count - 1;
+
+            while (srcIndex < src.Length)
             {
-                // 如果输入不足，扩展数组（保留原始数据）
-                byte[] newData = new byte[destSize];
-                Array.Copy(data, newData, Math.Min(data.Length, destSize));
-                data = newData;
-            }
+                int matchOffset = 0;
+                int matchLength = 0;
 
-            // 3. 创建临时缓冲区（与原 C++ 逻辑一致）
-            byte[] temp = new byte[data.Length];
-            Array.Copy(data, temp, data.Length);
-
-            // 4. 反 Swizzle 逻辑（与 C++ 一致）
-            int tileWidth = width / 32;
-            int blockWidth = tileWidth * 64; // 每行字节数（64 = 32像素 × 2字节/像素）
-
-            for (int y = 0; y < height; y += 32)
-            {
-                for (int x = 0; x < tileWidth; x++)
+                int startSearch = Math.Max(0, srcIndex - 0xFFF);
+                for (int i = startSearch; i < srcIndex; i++)
                 {
-                    int srcOffset = (y * blockWidth) + (x * 64);
-                    int destOffset = (y * width * 4) + (x * 32 * 4);
-
-                    for (int line = 0; line < 32; line++)
+                    int length = 0;
+                    while (length < 17 && srcIndex + length < src.Length && src[i + length] == src[srcIndex + length])
+                        length++;
+                    if (length > matchLength && length >= 2)
                     {
-                        // 确保不会越界
-                        if (srcOffset + 64 <= temp.Length && destOffset + 64 <= data.Length)
-                        {
-                            Array.Copy(temp, srcOffset, data, destOffset, 64);
-                        }
-                        srcOffset += blockWidth;
-                        destOffset += width * 4;
+                        matchLength = length;
+                        matchOffset = srcIndex - i;
                     }
                 }
-            }
-        }
 
-        private byte[] LzssDec(byte[] src, int offset, int srcSize)
-        {
-            List<byte> output = new List<byte>(srcSize * 8);
-            int flag = 1;
-            int end = offset + srcSize;
-
-            while (offset < end)
-            {
-                if (flag == 1)
+                if (matchLength >= 2)
                 {
-                    flag = src[offset++] | 0x100;
-                }
-
-                byte ch = src[offset++];
-
-                if ((flag & 1) != 0)
-                {
-                    output.Add(ch);
+                    int b1 = matchOffset & 0xFF;
+                    int b2 = ((matchLength - 2) << 4) | ((matchOffset >> 8) & 0xF);
+                    dst.Add((byte)b1);
+                    dst.Add((byte)b2);
+                    flag |= 0 << flagBit;
+                    srcIndex += matchLength;
                 }
                 else
                 {
-                    byte t = src[offset++];
-                    int jump = ((t & 0xF) << 8) | ch;
-                    int length = (t >> 4) + 2;
-                    int back = output.Count - jump;
-
-                    for (int i = 0; i < length; i++)
-                    {
-                        output.Add(output[back + i]);
-                    }
+                    dst.Add(src[srcIndex++]);
+                    flag |= 1 << flagBit;
                 }
 
-                flag >>= 1;
+                flagBit++;
+                if (flagBit == 8)
+                {
+                    dst[flagPos] = (byte)flag;
+                    flag = 0;
+                    flagBit = 0;
+                    dst.Add(0);
+                    flagPos = dst.Count - 1;
+                }
             }
 
-            return output.ToArray();
-        }
+            if (flagBit > 0)
+                dst[flagPos] = (byte)flag;
 
-        private int Align(uint value, int alignment)
-        {
-            return (int)((value + alignment - 1) & ~(alignment - 1));
+            return dst.ToArray();
         }
 
         /// <summary>
-        /// LZSS 压缩算法（与 Dino Crisis 2 的压缩格式匹配）
+        /// 将解交错图像重新交错回原始布局 (swizzle)
         /// </summary>
-        private byte[] LzssEnc(byte[] input)
+        private void SwizzleGfx(byte[] buf, DC2_ENTRY_GENERIC entry)
         {
-            // 最大搜索窗口大小（与游戏一致）
-            const int WindowSize = 4096;
-            // 最大匹配长度
-            const int MaxMatchLength = 18;
+            ushort x = (ushort)(entry.reserve[0] & 0xFFFF);
+            ushort y = (ushort)((entry.reserve[0] >> 16) & 0xFFFF);
+            ushort w = (ushort)(entry.reserve[1] & 0xFFFF);
+            ushort h = (ushort)((entry.reserve[1] >> 16) & 0xFFFF);
 
-            using (MemoryStream output = new MemoryStream())
-            using (BinaryWriter writer = new BinaryWriter(output))
+            int tw = w / 32;
+            int bw = tw * 64;
+            byte[] temp = new byte[buf.Length];
+            Array.Copy(buf, temp, buf.Length);
+
+            int bIndex = 0;
+            for (int yi = 0; yi < h; yi += 32)
             {
-                int position = 0;
-                int inputLength = input.Length;
-
-                while (position < inputLength)
+                for (int xi = 0; xi < tw; xi++)
                 {
-                    byte flagByte = 0;
-                    long flagPosition = output.Position;
-                    writer.Write(flagByte); // 预留标志位
-
-                    for (int bit = 0; bit < 8 && position < inputLength; bit++)
+                    int scanlineIndex = yi * bw + xi * 64;
+                    for (int j = 0; j < 32; j++)
                     {
-                        int bestMatchLength = 0;
-                        int bestMatchOffset = 0;
-
-                        // 查找最长匹配
-                        for (int offset = 1; offset <= Math.Min(WindowSize, position); offset++)
-                        {
-                            int matchLength = 0;
-                            while (matchLength < MaxMatchLength &&
-                                   position + matchLength < inputLength &&
-                                   input[position - offset + matchLength] == input[position + matchLength])
-                            {
-                                matchLength++;
-                            }
-
-                            if (matchLength > bestMatchLength)
-                            {
-                                bestMatchLength = matchLength;
-                                bestMatchOffset = offset;
-                            }
-                        }
-
-                        // 如果找到足够长的匹配，写入压缩标记
-                        if (bestMatchLength >= 3)
-                        {
-                            // 写入偏移和长度（12-bit offset + 4-bit length）
-                            ushort token = (ushort)(((bestMatchOffset - 1) << 4) | (bestMatchLength - 3));
-                            writer.Write((byte)(token & 0xFF));
-                            writer.Write((byte)(token >> 8));
-
-                            position += bestMatchLength;
-                            flagByte |= (byte)(1 << bit); // 标记为压缩块
-                        }
-                        else
-                        {
-                            // 直接写入字面量字节
-                            writer.Write(input[position++]);
-                        }
+                        Array.Copy(temp, scanlineIndex, buf, bIndex, 64);
+                        bIndex += 64;
+                        scanlineIndex += bw;
                     }
-
-                    // 回写标志位
-                    long endPosition = output.Position;
-                    output.Position = flagPosition;
-                    writer.Write(flagByte);
-                    output.Position = endPosition;
                 }
-
-                return output.ToArray();
             }
         }
 
         /// <summary>
-        /// 将线性纹理数据重新 Swizzle 为 PS1 格式（与 UnswizzleGfx 相反）
+        /// 数据按指定对齐字节数扩展
         /// </summary>
-        private byte[] SwizzleGfx(byte[] linearData, ushort width, ushort height)
+        private byte[] AlignData(byte[] data, int align)
         {
-            // 1. 检查输入
-            if (linearData == null || linearData.Length == 0)
-                throw new ArgumentException("Input data is empty.");
-
-            // 2. 计算 Swizzle 后的数据大小（按 32x32 块排列）
-            int tileWidth = width / 32;
-            int blockWidth = tileWidth * 64; // 每行字节数（64 = 32像素 × 2字节/像素）
-            int swizzledSize = height * blockWidth;
-            byte[] swizzledData = new byte[swizzledSize];
-
-            // 3. Swizzle 处理
-            for (int y = 0; y < height; y += 32)
-            {
-                for (int x = 0; x < tileWidth; x++)
-                {
-                    int srcOffset = (y * width * 4) + (x * 32 * 4);
-                    int destOffset = (y * blockWidth) + (x * 64);
-
-                    for (int line = 0; line < 32; line++)
-                    {
-                        if (srcOffset + 64 <= linearData.Length && destOffset + 64 <= swizzledData.Length)
-                        {
-                            Array.Copy(linearData, srcOffset, swizzledData, destOffset, 64);
-                        }
-                        srcOffset += width * 4;
-                        destOffset += blockWidth;
-                    }
-                }
-            }
-
-            return swizzledData;
+            int size = Align(data.Length, align);
+            if (data.Length < size)
+                Array.Resize(ref data, size);
+            return data;
         }
+
     }
 }
