@@ -475,6 +475,9 @@ namespace Hanhua.ImgEditTools
 
                 case ImgType.Tpl:
                     return new ImgEditorTpl(baseFile);
+
+                case ImgType.Dat:
+                    return new ImgEditorDatTex(baseFile);
             }
 
             return new ImgEditorBase(this.baseFile);
@@ -499,6 +502,9 @@ namespace Hanhua.ImgEditTools
 
                 case ImgType.Gvr:
                     return "Dc Gvr 图片文件（*.gvr）|*.gvr|所有文件|*.*";
+
+                case ImgType.Dat:
+                    return "Ps Dat (恐龙危机)压缩文件（*.dat）|*.dat|所有文件|*.*";
             }
 
             return "所有文件|*.*";
@@ -518,6 +524,7 @@ namespace Hanhua.ImgEditTools
             this.cmbImgType.Items.Add("Bio0 mhp");
             this.cmbImgType.Items.Add("Dc Prv");
             this.cmbImgType.Items.Add("Ngc Tpl");
+            this.cmbImgType.Items.Add("Ps Dat");
 
             this.cmbImgType.SelectedIndex = 7;
         }
@@ -609,7 +616,7 @@ namespace Hanhua.ImgEditTools
             if (file.EndsWith(Enum.GetName(typeof(ImgType), this.imgType), StringComparison.OrdinalIgnoreCase))
             {
                 if (this.imgType == ImgType.Gvr || this.imgType == ImgType.Tim || this.imgType == ImgType.Adt
-                    || this.imgType == ImgType.Mhp)
+                    || this.imgType == ImgType.Mhp || this.imgType == ImgType.Dat)
                 {
                     isAddFile = false;
                 }

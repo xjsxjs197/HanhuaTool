@@ -49,6 +49,11 @@ namespace Hanhua.ImgEditTools
         /// <summary>
         /// Ngc Tpl
         /// </summary>
-        Tpl = 7
+        Tpl = 7,
+
+        /// <summary>
+        /// Ps dat(dino Crisis 1 / 2)
+        /// </summary>
+        Dat = 8
     }
 }

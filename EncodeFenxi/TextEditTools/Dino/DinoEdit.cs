@@ -37,18 +37,6 @@ namespace Hanhua.Common.TextEditTools.Dino
         public ushort w, h;
     }
 
-    public class EntryInfo
-    {
-        public int Index;
-        public GEntryType Type;
-        public string FileName;    // relative path to file in folder
-        public uint Size;          // logical size (after any packing/processing this will be overwritten)
-        // gfx fields (if applicable)
-        public ushort x, y, w, h;
-        // raw bytes to be written into .dat (after processing)
-        public byte[] Data;
-    }
-
     public partial class DinoEdit : Form
     {
         public List<DC2_ENTRY_GENERIC> Entries = new List<DC2_ENTRY_GENERIC>();
@@ -87,7 +75,7 @@ namespace Hanhua.Common.TextEditTools.Dino
 
             this.Open(baseFile);
 
-            this.ExtractRaw(@"G:\Study\MySelfProject\Hanhua\Dino2\DatDeCom\");
+            this.ExtractRaw(@"E:\Game\Dino1\DatDecode\");
         }
 
         public void Reset()
