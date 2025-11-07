@@ -75,7 +75,7 @@ namespace Hanhua.Common.TextEditTools.Dino
 
             this.Open(baseFile);
 
-            this.ExtractRaw(@"E:\Game\Dino1\DatDecode\");
+            this.ExtractRaw(@"G:\Study\MySelfProject\Hanhua\Dino2\DatDeCom\");
         }
 
         public void Reset()
