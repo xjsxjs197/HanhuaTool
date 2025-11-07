@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 using Hanhua.Common;
+using System.IO;
 
 namespace Hanhua.ImgEditTools
 {
@@ -64,6 +65,10 @@ namespace Hanhua.ImgEditTools
         /// </summary>
         private List<DatTexInfo> texInfo = new List<DatTexInfo>();
 
+        /// <summary>
+        /// 图片和调色板的映射
+        /// </summary>
+        private Dictionary<int, int> texPalMap = new Dictionary<int, int>();
 
         #endregion
 
@@ -86,104 +91,7 @@ namespace Hanhua.ImgEditTools
         /// <returns>是否查找成功</returns>
         public override List<byte[]> SearchImg(byte[] byData, string file, List<string> imgInfos)
         {
-            List<byte[]> imgList = new List<byte[]>();
-            const int Type_DC1 = 0;
-            const int Type_DC2 = 1;
-
-            try
-            {
-                int entrySize = 16;
-                int PackType = Type_DC1;
-
-                // 判断是否是DC2结构（32字节entry）
-                uint[] check = new uint[4];
-                Buffer.BlockCopy(data, 16, check, 0, 16);
-                if (check[0] == 0 && check[1] == 0 && check[2] == 0 && check[3] == 0)
-                {
-                    PackType = Type_DC2;
-                    entrySize = 32;
-                }
-
-                int pos = 2048;
-                int si = 2048 / entrySize;
-                int i = 0;
-
-                while (true)
-                {
-                    DC2_ENTRY_GENERIC entry = ReadEntry(data, i * entrySize, entrySize);
-                    if (entry == null) break;
-
-                    byte[] buffer = null;
-                    int ssize = Align((int)entry.size, 2048);
-                    if (pos + ssize > data.Length) break;
-
-                    byte[] segmentData = new byte[entry.size];
-                    Array.Copy(data, pos, segmentData, 0, entry.size);
-
-                    switch ((GEntryType)entry.type)
-                    {
-                        case GEntryType.GET_TEXTURE:
-                            {
-                                buffer = new byte[ssize];
-                                Array.Clear(buffer, 0, ssize);
-                                Array.Copy(segmentData, buffer, entry.size);
-                                entry.size = (uint)ssize;
-                                UnswizzleGfx(buffer, entry);
-                                
-                                imgList.Add(buffer);
-                            }
-                            break;
-
-                        case GEntryType.GET_LZSS0:
-                            {
-                                byte[] dst;
-                                entry.size = Dc2LzssDec(segmentData, out dst);
-                                buffer = dst;
-                            }
-                            break;
-
-                        case GEntryType.GET_LZSS1:
-                            {
-                                byte[] temp;
-                                entry.size = Dc2LzssDec(segmentData, out temp);
-                                buffer = new byte[Align((int)entry.size, 2048)];
-                                Array.Clear(buffer, 0, buffer.Length);
-                                Array.Copy(temp, buffer, entry.size);
-                                entry.size = (uint)buffer.Length;
-                                UnswizzleGfx(buffer, entry);
-
-                                imgList.Add(buffer);
-                            }
-                            break;
-
-                        case GEntryType.GET_PALETTE:
-                            buffer = segmentData;
-                            break;
-
-                        case GEntryType.GET_DATA:
-                        case GEntryType.GET_SNDH:
-                        case GEntryType.GET_SNDB:
-                        case GEntryType.GET_SNDE:
-                        case GEntryType.GET_UNK:
-                            buffer = segmentData;
-                            break;
-
-                        default:
-                            i = si;
-                            break;
-                    }
-
-                    if (i == si) break;
-
-                    pos += ssize;
-                    i++;
-                }
-            }
-            catch (Exception ex)
-            {
-            }
-
-            return imgList;
+            return this.OpenDat(byData, file, imgInfos);
         }
 
         /// <summary>
@@ -193,8 +101,43 @@ namespace Hanhua.ImgEditTools
         /// <returns></returns>
         public override Image[] ImageDecode(byte[] byData, string fileInfo)
         {
+            this.OpenDat(File.ReadAllBytes(base.editingFile), string.Empty, null);
 
-            return null;
+            List<Image> dcImg = new List<Image>();
+            string[] fileInfos = fileInfo.Split(' ');
+            int imgIdx = Convert.ToInt32(fileInfos[1]);
+            DatTexInfo texItem = texInfo[imgIdx];
+            //foreach (DatTexInfo texItem in texInfo)
+            {
+                Bitmap img = new Bitmap(texItem.width, texItem.height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                Color[] palColor = this.paletteColor[this.texPalMap[imgIdx]];
+                byte[] byImgData = this.byAllImg[imgIdx];
+                int byImgIdx = 0;
+
+                for (int h = 0; h < texItem.height; h += texItem.blockHeight )
+                {
+                    for (int w = 0; w < texItem.width; w += texItem.blockWidth )
+                    {
+                        for (int bh = 0; bh < texItem.blockHeight; bh++)
+                        {
+                            for (int bw = 0; bw < texItem.blockWidth; bw += 2)
+                            {
+                                if (byImgIdx <= byImgData.Length - 1)
+                                {
+                                    img.SetPixel(w + bw, h + bh, palColor[byImgData[byImgIdx] & 0xF]);
+                                    img.SetPixel(w + bw + 1, h + bh, palColor[(byImgData[byImgIdx] >> 4) & 0xF]);
+                                }
+                                
+                                byImgIdx++;
+                            }
+                        }
+                    }
+                }
+                dcImg.Add(img);
+                imgIdx++;
+            }
+
+            return dcImg.ToArray();
         }
 
         /// <summary>
@@ -238,6 +181,163 @@ namespace Hanhua.ImgEditTools
 
         #region " 私有方法 "
 
+        private List<byte[]> OpenDat(byte[] data, string file, List<string> imgInfos)
+        {
+            List<byte[]> imgList = new List<byte[]>();
+            const int Type_DC1 = 0;
+            const int Type_DC2 = 1;
+            this.paletteColor.Clear();
+            this.byAllImg.Clear();
+            this.texInfo.Clear();
+            this.texPalMap.Clear();
+            int imgIdx = 0;
+            int palIdx = 0;
+
+            try
+            {
+                int entrySize = 16;
+                int PackType = Type_DC1;
+
+                // 判断是否是DC2结构（32字节entry）
+                uint[] check = new uint[4];
+                Buffer.BlockCopy(data, 16, check, 0, 16);
+                if (check[0] == 0 && check[1] == 0 && check[2] == 0 && check[3] == 0)
+                {
+                    PackType = Type_DC2;
+                    entrySize = 32;
+                }
+
+                int pos = 2048;
+                int si = 2048 / entrySize;
+                int i = 0;
+
+                while (true)
+                {
+                    DC2_ENTRY_GENERIC entry = ReadEntry(data, i * entrySize, entrySize);
+                    if (entry == null) break;
+
+                    byte[] buffer = null;
+                    int ssize = Align((int)entry.size, 2048);
+                    if (pos + ssize > data.Length) break;
+
+                    byte[] segmentData = new byte[entry.size];
+                    Array.Copy(data, pos, segmentData, 0, entry.size);
+
+                    switch ((GEntryType)entry.type)
+                    {
+                        case GEntryType.GET_TEXTURE:
+                            {
+                                buffer = new byte[ssize];
+                                Array.Clear(buffer, 0, ssize);
+                                Array.Copy(segmentData, buffer, entry.size);
+                                entry.size = (uint)ssize;
+                                UnswizzleGfx(buffer, entry);
+
+                                imgList.Add(buffer);
+                                this.byAllImg.Add(buffer);
+                                DatTexInfo datTexInfo = this.GetDatTexInfo(entry);
+                                this.texInfo.Add(datTexInfo);
+                                if (imgInfos != null)
+                                {
+                                    imgInfos.Add(Util.GetShortName(file) + " " + imgIdx + " " + datTexInfo.width + "X" + datTexInfo.height + " " + datTexInfo.blockWidth + "X" + datTexInfo.blockHeight);
+                                }
+                                this.texPalMap.Add(imgIdx++, palIdx);
+                            }
+                            break;
+
+                        case GEntryType.GET_LZSS0:
+                            {
+                                byte[] dst;
+                                entry.size = Dc2LzssDec(segmentData, out dst);
+                                buffer = dst;
+                            }
+                            break;
+
+                        case GEntryType.GET_LZSS1:
+                            {
+                                byte[] temp;
+                                entry.size = Dc2LzssDec(segmentData, out temp);
+                                buffer = new byte[Align((int)entry.size, 2048)];
+                                Array.Clear(buffer, 0, buffer.Length);
+                                Array.Copy(temp, buffer, entry.size);
+                                entry.size = (uint)buffer.Length;
+                                UnswizzleGfx(buffer, entry);
+
+                                imgList.Add(buffer);
+                                this.byAllImg.Add(buffer);
+                                DatTexInfo datTexInfo = this.GetDatTexInfo(entry);
+                                this.texInfo.Add(datTexInfo);
+                                if (imgInfos != null)
+                                {
+                                    imgInfos.Add(Util.GetShortName(file) + " " + imgIdx + " " + datTexInfo.width + "X" + datTexInfo.height + " " + datTexInfo.blockWidth + "X" + datTexInfo.blockHeight);
+                                }
+                                this.texPalMap.Add(imgIdx++, palIdx);
+                            }
+                            break;
+
+                        case GEntryType.GET_PALETTE:
+                            buffer = segmentData;
+                            this.AddPaletteColor(buffer);
+                            palIdx++;
+                            break;
+
+                        case GEntryType.GET_DATA:
+                        case GEntryType.GET_SNDH:
+                        case GEntryType.GET_SNDB:
+                        case GEntryType.GET_SNDE:
+                        case GEntryType.GET_UNK:
+                            buffer = segmentData;
+                            break;
+
+                        default:
+                            i = si;
+                            break;
+                    }
+
+                    if (i == si) break;
+
+                    pos += ssize;
+                    i++;
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+
+            return imgList;
+        }
+
+        private DatTexInfo GetDatTexInfo(DC2_ENTRY_GENERIC entry)
+        {
+            DatTexInfo texInfo = new DatTexInfo();
+
+            // 解释entry为DC2_ENTRY_GFX
+            ushort x = (ushort)(entry.reserve[0] & 0xFFFF);
+            ushort y = (ushort)((entry.reserve[0] >> 16) & 0xFFFF);
+            texInfo.blockWidth = (ushort)(entry.reserve[1] & 0xFFFF);
+            texInfo.blockHeight = (ushort)((entry.reserve[1] >> 16) & 0xFFFF);
+
+            //texInfo.width = 1024 - x;
+            texInfo.width = 256;
+            texInfo.height = texInfo.blockHeight;
+
+            return texInfo;
+        }
+
+        private void AddPaletteColor(byte[] byPalette)
+        {
+            List<Color> curPalette = new List<Color>();
+            for (int i = 0; i < byPalette.Length; i += 2)
+            {
+                int pixelColor = byPalette[i + 1] << 8 | byPalette[i];
+                int colorR = ((byte)(pixelColor & 0x1F)) << 3;
+                int colorG = ((byte)((pixelColor >> 5) & 0x1F)) << 3;
+                int colorB = ((byte)((pixelColor >> 10) & 0x1F)) << 3;
+                curPalette.Add(Color.FromArgb(colorR, colorG, colorB));
+
+            }
+            this.paletteColor.Add(curPalette.ToArray());
+        }
 
 
         private DC2_ENTRY_GENERIC ReadEntry(byte[] data, int offset, int size)
