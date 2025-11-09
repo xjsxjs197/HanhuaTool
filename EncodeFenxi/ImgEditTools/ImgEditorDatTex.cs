@@ -56,6 +56,16 @@ namespace Hanhua.ImgEditTools
         private List<Color[]> paletteColor = new List<Color[]>();
 
         /// <summary>
+        /// 固定的4bp调色板数据
+        /// </summary>
+        private List<Color> palGreyscale4bp = new List<Color>();
+
+        /// <summary>
+        /// 固定的8bp调色板数据
+        /// </summary>
+        private List<Color> palGreyscale8bp = new List<Color>();
+
+        /// <summary>
         /// 图片数据
         /// </summary>
         private List<byte[]> byAllImg = new List<byte[]>();
@@ -78,6 +88,7 @@ namespace Hanhua.ImgEditTools
         public ImgEditorDatTex(string file)
             : base(file)
         {
+            this.CreatePalGreyscale();
         }
 
         #region " 重写父类的虚方法 "
@@ -110,29 +121,50 @@ namespace Hanhua.ImgEditTools
             //foreach (DatTexInfo texItem in texInfo)
             {
                 Bitmap img = new Bitmap(texItem.width, texItem.height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                Color[] palColor = this.paletteColor[this.texPalMap[imgIdx]];
+                
+                Color[] palColor = null;
+                if (this.paletteIndex > 0)
+                {
+                    palColor = this.paletteColor[this.paletteIndex - 1];
+                }
+                
                 byte[] byImgData = this.byAllImg[imgIdx];
                 int byImgIdx = 0;
 
-                for (int h = 0; h < texItem.height; h += texItem.blockHeight )
+                if (1 == 1)
                 {
-                    for (int w = 0; w < texItem.width; w += texItem.blockWidth )
+                    for (int h = 0; h < texItem.height; h += 1)
                     {
-                        for (int bh = 0; bh < texItem.blockHeight; bh++)
+                        for (int w = 0; w < texItem.width; w += 2)
                         {
-                            for (int bw = 0; bw < texItem.blockWidth; bw += 2)
-                            {
-                                if (byImgIdx <= byImgData.Length - 1)
-                                {
-                                    img.SetPixel(w + bw, h + bh, palColor[byImgData[byImgIdx] & 0xF]);
-                                    img.SetPixel(w + bw + 1, h + bh, palColor[(byImgData[byImgIdx] >> 4) & 0xF]);
-                                }
-                                
-                                byImgIdx++;
-                            }
+                            img.SetPixel(w, h, this.palGreyscale4bp[byImgData[byImgIdx] & 0xF]);
+                            img.SetPixel(w + 1, h, this.palGreyscale4bp[(byImgData[byImgIdx] >> 4) & 0xF]);
+
+                            byImgIdx++;
                         }
                     }
                 }
+                else if (0 == 1)
+                {
+                    for (int h = 0; h < texItem.height; h += 1)
+                    {
+                        for (int w = 0; w < texItem.width; w += 1)
+                        {
+                            if (byImgIdx < byImgData.Length)
+                            {
+                                int colIdx = byImgData[byImgIdx];
+                                if (palColor != null && colIdx < palColor.Length)
+                                {
+                                    img.SetPixel(w, h, palColor[colIdx]);
+                                }
+                            }
+
+                            byImgIdx++;
+                        }
+                    }
+                }
+                
+
                 dcImg.Add(img);
                 imgIdx++;
             }
@@ -181,6 +213,24 @@ namespace Hanhua.ImgEditTools
 
         #region " 私有方法 "
 
+        /// <summary>
+        /// 创建固定位数的调色版
+        /// </summary>
+        private void CreatePalGreyscale()
+        {
+            this.palGreyscale4bp.Clear();
+            this.palGreyscale8bp.Clear();
+
+            for (int i = 0; i < 16; i++)
+            {
+                this.palGreyscale4bp.Add(Color.FromArgb(i * 16, i * 16, i * 16));
+            }
+            for (int i = 0; i < 256; i++)
+            {
+                this.palGreyscale8bp.Add(Color.FromArgb(i, i, i));
+            }
+        }
+
         private List<byte[]> OpenDat(byte[] data, string file, List<string> imgInfos)
         {
             List<byte[]> imgList = new List<byte[]>();
@@ -190,6 +240,7 @@ namespace Hanhua.ImgEditTools
             this.byAllImg.Clear();
             this.texInfo.Clear();
             this.texPalMap.Clear();
+            this.paletteCount = 1;
             int imgIdx = 0;
             int palIdx = 0;
 
@@ -233,15 +284,20 @@ namespace Hanhua.ImgEditTools
                                 entry.size = (uint)ssize;
                                 UnswizzleGfx(buffer, entry);
 
-                                imgList.Add(buffer);
-                                this.byAllImg.Add(buffer);
                                 DatTexInfo datTexInfo = this.GetDatTexInfo(entry);
-                                this.texInfo.Add(datTexInfo);
-                                if (imgInfos != null)
+                                if (datTexInfo.height == 16 || datTexInfo.height == 32 || datTexInfo.height == 48 || base.editingFile.EndsWith("core.dat", StringComparison.OrdinalIgnoreCase)
+                                     || file.EndsWith("core.dat", StringComparison.OrdinalIgnoreCase))
                                 {
-                                    imgInfos.Add(Util.GetShortName(file) + " " + imgIdx + " " + datTexInfo.width + "X" + datTexInfo.height + " " + datTexInfo.blockWidth + "X" + datTexInfo.blockHeight);
+                                    imgList.Add(buffer);
+                                    this.byAllImg.Add(buffer);
+                                    this.texInfo.Add(datTexInfo);
+                                    if (imgInfos != null)
+                                    {
+                                        imgInfos.Add(Util.GetShortName(file) + " " + imgIdx + " " + datTexInfo.width + "X" + datTexInfo.height // + " " + datTexInfo.blockWidth + "X" + datTexInfo.blockHeight
+                                            + "  " + buffer.Length);
+                                    }
+                                    this.texPalMap.Add(imgIdx++, palIdx);
                                 }
-                                this.texPalMap.Add(imgIdx++, palIdx);
                             }
                             break;
 
@@ -263,21 +319,27 @@ namespace Hanhua.ImgEditTools
                                 entry.size = (uint)buffer.Length;
                                 UnswizzleGfx(buffer, entry);
 
-                                imgList.Add(buffer);
-                                this.byAllImg.Add(buffer);
                                 DatTexInfo datTexInfo = this.GetDatTexInfo(entry);
-                                this.texInfo.Add(datTexInfo);
-                                if (imgInfos != null)
+                                if (datTexInfo.height == 16 || datTexInfo.height == 32 || datTexInfo.height == 48 || base.editingFile.EndsWith("core.dat", StringComparison.OrdinalIgnoreCase)
+                                    || file.EndsWith("core.dat", StringComparison.OrdinalIgnoreCase))
                                 {
-                                    imgInfos.Add(Util.GetShortName(file) + " " + imgIdx + " " + datTexInfo.width + "X" + datTexInfo.height + " " + datTexInfo.blockWidth + "X" + datTexInfo.blockHeight);
+                                    imgList.Add(buffer);
+                                    this.byAllImg.Add(buffer);
+                                    this.texInfo.Add(datTexInfo);
+                                    if (imgInfos != null)
+                                    {
+                                        imgInfos.Add(Util.GetShortName(file) + " " + imgIdx + " " + datTexInfo.width + "X" + datTexInfo.height // + " " + datTexInfo.blockWidth + "X" + datTexInfo.blockHeight
+                                            + "  " + buffer.Length);
+                                    }
+                                    this.texPalMap.Add(imgIdx++, palIdx);
                                 }
-                                this.texPalMap.Add(imgIdx++, palIdx);
                             }
                             break;
 
                         case GEntryType.GET_PALETTE:
                             buffer = segmentData;
                             this.AddPaletteColor(buffer);
+                            this.paletteCount++;
                             palIdx++;
                             break;
 
@@ -317,8 +379,8 @@ namespace Hanhua.ImgEditTools
             texInfo.blockWidth = (ushort)(entry.reserve[1] & 0xFFFF);
             texInfo.blockHeight = (ushort)((entry.reserve[1] >> 16) & 0xFFFF);
 
-            //texInfo.width = 1024 - x;
-            texInfo.width = 256;
+            //texInfo.blockWidth = texInfo.blockWidth * 4;
+            texInfo.width = texInfo.blockWidth * 4;
             texInfo.height = texInfo.blockHeight;
 
             return texInfo;

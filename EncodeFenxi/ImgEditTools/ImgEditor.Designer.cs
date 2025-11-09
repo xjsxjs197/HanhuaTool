@@ -28,10 +28,11 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.btnDoWork = new System.Windows.Forms.Button();
             this.btnSave = new System.Windows.Forms.Button();
             this.lblPalette = new System.Windows.Forms.Label();
             this.cmbTimPalette = new System.Windows.Forms.ComboBox();
@@ -44,7 +45,6 @@
             this.imgGrid = new System.Windows.Forms.DataGridView();
             this.Column1 = new System.Windows.Forms.DataGridViewImageColumn();
             this.lstImg = new System.Windows.Forms.ListBox();
-            this.btnDoWork = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.imgGrid)).BeginInit();
@@ -53,7 +53,7 @@
             // pnlTopBody
             // 
             this.pnlTopBody.Margin = new System.Windows.Forms.Padding(4);
-            this.pnlTopBody.Size = new System.Drawing.Size(765, 291);
+            this.pnlTopBody.Size = new System.Drawing.Size(887, 291);
             // 
             // panel1
             // 
@@ -69,13 +69,24 @@
             this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panel1.Location = new System.Drawing.Point(0, 259);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(765, 32);
+            this.panel1.Size = new System.Drawing.Size(887, 32);
             this.panel1.TabIndex = 0;
+            // 
+            // btnDoWork
+            // 
+            this.btnDoWork.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnDoWork.Location = new System.Drawing.Point(585, 5);
+            this.btnDoWork.Name = "btnDoWork";
+            this.btnDoWork.Size = new System.Drawing.Size(68, 23);
+            this.btnDoWork.TabIndex = 11;
+            this.btnDoWork.Text = "各种操作";
+            this.btnDoWork.UseVisualStyleBackColor = true;
+            this.btnDoWork.Click += new System.EventHandler(this.btnDoWork_Click);
             // 
             // btnSave
             // 
             this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSave.Location = new System.Drawing.Point(537, 5);
+            this.btnSave.Location = new System.Drawing.Point(659, 5);
             this.btnSave.Name = "btnSave";
             this.btnSave.Size = new System.Drawing.Size(68, 23);
             this.btnSave.TabIndex = 10;
@@ -85,8 +96,9 @@
             // 
             // lblPalette
             // 
+            this.lblPalette.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lblPalette.AutoSize = true;
-            this.lblPalette.Location = new System.Drawing.Point(320, 10);
+            this.lblPalette.Location = new System.Drawing.Point(479, 10);
             this.lblPalette.Name = "lblPalette";
             this.lblPalette.Size = new System.Drawing.Size(41, 12);
             this.lblPalette.TabIndex = 9;
@@ -94,9 +106,10 @@
             // 
             // cmbTimPalette
             // 
+            this.cmbTimPalette.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.cmbTimPalette.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbTimPalette.FormattingEnabled = true;
-            this.cmbTimPalette.Location = new System.Drawing.Point(367, 7);
+            this.cmbTimPalette.Location = new System.Drawing.Point(526, 7);
             this.cmbTimPalette.Name = "cmbTimPalette";
             this.cmbTimPalette.Size = new System.Drawing.Size(45, 20);
             this.cmbTimPalette.TabIndex = 8;
@@ -124,7 +137,7 @@
             // btnSelFile
             // 
             this.btnSelFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSelFile.Location = new System.Drawing.Point(685, 5);
+            this.btnSelFile.Location = new System.Drawing.Point(807, 5);
             this.btnSelFile.Name = "btnSelFile";
             this.btnSelFile.Size = new System.Drawing.Size(68, 23);
             this.btnSelFile.TabIndex = 5;
@@ -139,7 +152,7 @@
             this.chkCheckOther.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkCheckOther.Location = new System.Drawing.Point(186, 9);
             this.chkCheckOther.Name = "chkCheckOther";
-            this.chkCheckOther.Size = new System.Drawing.Size(132, 16);
+            this.chkCheckOther.Size = new System.Drawing.Size(138, 16);
             this.chkCheckOther.TabIndex = 4;
             this.chkCheckOther.Text = "分析非{0}后缀的文件";
             this.chkCheckOther.UseVisualStyleBackColor = true;
@@ -147,7 +160,7 @@
             // btnReadDic
             // 
             this.btnReadDic.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnReadDic.Location = new System.Drawing.Point(611, 5);
+            this.btnReadDic.Location = new System.Drawing.Point(733, 5);
             this.btnReadDic.Name = "btnReadDic";
             this.btnReadDic.Size = new System.Drawing.Size(68, 23);
             this.btnReadDic.TabIndex = 3;
@@ -162,7 +175,7 @@
             this.panel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel2.Location = new System.Drawing.Point(0, 0);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(765, 259);
+            this.panel2.Size = new System.Drawing.Size(887, 259);
             this.panel2.TabIndex = 1;
             // 
             // imgGrid
@@ -170,43 +183,43 @@
             this.imgGrid.AllowDrop = true;
             this.imgGrid.AllowUserToAddRows = false;
             this.imgGrid.BackgroundColor = System.Drawing.SystemColors.ActiveCaption;
-            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle4.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle4.Font = new System.Drawing.Font("MS UI Gothic", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.imgGrid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("MS UI Gothic", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.imgGrid.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.imgGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.imgGrid.ColumnHeadersVisible = false;
             this.imgGrid.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Column1});
-            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle5.BackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle5.Font = new System.Drawing.Font("MS UI Gothic", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            dataGridViewCellStyle5.ForeColor = System.Drawing.SystemColors.ControlText;
-            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Window;
-            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
-            this.imgGrid.DefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle2.BackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("MS UI Gothic", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            dataGridViewCellStyle2.ForeColor = System.Drawing.SystemColors.ControlText;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Window;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
+            this.imgGrid.DefaultCellStyle = dataGridViewCellStyle2;
             this.imgGrid.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.imgGrid.Location = new System.Drawing.Point(203, 0);
+            this.imgGrid.Location = new System.Drawing.Point(254, 0);
             this.imgGrid.Name = "imgGrid";
-            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle6.BackColor = System.Drawing.SystemColors.Control;
-            dataGridViewCellStyle6.Font = new System.Drawing.Font("MS UI Gothic", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this.imgGrid.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = System.Drawing.SystemColors.Control;
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("MS UI Gothic", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this.imgGrid.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this.imgGrid.RowHeadersVisible = false;
             this.imgGrid.RowTemplate.Height = 11;
             this.imgGrid.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
             this.imgGrid.ShowCellErrors = false;
             this.imgGrid.ShowRowErrors = false;
-            this.imgGrid.Size = new System.Drawing.Size(562, 259);
+            this.imgGrid.Size = new System.Drawing.Size(633, 259);
             this.imgGrid.TabIndex = 5;
             // 
             // Column1
@@ -222,31 +235,20 @@
             this.lstImg.ItemHeight = 12;
             this.lstImg.Location = new System.Drawing.Point(0, 0);
             this.lstImg.Name = "lstImg";
-            this.lstImg.Size = new System.Drawing.Size(203, 256);
+            this.lstImg.Size = new System.Drawing.Size(254, 256);
             this.lstImg.TabIndex = 0;
             this.lstImg.SelectedIndexChanged += new System.EventHandler(this.lstImg_SelectedIndexChanged);
             // 
-            // btnDoWork
-            // 
-            this.btnDoWork.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnDoWork.Location = new System.Drawing.Point(463, 5);
-            this.btnDoWork.Name = "btnDoWork";
-            this.btnDoWork.Size = new System.Drawing.Size(68, 23);
-            this.btnDoWork.TabIndex = 11;
-            this.btnDoWork.Text = "各种操作";
-            this.btnDoWork.UseVisualStyleBackColor = true;
-            this.btnDoWork.Click += new System.EventHandler(this.btnDoWork_Click);
-            // 
-            // ImgEditTools
+            // ImgEditor
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(765, 316);
+            this.ClientSize = new System.Drawing.Size(887, 316);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.panel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
             this.Margin = new System.Windows.Forms.Padding(4);
-            this.Name = "ImgEditTools";
+            this.Name = "ImgEditor";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
             this.Text = "{0}图片汉化专用工具";
             this.Controls.SetChildIndex(this.pnlTopBody, 0);

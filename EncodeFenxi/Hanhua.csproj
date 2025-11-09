@@ -73,6 +73,7 @@
     <Compile Include="ImgEditTools\DatTexInfo.cs" />
     <Compile Include="ImgEditTools\ImgEditorDatTex.cs" />
     <Compile Include="RfoRunEfactoryEdit\RfoRunEfactoryTextEditor.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="RfoRunEfactoryEdit\RfoRunEfactoryTextEditor.Designer.cs">
       <DependentUpon>RfoRunEfactoryTextEditor.cs</DependentUpon>
@@ -164,6 +165,7 @@
       <DependentUpon>RfoEdit.cs</DependentUpon>
     </Compile>
     <Compile Include="TextEditTools\TalesOfSymphonia\TalesOfSymphoniaTextEditor.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="TextEditTools\TalesOfSymphonia\TalesOfSymphoniaTextEditor.Designer.cs">
       <DependentUpon>TalesOfSymphoniaTextEditor.cs</DependentUpon>
@@ -188,6 +190,7 @@
     </Compile>
     <Compile Include="ImgEditTools\ImgEditorTim2.cs" />
     <Compile Include="ImgEditTools\ImgEditor.cs">
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="ImgEditTools\ImgEditor.Designer.cs">
       <DependentUpon>ImgEditor.cs</DependentUpon>

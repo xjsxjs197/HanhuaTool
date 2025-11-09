@@ -159,7 +159,7 @@ namespace Hanhua.ImgEditTools
                 imgSelected = this.AddImageToGrid(this.currentImgEditor.ImageDecode(this.ImgFiles[this.lstImg.SelectedIndex], this.lstImg.Items[this.lstImg.SelectedIndex].ToString()));
 
                 // 取得调色板个数
-                if (this.imgType == ImgType.Tim)
+                if (this.imgType == ImgType.Tim || this.imgType == ImgType.Dat)
                 {
                     if (this.currentImgEditor.paletteCount > 0)
                     {
@@ -316,7 +316,7 @@ namespace Hanhua.ImgEditTools
             }
 
             // Tim格式需要显示调色板下拉框
-            if (this.imgType == ImgType.Tim)
+            if (this.imgType == ImgType.Tim || this.imgType == ImgType.Dat)
             {
                 this.lblPalette.Visible = true;
                 this.cmbTimPalette.Visible = true;
@@ -769,6 +769,8 @@ namespace Hanhua.ImgEditTools
             {
                 // 取得当前文件名
                 string shortName = Util.GetShortNameWithoutType(this.ImgFileNames[i]);
+                this.baseFile = this.ImgFileNames[i];
+                this.currentImgEditor.editingFile = this.baseFile;
 
                 // 取得当前图片
                 string itemText = string.Empty;
