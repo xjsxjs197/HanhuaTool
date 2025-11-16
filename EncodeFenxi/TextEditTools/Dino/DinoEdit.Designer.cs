@@ -30,6 +30,8 @@
         {
             this.btnViewDat = new System.Windows.Forms.Button();
             this.btnComDat = new System.Windows.Forms.Button();
+            this.txtChk = new System.Windows.Forms.TextBox();
+            this.btnSearchTxt = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnViewDat
@@ -52,16 +54,36 @@
             this.btnComDat.UseVisualStyleBackColor = true;
             this.btnComDat.Click += new System.EventHandler(this.btnComDat_Click);
             // 
+            // txtChk
+            // 
+            this.txtChk.Location = new System.Drawing.Point(12, 76);
+            this.txtChk.Name = "txtChk";
+            this.txtChk.Size = new System.Drawing.Size(180, 21);
+            this.txtChk.TabIndex = 2;
+            // 
+            // btnSearchTxt
+            // 
+            this.btnSearchTxt.Location = new System.Drawing.Point(208, 71);
+            this.btnSearchTxt.Name = "btnSearchTxt";
+            this.btnSearchTxt.Size = new System.Drawing.Size(132, 28);
+            this.btnSearchTxt.TabIndex = 3;
+            this.btnSearchTxt.Text = "查看文本位置";
+            this.btnSearchTxt.UseVisualStyleBackColor = true;
+            this.btnSearchTxt.Click += new System.EventHandler(this.btnSearchTxt_Click);
+            // 
             // DinoEdit
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(519, 137);
+            this.Controls.Add(this.btnSearchTxt);
+            this.Controls.Add(this.txtChk);
             this.Controls.Add(this.btnComDat);
             this.Controls.Add(this.btnViewDat);
             this.Name = "DinoEdit";
             this.Text = "DinoEdit";
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -69,5 +91,7 @@
 
         private System.Windows.Forms.Button btnViewDat;
         private System.Windows.Forms.Button btnComDat;
+        private System.Windows.Forms.TextBox txtChk;
+        private System.Windows.Forms.Button btnSearchTxt;
     }
 }

@@ -7,36 +7,6 @@ using System.Windows.Forms;
 
 namespace Hanhua.Common.TextEditTools.Dino
 {
-    public enum GEntryType
-    {
-        GET_DATA,       // generic literal data
-        GET_TEXTURE,    // stripped TIM pixel
-        GET_PALETTE,    // stripped TIM clut
-        GET_SNDH,       // VAG header 'Gian'
-        GET_SNDB,       // VAG body
-        GET_SNDE,       // configuration for sound samples?
-        GET_UNK,
-        GET_LZSS0,
-        GET_LZSS1       // compressed texture
-    }
-
-    // Generic entry (32 bytes)
-    public class DC2_ENTRY_GENERIC
-    {
-        public uint type;
-        public uint size;
-        public uint[] reserve = new uint[6];
-    }
-
-    // GFX entry
-    public class DC2_ENTRY_GFX
-    {
-        public uint type;
-        public uint size;
-        public ushort x, y;
-        public ushort w, h;
-    }
-
     public partial class DinoEdit : Form
     {
         public List<DC2_ENTRY_GENERIC> Entries = new List<DC2_ENTRY_GENERIC>();
@@ -45,6 +15,44 @@ namespace Hanhua.Common.TextEditTools.Dino
 
         public const int Type_DC1 = 0;
         public const int Type_DC2 = 1;
+
+        private string[] coreFontChar1 = { 
+            "　", "１", "３", "５", "７", "９", "Ｂ", "Ｄ", "Ｆ", "Ｈ", "Ｊ", "Ｌ", "Ｎ", "Ｐ", "Ｒ", "Ｔ",
+            "Ｖ", "Ｘ", "Ｚ", "ｍ", "ｓ", "い", "え", "か", "く", "こ", "し", "せ", "た", "つ", "と", "に",
+            "ね", "は", "ふ", "ほ", "み", "め", "や", "よ", "り", "れ", "わ", "ん", "ぎ", "げ", "ざ", "ず",
+            "ぞ", "ぢ", "で", "ば", "ぶ", "ぼ", "ぴ", "ぺ", "ゃ", "ょ", "ア", "ウ", "オ", "キ", "ケ", "サ",
+            "ス", "ソ", "チ", "テ", "ナ", "ヌ", "ノ", "ヒ", "ヘ", "マ", "ム", "モ", "ユ", "ラ", "ル", "ロ",
+            "ヲ", "ガ", "グ", "ゴ", "ジ", "ゼ", "ダ", "ヅ", "ド", "ビ", "ベ", "パ", "プ", "ポ", "ュ", "ッ",
+            "一", "…", "。", "？", "．", "＆", "／", "》", "製", "型", "攻", "力", "用", "弾", "破", "付",
+            "着", "射", "定", "ィ", "上", "中", "出", "ェ", "敵", "与", "部", "散", "持", "酔", "—", "的",
+            "物", "効", "発", "要", "猛", "死", "頭", "準", "専", "爆", "炎", "限", "特", "参", "続", "血",
+            "体", "復", "抑", "果", "完", "蘇", "状", "素", "調", "品", "面", "作", "成", "増", "緊", "赤",
+            "黄", "集", "古", "予", "電", "地", "箱", "身", "明", "設", "異", "際", "仕", "通", "員", "資",
+            "研", "Ⅰ", "柄", "刻", "解", "念", "起", "供", "容", "今", "紋", "取", "現", "保", "個", "理",
+            "自", "学", "搬", "料", "手", "‟", "固", "応", "任", "博", "般", "機", "行", "重", "他", "実",
+            "護", "構", "原", "示", "納", "核", "字", "何", "受", "場", "色", "白", "計", "対", "暗", "認",
+            "表", "屋", "前", "戦", "議", "庫", "庭", "路", "点", "医", "休", "過", "可", "運", "階", "島",
+            "選", "差", "空", "決", "振", "＋", "補", "押", "操"
+        };
+
+        private string[] coreFontChar2 = { 
+            "０", "２", "４", "６", "８", "Ａ", "Ｃ", "Ｅ", "Ｇ", "Ｉ", "Ｋ", "Ｍ", "Ｏ", "Ｑ", "Ｓ", "Ｕ",
+            "Ｗ", "Ｙ", "c", "o", "あ", "う", "お", "き", "け", "さ", "す", "そ", "ち", "て", "な", "ぬ",
+            "の", "ひ", "へ", "ま", "む", "も", "ゆ", "ら", "る", "ろ", "を", "が", "ぐ", "ご", "じ", "ぜ",
+            "だ", "づ", "ど", "び", "べ", "ぱ", "ぷ", "ぽ", "ゅ", "っ", "イ", "エ", "カ", "ク", "コ", "シ",
+            "セ", "タ", "ツ", "ト", "ニ", "ネ", "ㇵ", "フ", "ホ", "ミ", "メ", "ヤ", "ヨ", "リ", "レ", "ワ",
+            "ン", "ギ", "ゲ", "ザ", "ズ", "ゾ", "ヂ", "デ", "バ", "ブ", "ボ", "ピ", "ペ", "ャ", "ョ", "ヴ",
+            "▼", "、", "！", "：", "・", "×", "《", "社", "小", "改", "撃", "軍", "長", "丸", "壊", "装",
+            "連", "安", "使", "率", "命", "高", "強", "ォ", "大", "造", "分", "広", "麻", "弱", "時", "生",
+            "眠", "数", "必", "間", "毒", "至", "標", "（", "）", "火", "無", "制", "殊", "最", "止", "剤",
+            "回", "失", "痛", "少", "全", "薬", "態", "材", "合", "画", "新", "系", "化", "殖", "急", "緑",
+            "開", "室", "記", "備", "源", "救", "人", "証", "施", "事", "動", "書", "組", "信", "置", "格",
+            "究", "図", "号", "子", "除", "Ⅱ", "充", "給", "量", "指", "採", "録", "在", "存", "管", "入",
+            "御", "質", "形", "換", "”", "常", "V", "責", "者", "士", "港", "密", "厳", "多", "Ⅲ", "験",
+            "ー", "守", "内", "収", "性", "違", "印", "器", "居", "所", "下", "文", "兵", "同", "確", "武",
+            "見", "外", "廊", "会", "修", "裏", "絡", "配", "検", "務", "憩", "許", "私", "央", "段", "水",
+            "抜", "直", "残", "照", "整", "向", "横", "枚", "以"
+        };
 
         private readonly string[] TypeExtensions = new string[]
         {
@@ -75,7 +83,7 @@ namespace Hanhua.Common.TextEditTools.Dino
 
             this.Open(baseFile);
 
-            this.ExtractRaw(@"G:\Study\MySelfProject\Hanhua\Dino2\DatDeCom\");
+            this.ExtractRaw(@"E:\Game\Dino1\DatDecode\LOAD2");
         }
 
         public void Reset()
@@ -527,5 +535,70 @@ namespace Hanhua.Common.TextEditTools.Dino
             return data;
         }
 
+        private void btnSearchTxt_Click(object sender, EventArgs e)
+        {
+            string chkTxt = this.txtChk.Text.Trim();
+            if (string.IsNullOrEmpty(chkTxt))
+            {
+                MessageBox.Show("请输入查找的文本");
+                return;
+            }
+
+            Dictionary<string, string> dinoCoreFontChar = new Dictionary<string, string>();
+            int charIdx = 0;
+            for (int i = 0; i < coreFontChar1.Length; i++)
+            {
+                dinoCoreFontChar.Add(coreFontChar1[i], charIdx + " 0");
+                dinoCoreFontChar.Add(coreFontChar2[i], charIdx + " 1");
+                charIdx++;
+            }
+
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < chkTxt.Length; i++)
+            {
+                string curChar = chkTxt.Substring(i, 1);
+                if (dinoCoreFontChar.ContainsKey(curChar))
+                {
+                    sb.Append(dinoCoreFontChar[curChar]).Append(" ");
+                }
+                else
+                {
+                    sb.Append(999).Append(" ");
+                }
+            }
+
+            this.txtChk.Text = sb.ToString();
+        }
+
+    }
+
+    public enum GEntryType
+    {
+        GET_DATA,       // generic literal data
+        GET_TEXTURE,    // stripped TIM pixel
+        GET_PALETTE,    // stripped TIM clut
+        GET_SNDH,       // VAG header 'Gian'
+        GET_SNDB,       // VAG body
+        GET_SNDE,       // configuration for sound samples?
+        GET_UNK,
+        GET_LZSS0,
+        GET_LZSS1       // compressed texture
+    }
+
+    // Generic entry (32 bytes)
+    public class DC2_ENTRY_GENERIC
+    {
+        public uint type;
+        public uint size;
+        public uint[] reserve = new uint[6];
+    }
+
+    // GFX entry
+    public class DC2_ENTRY_GFX
+    {
+        public uint type;
+        public uint size;
+        public ushort x, y;
+        public ushort w, h;
     }
 }
