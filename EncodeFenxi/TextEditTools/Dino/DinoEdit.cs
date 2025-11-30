@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Xml;
 using System.Windows.Forms;
+using System.Linq;
 
 namespace Hanhua.Common.TextEditTools.Dino
 {
@@ -23,7 +24,7 @@ namespace Hanhua.Common.TextEditTools.Dino
             "ぞ", "ぢ", "で", "ば", "ぶ", "ぼ", "ぴ", "ぺ", "ゃ", "ょ", "ア", "ウ", "オ", "キ", "ケ", "サ",
             "ス", "ソ", "チ", "テ", "ナ", "ヌ", "ノ", "ヒ", "ヘ", "マ", "ム", "モ", "ユ", "ラ", "ル", "ロ",
             "ヲ", "ガ", "グ", "ゴ", "ジ", "ゼ", "ダ", "ヅ", "ド", "ビ", "ベ", "パ", "プ", "ポ", "ュ", "ッ",
-            "一", "…", "。", "？", "．", "＆", "／", "》", "製", "型", "攻", "力", "用", "弾", "破", "付",
+            "ー", "…", "。", "？", "．", "＆", "／", "》", "製", "型", "攻", "力", "用", "弾", "破", "付",
             "着", "射", "定", "ィ", "上", "中", "出", "ェ", "敵", "与", "部", "散", "持", "酔", "—", "的",
             "物", "効", "発", "要", "猛", "死", "頭", "準", "専", "爆", "炎", "限", "特", "参", "続", "血",
             "体", "復", "抑", "果", "完", "蘇", "状", "素", "調", "品", "面", "作", "成", "増", "緊", "赤",
@@ -49,9 +50,47 @@ namespace Hanhua.Common.TextEditTools.Dino
             "開", "室", "記", "備", "源", "救", "人", "証", "施", "事", "動", "書", "組", "信", "置", "格",
             "究", "図", "号", "子", "除", "Ⅱ", "充", "給", "量", "指", "採", "録", "在", "存", "管", "入",
             "御", "質", "形", "換", "”", "常", "V", "責", "者", "士", "港", "密", "厳", "多", "Ⅲ", "験",
-            "ー", "守", "内", "収", "性", "違", "印", "器", "居", "所", "下", "文", "兵", "同", "確", "武",
+            "一", "守", "内", "収", "性", "違", "印", "器", "居", "所", "下", "文", "兵", "同", "確", "武",
             "見", "外", "廊", "会", "修", "裏", "絡", "配", "検", "務", "憩", "許", "私", "央", "段", "水",
             "抜", "直", "残", "照", "整", "向", "横", "枚", "以"
+        };
+
+        private string[] st8210AChar = {
+             "", "風", "口", "先", "項", "張", "『", "未", "来", "』"
+        };
+        private string[] st8210BChar = {
+             "　", "惨",
+            "年", "夜",
+            "試", "暴",
+            "走", "故",
+            "名", "瞬",
+            "悲", "劇",
+            "繰", "返",
+            "警", "戒",
+            "勢", "幅",
+            "近", "端",
+            "末", "悪",
+            "偽", "件",
+            "本", "日",
+            "処", "策",
+            "講", "気",
+            "後", "退",
+            "忘", "登",
+            "番", "属",
+            "線", "話",
+            "呼", "誰",
+            "留", "類",
+            "未", "提",
+            "＜", "旧",
+            "＞", "別",
+            "航", "週",
+            "害", "虫",
+            "駆", "机",
+            "関", "係",
+            "並", "職",
+            "項", "ァ",
+            "読", "索",
+            "方", "式"
         };
 
         private readonly string[] TypeExtensions = new string[]
@@ -568,6 +607,96 @@ namespace Hanhua.Common.TextEditTools.Dino
             }
 
             this.txtChk.Text = sb.ToString();
+        }
+
+        private void btnTest_Click(object sender, EventArgs e)
+        {
+            List<FilePosInfo> allBin = Util.GetAllFiles(@"E:\Game\Dino1\DatDecode").Where(p => !p.IsFolder && p.File.EndsWith(".bin", StringComparison.OrdinalIgnoreCase)).ToList();
+            StringBuilder sb = new StringBuilder();
+
+            string[] char1 = new string[256];
+            string[] char2 = new string[256];
+            int charIdx = 0;
+            int charIdx1 = 0;
+            int charIdx2 = 0;
+            bool isChar1 = true;
+            while (charIdx1 < (coreFontChar1.Length + coreFontChar2.Length))
+            {
+                if (charIdx1 < 255)
+                {
+                    char1[charIdx1++] = coreFontChar1[charIdx];
+                    char1[charIdx1++] = coreFontChar2[charIdx];
+                    charIdx++;
+                }
+                else
+                {
+                    char2[charIdx1 - 256] = coreFontChar1[charIdx];
+                    charIdx1++;
+                    char2[charIdx1 - 256] = coreFontChar2[charIdx];
+                    charIdx1++;
+                    charIdx++;
+                }
+            }
+
+            byte[] binByte = File.ReadAllBytes(@"H:\游戏汉化\Dino Crisis\Ps_jp\ST10B\08.bin");
+            //  st10a 07.bin 0x499b0
+
+            for (int i = 0x39058; i < binByte.Length; i += 2 )
+            {
+                if (binByte[i] == 0x00 && binByte[i + 1] == 0xA0)
+                {
+                    sb.Append("^00A0^\r\n");
+                }
+                else if (binByte[i] == 0x00 && binByte[i + 1] == 0xC0)
+                {
+                    sb.Append("^00C0^\r\n");
+                }
+                else if (binByte[i + 1] == 0x80)
+                {
+                    sb.Append(char1[binByte[i]]); //.Append("80");
+                }
+                else if (binByte[i + 1] == 0x81)
+                {
+                    sb.Append(char2[binByte[i]]);
+                }
+                else if (binByte[i + 1] == 0x82)
+                {
+                    if (binByte[i] < st8210BChar.Length)
+                    {
+                        sb.Append(st8210BChar[binByte[i]]);
+                    }
+                    else
+                    {
+                        sb.Append(binByte[i].ToString("X2")).Append("82");
+                    }
+                }
+                else
+                {
+                    sb.Append(binByte[i].ToString("X2")).Append(binByte[i + 1].ToString("X2"));
+                }
+            }
+        }
+
+        private void btnDecAllDat_Click(object sender, EventArgs e)
+        {
+            List<FilePosInfo> allDat = Util.GetAllFiles(@"H:\游戏汉化\Dino Crisis\PC_cn").Where(p => !p.IsFolder && p.File.EndsWith(".dat", StringComparison.OrdinalIgnoreCase)).ToList();
+            foreach (FilePosInfo datFile in allDat)
+            {
+                try
+                {
+                    this.Open(datFile.File);
+
+                    string folder = @"H:\游戏汉化\Dino Crisis\PC_cn\" + Util.GetShortNameWithoutType(datFile.File);
+                    Directory.CreateDirectory(folder);
+
+                    this.ExtractRaw(folder);
+                }
+                catch (Exception exp)
+                { 
+                }
+            }
+
+            MessageBox.Show("OK");
         }
 
     }

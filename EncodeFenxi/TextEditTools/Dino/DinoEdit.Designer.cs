@@ -32,6 +32,8 @@
             this.btnComDat = new System.Windows.Forms.Button();
             this.txtChk = new System.Windows.Forms.TextBox();
             this.btnSearchTxt = new System.Windows.Forms.Button();
+            this.btnTest = new System.Windows.Forms.Button();
+            this.btnDecAllDat = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnViewDat
@@ -71,11 +73,33 @@
             this.btnSearchTxt.UseVisualStyleBackColor = true;
             this.btnSearchTxt.Click += new System.EventHandler(this.btnSearchTxt_Click);
             // 
+            // btnTest
+            // 
+            this.btnTest.Location = new System.Drawing.Point(346, 71);
+            this.btnTest.Name = "btnTest";
+            this.btnTest.Size = new System.Drawing.Size(132, 28);
+            this.btnTest.TabIndex = 4;
+            this.btnTest.Text = "文本测试";
+            this.btnTest.UseVisualStyleBackColor = true;
+            this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
+            // 
+            // btnDecAllDat
+            // 
+            this.btnDecAllDat.Location = new System.Drawing.Point(208, 105);
+            this.btnDecAllDat.Name = "btnDecAllDat";
+            this.btnDecAllDat.Size = new System.Drawing.Size(132, 28);
+            this.btnDecAllDat.TabIndex = 5;
+            this.btnDecAllDat.Text = "解压所有Dat文件";
+            this.btnDecAllDat.UseVisualStyleBackColor = true;
+            this.btnDecAllDat.Click += new System.EventHandler(this.btnDecAllDat_Click);
+            // 
             // DinoEdit
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(519, 137);
+            this.Controls.Add(this.btnDecAllDat);
+            this.Controls.Add(this.btnTest);
             this.Controls.Add(this.btnSearchTxt);
             this.Controls.Add(this.txtChk);
             this.Controls.Add(this.btnComDat);
@@ -93,5 +117,7 @@
         private System.Windows.Forms.Button btnComDat;
         private System.Windows.Forms.TextBox txtChk;
         private System.Windows.Forms.Button btnSearchTxt;
+        private System.Windows.Forms.Button btnTest;
+        private System.Windows.Forms.Button btnDecAllDat;
     }
 }

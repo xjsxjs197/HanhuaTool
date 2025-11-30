@@ -221,9 +221,37 @@ namespace Hanhua.ImgEditTools
             this.palGreyscale4bp.Clear();
             this.palGreyscale8bp.Clear();
 
-            for (int i = 0; i < 16; i++)
+            //for (int i = 0; i < 16; i++)
+            //{
+            //    this.palGreyscale4bp.Add(Color.FromArgb(i * 16, i * 16, i * 16));
+            //}
+            for (int i = 0; i < 4; i++)
             {
-                this.palGreyscale4bp.Add(Color.FromArgb(i * 16, i * 16, i * 16));
+                //this.palGreyscale4bp.Add(Color.FromArgb(i * 16, i * 16, i * 16));
+
+                this.palGreyscale4bp.Add(Color.FromArgb(0, 0, 0));
+                int pixelColor;
+                int colorR;
+                int colorG;
+                int colorB;
+                pixelColor = 0x0842;
+                colorR = ((byte)(pixelColor & 0x1F)) << 3;
+                colorG = ((byte)((pixelColor >> 5) & 0x1F)) << 3;
+                colorB = ((byte)((pixelColor >> 10) & 0x1F)) << 3;
+                this.palGreyscale4bp.Add(Color.FromArgb(colorR, colorG, colorB));
+
+                pixelColor = 0x318C;
+                colorR = ((byte)(pixelColor & 0x1F)) << 3;
+                colorG = ((byte)((pixelColor >> 5) & 0x1F)) << 3;
+                colorB = ((byte)((pixelColor >> 10) & 0x1F)) << 3;
+                this.palGreyscale4bp.Add(Color.FromArgb(colorR, colorG, colorB));
+
+                pixelColor = 0x5AD6;
+                colorR = ((byte)(pixelColor & 0x1F)) << 3;
+                colorG = ((byte)((pixelColor >> 5) & 0x1F)) << 3;
+                colorB = ((byte)((pixelColor >> 10) & 0x1F)) << 3;
+                this.palGreyscale4bp.Add(Color.FromArgb(colorR, colorG, colorB));
+
             }
             for (int i = 0; i < 256; i++)
             {
