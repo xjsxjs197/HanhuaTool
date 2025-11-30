@@ -699,6 +699,36 @@ namespace Hanhua.Common.TextEditTools.Dino
             MessageBox.Show("OK");
         }
 
+        private void btnSearTextAddr_Click(object sender, EventArgs e)
+        {
+            List<FilePosInfo> allTextBin = Util.GetAllFiles(@"E:\Game\Dino1\DatDecode").Where(p => !p.IsFolder && p.File.EndsWith(".bin", StringComparison.OrdinalIgnoreCase)).ToList();
+            StringBuilder sb = new StringBuilder();
+            foreach (FilePosInfo binFile in allTextBin)
+            {
+                try
+                {
+                    byte[] byBin = File.ReadAllBytes(binFile.File);
+                    int textPos = byBin.Length - 1;
+                    while (textPos > 0 )
+                    {
+                        if (byBin[textPos - 3] == 0x04 && byBin[textPos - 2] == 0x00 && byBin[textPos - 1] == 0x00 && byBin[textPos] == 0x00)
+                        {
+                            sb.Append((binFile.File)).Append("\r\n");
+                            sb.Append((textPos - 3).ToString("X")).Append("\r\n");
+                            break;
+
+                        }
+                        textPos -= 4;
+                    }
+                }
+                catch (Exception exp)
+                {
+                }
+            }
+
+            MessageBox.Show("OK");
+        }
+
     }
 
     public enum GEntryType
