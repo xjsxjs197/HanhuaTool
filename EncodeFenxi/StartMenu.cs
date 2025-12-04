@@ -528,13 +528,114 @@ namespace Hanhua.Common
             //this.ChkDomainIp();
             //this.ChkSvnHtpasswd();
             //this.CheckCopyTexPng();
-            DinoEdit dinoEdit = new DinoEdit();
-            dinoEdit.Show();
+            //DinoEdit dinoEdit = new DinoEdit();
+            //dinoEdit.Show();
+            //this.CreateSampleXml();
+            this.Create16_16TextChar();
         }
 
         #endregion
 
         #region " 私有方法 "
+
+        private void Create16_16TextChar()
+        {
+            char[] allShiftJisChar = Util.GetShiftJisCharSet().ToCharArray();
+
+            ImgInfo imgInfo = new ImgInfo(16, 16);
+            imgInfo.BlockImgH = 16;
+            imgInfo.BlockImgW = 16;
+            imgInfo.NeedBorder = false;
+            //imgInfo.FontStyle = FontStyle.Bold;
+            imgInfo.FontSize = 16;
+            //imgInfo.FontName = "gulim";
+            imgInfo.FontName = "Times New Roman";
+            imgInfo.Brush = Brushes.White;
+            imgInfo.Sf.LineAlignment = StringAlignment.Far;
+            imgInfo.Grp.Clear(Color.Black);
+
+            // 显示进度条
+            this.ResetProcessBar(allShiftJisChar.Length);
+
+            int charIndex = 0;
+            StringBuilder sb = new StringBuilder();
+            foreach (char fontChar in allShiftJisChar)
+            {
+                imgInfo.NewImg();
+                imgInfo.Grp.Clear(Color.Black);
+                imgInfo.CharTxt = fontChar.ToString();
+                //if ("G".Equals(imgInfo.CharTxt) || "g".Equals(imgInfo.CharTxt))
+                //{
+                //    //imgInfo.YPadding = -3;
+                //}
+                //else
+                {
+                    imgInfo.YPadding = 0;
+                }
+                imgInfo.PosX = 0;
+                imgInfo.PosY = 1;
+                imgInfo.XPadding = 0;
+
+                imgInfo.Sf.Alignment = StringAlignment.Center;
+                imgInfo.Sf.LineAlignment = StringAlignment.Center;
+
+                imgInfo.Grp.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
+                ImgUtil.WriteBlockImg(imgInfo);
+
+                string charImgName = charIndex.ToString().PadLeft(4, '0');
+                sb.Append(charImgName).Append(".png ").Append(fontChar).Append("\r\n");
+                imgInfo.Bmp.Save(@"E:\pytorch_env\dataset\" + charImgName + ".png");
+
+
+                //if (charIndex++ < 100)
+                //{
+                //    //imgInfo.Bmp.Save(@"H:\游戏汉化\fontTest\CharPng\" + unicodeChar + ".png");
+                //    imgInfo.Bmp.Save(@"G:\Study\MySelfProject\Hanhua\fontTest\CharPng\" + fontChar + ".png");
+                //}
+                //else
+                //{
+                //    break;
+                //}
+                charIndex++;
+
+
+                // 更新进度条
+                this.ProcessBarStep();
+            }
+
+            File.WriteAllText(@"E:\pytorch_env\dataset\labels.txt", sb.ToString(), Encoding.UTF8);
+
+            // 隐藏进度条
+            this.CloseProcessBar();
+        }
+
+        private void CreateSampleXml()
+        {
+            XmlDocument doc = new XmlDocument();
+            // 加载XML字符串
+            doc.LoadXml(File.ReadAllText(@"D:\Labo\12.ライセンス発行\JobCheckerOld.xml"));
+
+            string[] allLine = File.ReadAllLines(@"D:\Labo\OPTPJT\local_workspace\01-Documents\01.お客様から資料\新案件\datItem.txt");
+            StringBuilder sb = new StringBuilder();
+            Random random = new Random();
+            foreach (string line in allLine)
+            {
+                if (string.IsNullOrEmpty(line))
+                {
+                    break;
+                }
+
+                sb.Append("              <").Append(line).Append(">").Append("\r\n");
+                sb.Append("                <key>").Append(random.Next(0, 7)).Append("</key>").Append("\r\n");
+                sb.Append("                <value>").Append("\r\n");
+                sb.Append("                  <m_Current>").Append(random.Next(0, 4)).Append("</m_Current>").Append("\r\n");
+                sb.Append("                  <m_Reccomend>").Append(random.Next(0, 4)).Append("</m_Reccomend>").Append("\r\n");
+                sb.Append("                  <m_Result>").Append(random.Next(0, 3)).Append("</m_Result>").Append("\r\n");
+                sb.Append("                  <m_Override>").Append(random.Next(0, 2)).Append("</m_Override>").Append("\r\n");
+                sb.Append("                </value>").Append("\r\n");
+                sb.Append("              </").Append(line).Append(">").Append("\r\n");
+            }
+        }
 
         private void CheckCopyTexPng()
         {

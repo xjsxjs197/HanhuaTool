@@ -679,14 +679,14 @@ namespace Hanhua.Common.TextEditTools.Dino
 
         private void btnDecAllDat_Click(object sender, EventArgs e)
         {
-            List<FilePosInfo> allDat = Util.GetAllFiles(@"H:\游戏汉化\Dino Crisis\PC_cn").Where(p => !p.IsFolder && p.File.EndsWith(".dat", StringComparison.OrdinalIgnoreCase)).ToList();
+            List<FilePosInfo> allDat = Util.GetAllFiles(@"G:\Study\MySelfProject\Hanhua\Dino1\Ps_Iso\PSX\DATA").Where(p => !p.IsFolder && p.File.EndsWith(".dat", StringComparison.OrdinalIgnoreCase)).ToList();
             foreach (FilePosInfo datFile in allDat)
             {
                 try
                 {
                     this.Open(datFile.File);
 
-                    string folder = @"H:\游戏汉化\Dino Crisis\PC_cn\" + Util.GetShortNameWithoutType(datFile.File);
+                    string folder = @"G:\Study\MySelfProject\Hanhua\Dino1\PS_jp\" + Util.GetShortNameWithoutType(datFile.File);
                     Directory.CreateDirectory(folder);
 
                     this.ExtractRaw(folder);
@@ -701,30 +701,65 @@ namespace Hanhua.Common.TextEditTools.Dino
 
         private void btnSearTextAddr_Click(object sender, EventArgs e)
         {
-            List<FilePosInfo> allTextBin = Util.GetAllFiles(@"E:\Game\Dino1\DatDecode").Where(p => !p.IsFolder && p.File.EndsWith(".bin", StringComparison.OrdinalIgnoreCase)).ToList();
+            List<FilePosInfo> allTextBin = Util.GetAllFiles(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_jp").Where(p => !p.IsFolder && p.File.EndsWith(".bin", StringComparison.OrdinalIgnoreCase)).ToList();
             StringBuilder sb = new StringBuilder();
+            StringBuilder sb2 = new StringBuilder();
             foreach (FilePosInfo binFile in allTextBin)
             {
                 try
                 {
                     byte[] byBin = File.ReadAllBytes(binFile.File);
                     int textPos = byBin.Length - 1;
+                    bool hasEndFlg = false;
+                    bool hasBlankFlg = false;
+                    bool hasText = false;
                     while (textPos > 0 )
                     {
                         if (byBin[textPos - 3] == 0x04 && byBin[textPos - 2] == 0x00 && byBin[textPos - 1] == 0x00 && byBin[textPos] == 0x00)
                         {
-                            sb.Append((binFile.File)).Append("\r\n");
-                            sb.Append((textPos - 3).ToString("X")).Append("\r\n");
+                            if ((textPos - 3) != 0 && textPos != (byBin.Length - 1) && hasBlankFlg && hasEndFlg)
+                            {
+                                sb.Append((binFile.File)).Append("\r\n");
+                                sb.Append((textPos - 3).ToString("X")).Append("\r\n");
+                                hasText = true;
+                            }
                             break;
+
+                        }
+                        else
+                        {
+                            if ((byBin[textPos - 3] == 0x00 && byBin[textPos - 2] == 0x80)
+                                || (byBin[textPos - 1] == 0x00 && byBin[textPos] == 0x80))
+                            {
+                                hasBlankFlg = true;
+                            }
+                            else if ((byBin[textPos - 3] == 0x00 && byBin[textPos - 2] == 0xA0)
+                                || (byBin[textPos - 1] == 0x00 && byBin[textPos] == 0xA0))
+                            {
+                                hasEndFlg = true;
+                            }
+                            else if (byBin[textPos - 2] > 0xC0 || byBin[textPos] > 0xC0)
+                            {
+                                break;
+                            }
 
                         }
                         textPos -= 4;
                     }
+
+                    if (!hasText)
+                    {
+                        sb2.Append((binFile.File)).Append("\r\n");
+                    }
+                            
                 }
                 catch (Exception exp)
                 {
                 }
             }
+
+            File.WriteAllText(@"G:\Study\MySelfProject\Hanhua\Dino1\textAddr.txt", sb.ToString(), Encoding.UTF8);
+            File.WriteAllText(@"G:\Study\MySelfProject\Hanhua\Dino1\noTextInfo.txt", sb2.ToString(), Encoding.UTF8);
 
             MessageBox.Show("OK");
         }

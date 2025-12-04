@@ -9,6 +9,8 @@ using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using nQuant;
+using System.Xml;
+using System.Reflection;
 
 namespace Hanhua.Common
 {
@@ -3436,6 +3438,33 @@ namespace Hanhua.Common
             }
 
             return string.Empty;
+        }
+
+        /// <summary>
+        /// 取得Shift-jis字符集
+        /// </summary>
+        /// <returns></returns>
+        public static string GetShiftJisCharSet()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            // 读取配置文件中Shift-jis字符集信息
+            string strPath = Assembly.GetExecutingAssembly().ManifestModule.FullyQualifiedName.Replace(
+                Assembly.GetExecutingAssembly().ManifestModule.Name, string.Empty);
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load(strPath + "Shift-JisEncode.xml");
+
+            XmlNode xmlInfo = xmlDoc.SelectSingleNode("/MyEncode/UseShift-JisEncode");
+
+            foreach (XmlNode item in xmlInfo.ChildNodes)
+            {
+                if (item.NodeType == XmlNodeType.Element)
+                {
+                    sb.Append(item.InnerText.Replace(" ", "").Replace("\n", "").Replace("\r", ""));
+                }
+            }
+
+            return sb.ToString();
         }
 
         #endregion
