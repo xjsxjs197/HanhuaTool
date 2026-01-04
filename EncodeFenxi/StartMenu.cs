@@ -528,10 +528,10 @@ namespace Hanhua.Common
             //this.ChkDomainIp();
             //this.ChkSvnHtpasswd();
             //this.CheckCopyTexPng();
-            //DinoEdit dinoEdit = new DinoEdit();
-            //dinoEdit.Show();
+            DinoEdit dinoEdit = new DinoEdit();
+            dinoEdit.Show();
             //this.CreateSampleXml();
-            this.Create16_16TextChar();
+            //this.Create16_16TextChar();
         }
 
         #endregion

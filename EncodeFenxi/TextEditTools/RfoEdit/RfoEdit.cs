@@ -15,7 +15,7 @@ namespace Hanhua.Common.TextEditTools.RfoEdit
     public partial class RfoEdit : Form
     {
         private string baseFolder = @"G:\Study\MySelfProject\Hanhua\TodoCn\Rfo\";
-        private int fontImgCnt = 27;
+        private int fontImgCnt = 26;
 
         public RfoEdit()
         {

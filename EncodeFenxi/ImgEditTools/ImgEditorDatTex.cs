@@ -225,11 +225,38 @@ namespace Hanhua.ImgEditTools
             //{
             //    this.palGreyscale4bp.Add(Color.FromArgb(i * 16, i * 16, i * 16));
             //}
-            for (int i = 0; i < 4; i++)
+            //for (int i = 0; i < 4; i++)
             {
                 //this.palGreyscale4bp.Add(Color.FromArgb(i * 16, i * 16, i * 16));
 
+                //this.palGreyscale4bp.Add(Color.FromArgb(0, 0, 0));
+                //int pixelColor;
+                //int colorR;
+                //int colorG;
+                //int colorB;
+                //pixelColor = 0x0842;
+                //colorR = ((byte)(pixelColor & 0x1F)) << 3;
+                //colorG = ((byte)((pixelColor >> 5) & 0x1F)) << 3;
+                //colorB = ((byte)((pixelColor >> 10) & 0x1F)) << 3;
+                //this.palGreyscale4bp.Add(Color.FromArgb(colorR, colorG, colorB));
+
+                //pixelColor = 0x318C;
+                //colorR = ((byte)(pixelColor & 0x1F)) << 3;
+                //colorG = ((byte)((pixelColor >> 5) & 0x1F)) << 3;
+                //colorB = ((byte)((pixelColor >> 10) & 0x1F)) << 3;
+                //this.palGreyscale4bp.Add(Color.FromArgb(colorR, colorG, colorB));
+
+                //pixelColor = 0x5AD6;
+                //colorR = ((byte)(pixelColor & 0x1F)) << 3;
+                //colorG = ((byte)((pixelColor >> 5) & 0x1F)) << 3;
+                //colorB = ((byte)((pixelColor >> 10) & 0x1F)) << 3;
+                //this.palGreyscale4bp.Add(Color.FromArgb(colorR, colorG, colorB));
+
                 this.palGreyscale4bp.Add(Color.FromArgb(0, 0, 0));
+                this.palGreyscale4bp.Add(Color.FromArgb(0, 0, 0));
+                this.palGreyscale4bp.Add(Color.FromArgb(0, 0, 0));
+                this.palGreyscale4bp.Add(Color.FromArgb(0, 0, 0));
+
                 int pixelColor;
                 int colorR;
                 int colorG;
@@ -239,17 +266,26 @@ namespace Hanhua.ImgEditTools
                 colorG = ((byte)((pixelColor >> 5) & 0x1F)) << 3;
                 colorB = ((byte)((pixelColor >> 10) & 0x1F)) << 3;
                 this.palGreyscale4bp.Add(Color.FromArgb(colorR, colorG, colorB));
+                this.palGreyscale4bp.Add(Color.FromArgb(colorR, colorG, colorB));
+                this.palGreyscale4bp.Add(Color.FromArgb(colorR, colorG, colorB));
+                this.palGreyscale4bp.Add(Color.FromArgb(colorR, colorG, colorB));
 
                 pixelColor = 0x318C;
                 colorR = ((byte)(pixelColor & 0x1F)) << 3;
                 colorG = ((byte)((pixelColor >> 5) & 0x1F)) << 3;
                 colorB = ((byte)((pixelColor >> 10) & 0x1F)) << 3;
                 this.palGreyscale4bp.Add(Color.FromArgb(colorR, colorG, colorB));
+                this.palGreyscale4bp.Add(Color.FromArgb(colorR, colorG, colorB));
+                this.palGreyscale4bp.Add(Color.FromArgb(colorR, colorG, colorB));
+                this.palGreyscale4bp.Add(Color.FromArgb(colorR, colorG, colorB));
 
                 pixelColor = 0x5AD6;
                 colorR = ((byte)(pixelColor & 0x1F)) << 3;
                 colorG = ((byte)((pixelColor >> 5) & 0x1F)) << 3;
                 colorB = ((byte)((pixelColor >> 10) & 0x1F)) << 3;
+                this.palGreyscale4bp.Add(Color.FromArgb(colorR, colorG, colorB));
+                this.palGreyscale4bp.Add(Color.FromArgb(colorR, colorG, colorB));
+                this.palGreyscale4bp.Add(Color.FromArgb(colorR, colorG, colorB));
                 this.palGreyscale4bp.Add(Color.FromArgb(colorR, colorG, colorB));
 
             }
@@ -313,8 +349,8 @@ namespace Hanhua.ImgEditTools
                                 UnswizzleGfx(buffer, entry);
 
                                 DatTexInfo datTexInfo = this.GetDatTexInfo(entry);
-                                if (datTexInfo.height == 16 || datTexInfo.height == 32 || datTexInfo.height == 48 || base.editingFile.EndsWith("core.dat", StringComparison.OrdinalIgnoreCase)
-                                     || file.EndsWith("core.dat", StringComparison.OrdinalIgnoreCase))
+                                //if (datTexInfo.height == 16 || datTexInfo.height == 32 || datTexInfo.height == 48 || base.editingFile.EndsWith("core.dat", StringComparison.OrdinalIgnoreCase)
+                                //     || file.EndsWith("core.dat", StringComparison.OrdinalIgnoreCase))
                                 {
                                     imgList.Add(buffer);
                                     this.byAllImg.Add(buffer);
@@ -348,8 +384,8 @@ namespace Hanhua.ImgEditTools
                                 UnswizzleGfx(buffer, entry);
 
                                 DatTexInfo datTexInfo = this.GetDatTexInfo(entry);
-                                if (datTexInfo.height == 16 || datTexInfo.height == 32 || datTexInfo.height == 48 || base.editingFile.EndsWith("core.dat", StringComparison.OrdinalIgnoreCase)
-                                    || file.EndsWith("core.dat", StringComparison.OrdinalIgnoreCase))
+                                //if (datTexInfo.height == 16 || datTexInfo.height == 32 || datTexInfo.height == 48 || base.editingFile.EndsWith("core.dat", StringComparison.OrdinalIgnoreCase)
+                                //    || file.EndsWith("core.dat", StringComparison.OrdinalIgnoreCase))
                                 {
                                     imgList.Add(buffer);
                                     this.byAllImg.Add(buffer);

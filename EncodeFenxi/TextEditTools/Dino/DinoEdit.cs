@@ -5,6 +5,10 @@ using System.Text;
 using System.Xml;
 using System.Windows.Forms;
 using System.Linq;
+using System.Reflection;
+using System.Globalization;
+using System.Text.RegularExpressions;
+using System.Drawing;
 
 namespace Hanhua.Common.TextEditTools.Dino
 {
@@ -25,7 +29,7 @@ namespace Hanhua.Common.TextEditTools.Dino
             "ス", "ソ", "チ", "テ", "ナ", "ヌ", "ノ", "ヒ", "ヘ", "マ", "ム", "モ", "ユ", "ラ", "ル", "ロ",
             "ヲ", "ガ", "グ", "ゴ", "ジ", "ゼ", "ダ", "ヅ", "ド", "ビ", "ベ", "パ", "プ", "ポ", "ュ", "ッ",
             "ー", "…", "。", "？", "．", "＆", "／", "》", "製", "型", "攻", "力", "用", "弾", "破", "付",
-            "着", "射", "定", "ィ", "上", "中", "出", "ェ", "敵", "与", "部", "散", "持", "酔", "—", "的",
+            "着", "射", "定", "ィ", "上", "中", "出", "ェ", "敵", "与", "部", "散", "持", "酔", "一", "的",
             "物", "効", "発", "要", "猛", "死", "頭", "準", "専", "爆", "炎", "限", "特", "参", "続", "血",
             "体", "復", "抑", "果", "完", "蘇", "状", "素", "調", "品", "面", "作", "成", "増", "緊", "赤",
             "黄", "集", "古", "予", "電", "地", "箱", "身", "明", "設", "異", "際", "仕", "通", "員", "資",
@@ -41,7 +45,7 @@ namespace Hanhua.Common.TextEditTools.Dino
             "Ｗ", "Ｙ", "c", "o", "あ", "う", "お", "き", "け", "さ", "す", "そ", "ち", "て", "な", "ぬ",
             "の", "ひ", "へ", "ま", "む", "も", "ゆ", "ら", "る", "ろ", "を", "が", "ぐ", "ご", "じ", "ぜ",
             "だ", "づ", "ど", "び", "べ", "ぱ", "ぷ", "ぽ", "ゅ", "っ", "イ", "エ", "カ", "ク", "コ", "シ",
-            "セ", "タ", "ツ", "ト", "ニ", "ネ", "ㇵ", "フ", "ホ", "ミ", "メ", "ヤ", "ヨ", "リ", "レ", "ワ",
+            "セ", "タ", "ツ", "ト", "ニ", "ネ", "ハ", "フ", "ホ", "ミ", "メ", "ヤ", "ヨ", "リ", "レ", "ワ",
             "ン", "ギ", "ゲ", "ザ", "ズ", "ゾ", "ヂ", "デ", "バ", "ブ", "ボ", "ピ", "ペ", "ャ", "ョ", "ヴ",
             "▼", "、", "！", "：", "・", "×", "《", "社", "小", "改", "撃", "軍", "長", "丸", "壊", "装",
             "連", "安", "使", "率", "命", "高", "強", "ォ", "大", "造", "分", "広", "麻", "弱", "時", "生",
@@ -50,7 +54,7 @@ namespace Hanhua.Common.TextEditTools.Dino
             "開", "室", "記", "備", "源", "救", "人", "証", "施", "事", "動", "書", "組", "信", "置", "格",
             "究", "図", "号", "子", "除", "Ⅱ", "充", "給", "量", "指", "採", "録", "在", "存", "管", "入",
             "御", "質", "形", "換", "”", "常", "V", "責", "者", "士", "港", "密", "厳", "多", "Ⅲ", "験",
-            "一", "守", "内", "収", "性", "違", "印", "器", "居", "所", "下", "文", "兵", "同", "確", "武",
+            "—", "守", "内", "収", "性", "違", "印", "器", "居", "所", "下", "文", "兵", "同", "確", "武",
             "見", "外", "廊", "会", "修", "裏", "絡", "配", "検", "務", "憩", "許", "私", "央", "段", "水",
             "抜", "直", "残", "照", "整", "向", "横", "枚", "以"
         };
@@ -122,7 +126,8 @@ namespace Hanhua.Common.TextEditTools.Dino
 
             this.Open(baseFile);
 
-            this.ExtractRaw(@"E:\Game\Dino1\DatDecode\LOAD2");
+            string fileName = Util.GetShortNameWithoutType(baseFile);
+            this.ExtractRaw(@"G:\Study\MySelfProject\Hanhua\Dino1\Ps_IsoCn\PSX\DATA_Test\" + fileName);
         }
 
         public void Reset()
@@ -378,14 +383,20 @@ namespace Hanhua.Common.TextEditTools.Dino
         private void btnComDat_Click(object sender, EventArgs e)
         {
             // 选择已解压文件的目录
-            string folder = @"G:\Study\MySelfProject\Hanhua\Dino2\DatDeCom";
-            if (string.IsNullOrEmpty(folder)) return;
+            string folder = Util.OpenFolder(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn");
 
+            this.CompressDatFile(folder);
+
+            MessageBox.Show("打包完成");
+        }
+
+        private void CompressDatFile(string folder)
+        {
             // 获取 XML 索引
-            string xmlPath = Path.Combine(folder, "package.xml");
+            string xmlPath = Path.Combine(folder, "manifest.xml");
             if (!File.Exists(xmlPath))
             {
-                MessageBox.Show("未找到 package.xml 文件！");
+                MessageBox.Show("未找到 manifest.xml 文件！");
                 return;
             }
 
@@ -393,12 +404,17 @@ namespace Hanhua.Common.TextEditTools.Dino
             doc.Load(xmlPath);
             XmlNodeList nodes = doc.SelectNodes("/DinoCrisisPackage/Entry");
 
-            string outputDat = Path.Combine(folder, "DinoRepacked.dat");
+            string outputDat = folder + ".dat";
             using (FileStream fs = new FileStream(outputDat, FileMode.Create, FileAccess.Write))
             using (BinaryWriter bw = new BinaryWriter(fs))
             {
                 // 写 2048 字节头
                 byte[] header = new byte[2048];
+                byte[] byDummyHeader = Encoding.ASCII.GetBytes("dummy header    ");
+                for (int i = 0; i < 2048 / 16; i++)
+                {
+                    Array.Copy(byDummyHeader, 0, header, i * 16, byDummyHeader.Length);
+                }
                 bw.Write(header, 0, header.Length);
 
                 int dataOffset = 2048;
@@ -406,9 +422,8 @@ namespace Hanhua.Common.TextEditTools.Dino
 
                 foreach (XmlNode node in nodes)
                 {
-                    int index = int.Parse(node.Attributes["index"].Value);
                     int type = int.Parse(node.Attributes["type"].Value);
-                    string file = node.Attributes["file"].Value;
+                    string file = node.InnerText.Trim();
 
                     string path = Path.Combine(folder, file);
                     if (!File.Exists(path)) continue;
@@ -425,22 +440,36 @@ namespace Hanhua.Common.TextEditTools.Dino
                     {
                         case GEntryType.GET_LZSS0:
                             outputData = Dc2LzssEnc(rawData);
+                            entry.size = (uint)outputData.Length;
                             outputData = AlignData(outputData, 2048);
+                            entry.reserve[0] = uint.Parse(node.Attributes["address"].Value.Replace("0x", ""), NumberStyles.HexNumber);
                             break;
 
                         case GEntryType.GET_LZSS1:
+                            entry.reserve[0] = (uint.Parse(node.Attributes["y"].Value) << 16) | uint.Parse(node.Attributes["x"].Value);
+                            entry.reserve[1] = (uint.Parse(node.Attributes["h"].Value) << 16) | uint.Parse(node.Attributes["w"].Value);
                             SwizzleGfx(rawData, entry);
                             outputData = Dc2LzssEnc(rawData);
+                            entry.size = (uint)outputData.Length;
                             outputData = AlignData(outputData, 2048);
                             break;
 
                         case GEntryType.GET_TEXTURE:
+                            entry.reserve[0] = (uint.Parse(node.Attributes["y"].Value) << 16) | uint.Parse(node.Attributes["x"].Value);
+                            entry.reserve[1] = (uint.Parse(node.Attributes["h"].Value) << 16) | uint.Parse(node.Attributes["w"].Value);
                             SwizzleGfx(rawData, entry);
                             outputData = AlignData(rawData, 2048);
                             break;
 
+                        case GEntryType.GET_PALETTE:
+                            outputData = AlignData(rawData, 2048);
+                            entry.reserve[0] = (uint.Parse(node.Attributes["y"].Value) << 16) | uint.Parse(node.Attributes["x"].Value);
+                            entry.reserve[1] = (uint.Parse(node.Attributes["h"].Value) << 16) | uint.Parse(node.Attributes["w"].Value);
+                            break;
+
                         default:
                             outputData = AlignData(rawData, 2048);
+                            entry.reserve[0] = uint.Parse(node.Attributes["address"].Value.Replace("0x", ""), NumberStyles.HexNumber);
                             break;
                     }
 
@@ -458,14 +487,10 @@ namespace Hanhua.Common.TextEditTools.Dino
                 {
                     bw.Write(entry.type);
                     bw.Write(entry.size);
-                    if (PackType == Type_DC2)
-                    {
-                        for (int i = 0; i < 6; i++) bw.Write(entry.reserve[i]);
-                    }
+                    bw.Write(entry.reserve[0]);
+                    bw.Write(entry.reserve[1]);
                 }
             }
-
-            MessageBox.Show("打包完成: " + outputDat);
         }
 
         /// <summary>
@@ -583,22 +608,39 @@ namespace Hanhua.Common.TextEditTools.Dino
                 return;
             }
 
-            Dictionary<string, string> dinoCoreFontChar = new Dictionary<string, string>();
+            List<string> char80 = new List<string>();
+            List<string> char81 = new List<string>();
             int charIdx = 0;
-            for (int i = 0; i < coreFontChar1.Length; i++)
+            int charIdx1 = 0;
+            while (charIdx1 < (coreFontChar1.Length + coreFontChar2.Length))
             {
-                dinoCoreFontChar.Add(coreFontChar1[i], charIdx + " 0");
-                dinoCoreFontChar.Add(coreFontChar2[i], charIdx + " 1");
-                charIdx++;
+                if (charIdx1 < 255)
+                {
+                    char80.Add(coreFontChar1[charIdx]);
+                    char80.Add(coreFontChar2[charIdx]);
+                    charIdx1 += 2;
+                    charIdx++;
+                }
+                else
+                {
+                    char81.Add(coreFontChar1[charIdx]);
+                    char81.Add(coreFontChar2[charIdx]);
+                    charIdx1 += 2;
+                    charIdx++;
+                }
             }
 
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < chkTxt.Length; i++)
             {
                 string curChar = chkTxt.Substring(i, 1);
-                if (dinoCoreFontChar.ContainsKey(curChar))
+                if (char80.Contains(curChar))
                 {
-                    sb.Append(dinoCoreFontChar[curChar]).Append(" ");
+                    sb.Append(char80.IndexOf(curChar).ToString("X2")).Append(" 80 ");
+                }
+                else if (char81.Contains(curChar))
+                {
+                    sb.Append(char81.IndexOf(curChar).ToString("X2")).Append(" 81 ");
                 }
                 else
                 {
@@ -609,39 +651,10 @@ namespace Hanhua.Common.TextEditTools.Dino
             this.txtChk.Text = sb.ToString();
         }
 
-        private void btnTest_Click(object sender, EventArgs e)
+        private string DecodeDinoText(byte[] binByte, int startPos, int endPos, List<string> char80, List<string> char81, List<string> char82, StringBuilder sb2)
         {
-            List<FilePosInfo> allBin = Util.GetAllFiles(@"E:\Game\Dino1\DatDecode").Where(p => !p.IsFolder && p.File.EndsWith(".bin", StringComparison.OrdinalIgnoreCase)).ToList();
             StringBuilder sb = new StringBuilder();
-
-            string[] char1 = new string[256];
-            string[] char2 = new string[256];
-            int charIdx = 0;
-            int charIdx1 = 0;
-            int charIdx2 = 0;
-            bool isChar1 = true;
-            while (charIdx1 < (coreFontChar1.Length + coreFontChar2.Length))
-            {
-                if (charIdx1 < 255)
-                {
-                    char1[charIdx1++] = coreFontChar1[charIdx];
-                    char1[charIdx1++] = coreFontChar2[charIdx];
-                    charIdx++;
-                }
-                else
-                {
-                    char2[charIdx1 - 256] = coreFontChar1[charIdx];
-                    charIdx1++;
-                    char2[charIdx1 - 256] = coreFontChar2[charIdx];
-                    charIdx1++;
-                    charIdx++;
-                }
-            }
-
-            byte[] binByte = File.ReadAllBytes(@"H:\游戏汉化\Dino Crisis\Ps_jp\ST10B\08.bin");
-            //  st10a 07.bin 0x499b0
-
-            for (int i = 0x39058; i < binByte.Length; i += 2 )
+            for (int i = startPos; i < endPos; i += 2)
             {
                 if (binByte[i] == 0x00 && binByte[i + 1] == 0xA0)
                 {
@@ -651,42 +664,231 @@ namespace Hanhua.Common.TextEditTools.Dino
                 {
                     sb.Append("^00C0^\r\n");
                 }
+                else if (binByte[i] == 0x00 && binByte[i + 1] == 0x90)
+                {
+                    sb.Append("^0090^\r\n");
+                }
                 else if (binByte[i + 1] == 0x80)
                 {
-                    sb.Append(char1[binByte[i]]); //.Append("80");
+                    sb.Append(char80[binByte[i]]);
                 }
                 else if (binByte[i + 1] == 0x81)
                 {
-                    sb.Append(char2[binByte[i]]);
-                }
-                else if (binByte[i + 1] == 0x82)
-                {
-                    if (binByte[i] < st8210BChar.Length)
+                    if (binByte[i] < char81.Count)
                     {
-                        sb.Append(st8210BChar[binByte[i]]);
+                        sb.Append(char81[binByte[i]]);
                     }
                     else
                     {
-                        sb.Append(binByte[i].ToString("X2")).Append("82");
+                        sb2.Append("^").Append(binByte[i].ToString("X2")).Append(" 81").Append("^");
+                        sb.Append("^").Append(binByte[i].ToString("X2")).Append(" 81").Append("^");
+                    }
+                }
+                else if (binByte[i + 1] == 0x82)
+                {
+                    if (binByte[i] < char82.Count)
+                    {
+                        sb.Append(char82[binByte[i]]);
+                    }
+                    else
+                    {
+                        sb2.Append("^").Append(binByte[i].ToString("X2")).Append(" 82").Append("^");
+                        //sb.Append("^").Append(binByte[i].ToString("X2")).Append(" 82").Append("^");
+                        sb.Append("　");
                     }
                 }
                 else
                 {
-                    sb.Append(binByte[i].ToString("X2")).Append(binByte[i + 1].ToString("X2"));
+                    sb.Append("^").Append(binByte[i].ToString("X2")).Append(binByte[i + 1].ToString("X2")).Append("^");
                 }
             }
+
+            return sb.ToString();
+        }
+
+        private void btnTest_Click(object sender, EventArgs e)
+        {
+            //StringBuilder sb = new StringBuilder();
+            //XmlDocument doc = new XmlDocument();
+            //List<FilePosInfo> allPic = Util.GetAllFiles(@"G:\Study\MySelfProject\Hanhua\Dino1\Dino1FontPic\FontPic\jp0");
+            //foreach (FilePosInfo file in allPic)
+            //{
+            //    string folderName = Util.GetShortName(file.File).Replace("_00.png", "").Replace("_01.png", "").ToUpper();
+            //    string folder = @"G:\Study\MySelfProject\Hanhua\Dino1\PS_jp\" + folderName;
+            //    if (Directory.Exists(folder))
+            //    {
+            //        string xmlPath = Path.Combine(folder, "manifest.xml");
+            //        if (!File.Exists(xmlPath))
+            //        {
+            //            continue;
+            //        }
+
+            //        Image img = Bitmap.FromFile(file.File);
+
+            //        doc.Load(xmlPath);
+            //        XmlNodeList nodes = doc.SelectNodes("/DinoCrisisPackage/Entry");
+            //        foreach (XmlNode node in nodes)
+            //        {
+            //            int type = int.Parse(node.Attributes["type"].Value);
+            //            if ((GEntryType)type == GEntryType.GET_LZSS1 || (GEntryType)type == GEntryType.GET_TEXTURE)
+            //            {
+            //                string path = Path.Combine(folder, node.InnerText.Trim());
+            //                if (!File.Exists(path)) continue;
+
+            //                if (uint.Parse(node.Attributes["h"].Value) == img.Height)
+            //                {
+            //                    sb.Append(folderName).Append("\r\n");
+            //                    sb.Append(path).Append("\r\n");
+            //                    break;
+            //                }
+            //            }
+            //        }
+            //    }
+            //}
+
+            //File.WriteAllText(@"G:\Study\MySelfProject\Hanhua\Dino1\fontImgInfo.txt", sb.ToString(), Encoding.UTF8);
+
+            Dictionary<string, List<string>> cnFontChar = new Dictionary<string, List<string>>();
+            string[] allCnFontChar = File.ReadAllLines(@"G:\Study\MySelfProject\Hanhua\Dino1\dino1FontChar_cn.txt", Encoding.UTF8);
+            for (int i = 0; i < allCnFontChar.Length; i += 2)
+            {
+                List<string> curCnChars = new List<string>();
+                curCnChars.AddRange(allCnFontChar[i + 1].Split(','));
+                cnFontChar.Add(allCnFontChar[i].ToUpper(), curCnChars);
+            }
+
+            List<string> comnCnFontChars = cnFontChar["SLPS_021.80"];
+            List<string> cnFont80 = new List<string>();
+            List<string> cnFont81 = new List<string>();
+            for (int j = 0; j < comnCnFontChars.Count; j += 2)
+            {
+                cnFont80.Add(comnCnFontChars[j]);
+                if (j < comnCnFontChars.Count - 1)
+                {
+                    cnFont81.Add(comnCnFontChars[j + 1]);
+                }
+            }
+
+            string[] allJpTxtFiles = File.ReadAllLines(@"G:\Study\MySelfProject\Hanhua\Dino1\textAddr.txt");
+            StringBuilder sb = new StringBuilder();
+
+            Microsoft.Office.Interop.Excel.Application xApp = null;
+            Microsoft.Office.Interop.Excel.Workbook xBook = null;
+            Microsoft.Office.Interop.Excel.Worksheet xSheet = null;
+
+            try
+            {
+                // 创建Application对象 
+                xApp = new Microsoft.Office.Interop.Excel.ApplicationClass();
+                //xApp.Visible = true;
+
+                // 追加一个WorkBook
+                xBook = xApp.Workbooks.Add(Missing.Value);
+
+                for (int i = 0; i < allJpTxtFiles.Length; i += 2)
+                {
+                    byte[] byTxt = File.ReadAllBytes(allJpTxtFiles[i].Replace("PS_jp", "PS_cn"));
+                    string[] posInfos = allJpTxtFiles[i + 1].Split(' ');
+                    int endPos = byTxt.Length;
+                    int startPos = Convert.ToInt32(posInfos[0], 16);
+                    if (posInfos.Length > 1)
+                    {
+                        endPos = Convert.ToInt32(posInfos[1], 16);
+                    }
+
+                    if (allJpTxtFiles[i].EndsWith("SLPS_021.80", StringComparison.OrdinalIgnoreCase))
+                    {
+                        xSheet = (Microsoft.Office.Interop.Excel.Worksheet)xBook.Sheets.Add(Missing.Value, Missing.Value, Missing.Value, Missing.Value);
+                        xSheet.Name = "SLPS_021.80";
+                        int lineIdx = 1;
+                        List<string> allComText = new List<string>();
+
+                        for (int j = startPos; j < endPos - 4; j += 4)
+                        {
+                            int txtStartPos = endPos + ((byTxt[j] << 0) | (byTxt[j + 1] << 8) | (byTxt[j + 2] << 16) | (byTxt[j + 3] << 24)) * 2;
+                            int txtEndPos = endPos + ((byTxt[j + 4] << 0) | (byTxt[j + 5] << 8) | (byTxt[j + 6] << 16) | (byTxt[j + 7] << 24)) * 2;
+                            allComText.AddRange(this.DecodeDinoText(byTxt, txtStartPos, txtEndPos, cnFont80, cnFont81, cnFont80, sb).Split('\n'));
+                        }
+
+                        int txtStartPos1 = endPos + ((byTxt[endPos - 4] << 0) | (byTxt[endPos - 3] << 8) | (byTxt[endPos - 2] << 16) | (byTxt[endPos - 1] << 24)) * 2;
+                        int txtEndPos1 = Convert.ToInt32(posInfos[2], 16);
+                        allComText.AddRange(this.DecodeDinoText(byTxt, txtStartPos1, txtEndPos1, cnFont80, cnFont81, cnFont80, sb).Split('\n'));
+
+                        for (int j = 0; j < allComText.Count; j++)
+                        {
+                            string curLine = allComText[j].Replace("\r", "");
+                            if (!string.IsNullOrEmpty(curLine))
+                            {
+                                Microsoft.Office.Interop.Excel.Range rngCn = xSheet.get_Range("A" + (lineIdx++), Missing.Value);
+                                rngCn.Value2 = curLine;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        string[] fileNames = allJpTxtFiles[i].Split('\\');
+                        string shortName = fileNames[fileNames.Length - 2];
+                        if (cnFontChar.ContainsKey(shortName.ToUpper()))
+                        {
+                            sb.Append(shortName).Append(" ");
+                            string[] allTxtLines = this.DecodeDinoText(byTxt, startPos, endPos, cnFont80, cnFont81, cnFontChar[shortName.ToUpper()], sb).Split('\n');
+
+                            xSheet = (Microsoft.Office.Interop.Excel.Worksheet)xBook.Sheets.Add(Missing.Value, Missing.Value, Missing.Value, Missing.Value);
+                            xSheet.Name = shortName;
+
+                            for (int j = 0; j < allTxtLines.Length; j++)
+                            {
+
+                                Microsoft.Office.Interop.Excel.Range rngCn = xSheet.get_Range("A" + (j + 1), Missing.Value);
+                                rngCn.Value2 = allTxtLines[j].Replace("\r", "");
+                            }
+                            sb.Append("\r\n");
+                        }
+                        else
+                        {
+                            sb.Append(shortName).Append("\r\n");
+                        }
+                    }
+                }
+
+                // 保存
+                xSheet.SaveAs(
+                    @"G:\Study\MySelfProject\Hanhua\Dino1\allCnTextChk.xlsx",
+                    Missing.Value, Missing.Value, Missing.Value, Missing.Value,
+                    Missing.Value, Missing.Value, Missing.Value, Missing.Value, Missing.Value);
+
+                // 显示保存完成信息
+                MessageBox.Show("导出完成！");
+
+            }
+            catch (Exception me)
+            {
+                MessageBox.Show(me.Message + "\n" + me.StackTrace);
+            }
+            finally
+            {
+                // 清空各种对象
+                xSheet = null;
+                xBook = null;
+                if (xApp != null)
+                {
+                    xApp.Quit();
+                    xApp = null;
+                }
+            }
+            
         }
 
         private void btnDecAllDat_Click(object sender, EventArgs e)
         {
-            List<FilePosInfo> allDat = Util.GetAllFiles(@"G:\Study\MySelfProject\Hanhua\Dino1\Ps_Iso\PSX\DATA").Where(p => !p.IsFolder && p.File.EndsWith(".dat", StringComparison.OrdinalIgnoreCase)).ToList();
+            List<FilePosInfo> allDat = Util.GetAllFiles(@"G:\Study\MySelfProject\Hanhua\Dino1\Ps_IsoCn\PSX\DATA").Where(p => !p.IsFolder && p.File.EndsWith(".dat", StringComparison.OrdinalIgnoreCase)).ToList();
             foreach (FilePosInfo datFile in allDat)
             {
                 try
                 {
                     this.Open(datFile.File);
 
-                    string folder = @"G:\Study\MySelfProject\Hanhua\Dino1\PS_jp\" + Util.GetShortNameWithoutType(datFile.File);
+                    string folder = @"G:\Study\MySelfProject\Hanhua\Dino1\Ps_IsoCn\PSX\DATA_Test\" + Util.GetShortNameWithoutType(datFile.File);
                     Directory.CreateDirectory(folder);
 
                     this.ExtractRaw(folder);
@@ -762,6 +964,1007 @@ namespace Hanhua.Common.TextEditTools.Dino
             File.WriteAllText(@"G:\Study\MySelfProject\Hanhua\Dino1\noTextInfo.txt", sb2.ToString(), Encoding.UTF8);
 
             MessageBox.Show("OK");
+        }
+
+
+        private Dictionary<string, List<string>> GetFontChar(string excelFileName)
+        {
+            Dictionary<string, List<string>> fontChars = new Dictionary<string, List<string>>();
+            if (string.IsNullOrEmpty(excelFileName))
+            {
+                return fontChars;
+            }
+
+            StringBuilder sb = new StringBuilder();
+            List<string> char10a = new List<string>();
+            List<string> char10b = new List<string>();
+            char10a.AddRange(st8210AChar);
+            char10b.AddRange(st8210BChar);
+            fontChars.Add("st10a_00", char10a);
+            fontChars.Add("st10b_00", char10b);
+
+            string[] txtFiles = File.ReadAllLines(@"G:\Study\MySelfProject\Hanhua\Dino1\Dino1FontPic\fontImgInfo.txt");
+
+            Microsoft.Office.Interop.Excel.Application xApp = null;
+            Microsoft.Office.Interop.Excel.Workbook xBook = null;
+            Microsoft.Office.Interop.Excel.Worksheet xSheet = null;
+
+            try
+            {
+                // 创建Application对象 
+                xApp = new Microsoft.Office.Interop.Excel.ApplicationClass();
+
+                // 得到WorkBook对象, 打开已有的文件 
+                xBook = xApp.Workbooks._Open(
+                    excelFileName,
+                    Missing.Value, Missing.Value, Missing.Value, Missing.Value
+                    , Missing.Value, Missing.Value, Missing.Value, Missing.Value
+                    , Missing.Value, Missing.Value, Missing.Value, Missing.Value);
+
+                // 取得相应的Sheet
+                xSheet = (Microsoft.Office.Interop.Excel.Worksheet)xBook.Sheets[1];
+
+                int curFileIdx = 0;
+                int lineNum = 21;
+                int blankNum = 0;
+                string[] char0Pos = { "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q" };
+                string[] char1Pos = { "S", "T", "U", "V", "W", "X", "Y", "Z", "AA", "AB", "AC", "AD", "AE", "AF", "AG", "AH" };
+                while (blankNum < 10)
+                {
+                    string cellValue = xSheet.get_Range("S" + lineNum, Missing.Value).Value2 as string;
+
+                    int row = 0;
+                    if (string.IsNullOrEmpty(cellValue))
+                    {
+                        blankNum++;
+                    }
+                    else
+                    {
+                        //xSheet.get_Range("A" + lineNum, Missing.Value).Value2 = txtFiles[curFileIdx];
+
+                        blankNum = 0;
+                        List<string> charList = new List<string>();
+
+                        bool isCharOk = false;
+                        for (row = 0; row < 3; row++)
+                        {
+                            for (int col = 0; col < 16; col++)
+                            {
+                                string cell0Value = xSheet.get_Range(char0Pos[col] + (lineNum + row), Missing.Value).Value2 as string;
+                                string cell1Value = xSheet.get_Range(char1Pos[col] + (lineNum + row), Missing.Value).Value2 as string;
+                                if (string.IsNullOrEmpty(cell0Value))
+                                {
+                                    if (charList.Count == 0)
+                                    {
+                                        cell0Value = "　";
+                                    }
+                                    else
+                                    {
+                                        isCharOk = true;
+                                        break;
+                                    }
+                                }
+                                charList.Add(cell0Value);
+                                if (string.IsNullOrEmpty(cell1Value))
+                                {
+                                    isCharOk = true;
+                                    break;
+                                }
+                                charList.Add(cell1Value);
+                            }
+                            if (isCharOk)
+                            {
+                                break;
+                            }
+                        }
+
+
+                        sb.Append(txtFiles[curFileIdx]).Append("\r\n");
+                        sb.Append(string.Join(",", charList.ToArray())).Append("\r\n");
+                        fontChars.Add(txtFiles[curFileIdx++], charList);
+                    }
+
+                    lineNum += row + 1;
+                }
+
+                
+            }
+            catch (Exception me)
+            {
+                MessageBox.Show(me.Message + "\r\n" + me.StackTrace);
+            }
+            finally
+            {
+                //xSheet.SaveAs(
+                //    @"G:\Study\MySelfProject\Hanhua\Dino1\Dino1FontPic\DinoFontChk.xlsx",
+                //    Missing.Value, Missing.Value, Missing.Value, Missing.Value,
+                //    Missing.Value, Missing.Value, Missing.Value, Missing.Value, Missing.Value);
+
+                // 清空各种对象
+                xSheet = null;
+                xBook = null;
+                if (xApp != null)
+                {
+                    xApp.Quit();
+                    xApp = null;
+                }
+            }
+            File.WriteAllText(@"G:\Study\MySelfProject\Hanhua\Dino1\dino1FontChar.txt", sb.ToString());
+
+            return fontChars;
+        }
+
+        private void btnFormatText_Click(object sender, EventArgs e)
+        {
+            string curTxt = this.txtFormat.Text;
+            if (string.IsNullOrEmpty(curTxt))
+            {
+                return;
+            }
+
+            string halfStr = "0123456789ABCDEFHIKLNOPRSVWm&/.";
+            string fullStr = "０１２３４５６７８９ＡＢＣＤＥＦＨＩＫＬＮＯＰＲＳＶＷｍ＆／．";
+            Dictionary<string, string> halfFullMap = new Dictionary<string, string>();
+            for (int i = 0; i < halfStr.Length; i++)
+            {
+                halfFullMap.Add(halfStr.Substring(i, 1), fullStr.Substring(i, 1));
+            }
+
+            StringBuilder sb = new StringBuilder();
+            string[] allLine = curTxt.Split('\n');
+            foreach (string curLine in allLine)
+            {
+                if (string.IsNullOrEmpty(curLine))
+                {
+                    break;
+                }
+                string newLine = curLine.Replace("\r", "");
+                string trueLine = newLine.Substring(0, newLine.Length - 6);
+                for (int i = 0; i < trueLine.Length; i++)
+                {
+                    string curChar = trueLine.Substring(i, 1);
+                    if (halfFullMap.ContainsKey(curChar))
+                    {
+                        sb.Append(halfFullMap[curChar]);
+                    }
+                    else
+                    {
+                        sb.Append(curChar);
+                    }
+                }
+                sb.Append(newLine.Substring(newLine.Length - 6)).Append("\r\n");
+            }
+            this.txtFormat.Text = sb.ToString();
+
+            //string[] allLine = curTxt.Split('\n');
+            //List<string> newText = new List<string>();
+            //int maxLen = 0;
+            //string newLine;
+            //foreach (string curLine in allLine)
+            //{
+            //    newLine = curLine.Replace("\r", "");
+            //    if (newLine.EndsWith("^00C0^") || newLine.EndsWith("^0090^"))
+            //    {
+            //        newText.Add(newLine);
+
+            //        newLine = Regex.Replace(newLine, @"\^.*?\^", "").Trim();
+            //        if (newLine.Length > maxLen)
+            //        {
+            //            maxLen = newLine.Length;
+            //        }
+            //    }
+            //    else if (newLine.EndsWith("^00A0^"))
+            //    {
+            //        string tmpLine = Regex.Replace(newLine, @"\^.*?\^", "").Trim();
+            //        if (tmpLine.Length > maxLen)
+            //        {
+            //            maxLen = tmpLine.Length;
+            //        }
+
+            //        if (tmpLine.Length > 0)
+            //        {
+            //            newText.Add(this.getFormatedString(newLine, tmpLine, maxLen));
+            //        }
+            //        else
+            //        {
+            //            newText.Add(newLine);
+            //        }
+
+            //        int nextIdx = newText.Count - 2;
+            //        while (nextIdx >= 0)
+            //        {
+            //            newLine = newText[nextIdx];
+            //            if (newLine.EndsWith("^00C0^") || newLine.EndsWith("^0090^"))
+            //            {
+            //                tmpLine = Regex.Replace(newLine, @"\^.*?\^", "").Trim();
+            //                if (tmpLine.Length > 0)
+            //                {
+            //                    newText[nextIdx] = this.getFormatedString(newLine, tmpLine, maxLen);
+            //                }
+            //            }
+            //            else
+            //            {
+            //                break;
+            //            }
+            //            nextIdx--;
+            //        }
+            //        maxLen = 0;
+            //    }
+            //}
+
+            //this.txtFormat.Text = string.Join("\r\n", newText.ToArray());
+            Clipboard.SetText(this.txtFormat.Text);
+        }
+
+        private string getFormatedString(string input, string trimInput, int maxLen)
+        {
+            int leftBlank = (18 - maxLen) / 2;
+            int rightBlank = 18 - leftBlank - trimInput.Length;
+
+            // 匹配开头的 ^...^ 部分（可能连续多个）
+            string startPattern = @"^(?<!\s)\^[^^]*\^(?:\^[^^]*\^)*"; //@"^\^[^^]*\^(?:\^[^^]*\^)*";
+            Match startMatch = Regex.Match(input, startPattern);
+            string startPart = startMatch.Success ? startMatch.Value : "";
+
+            // 匹配结尾的 ^...^ 部分（可能连续多个）
+            string endPattern = @"\^[^^]*\^(?:\^[^^]*\^)*$";
+            Match endMatch = Regex.Match(input, endPattern);
+            string endPart = endMatch.Success ? endMatch.Value : "";
+
+            // 中间部分 = 原始字符串 - 开头部分 - 结尾部分
+            string middlePart = input.Substring(
+                startPart.Length,
+                input.Length - startPart.Length - endPart.Length
+            );
+
+            return startPart + "".PadLeft(leftBlank, '　') + middlePart.Trim() + "".PadRight(rightBlank, '　') + endPart;
+        }
+
+        private void btnChkCnChar_Click(object sender, EventArgs e)
+        {
+            Microsoft.Office.Interop.Excel.Application xApp = null;
+            Microsoft.Office.Interop.Excel.Workbook xBook = null;
+            Microsoft.Office.Interop.Excel.Worksheet xSheet = null;
+
+            try
+            {
+                // 创建Application对象 
+                xApp = new Microsoft.Office.Interop.Excel.ApplicationClass();
+
+                // 得到WorkBook对象, 打开已有的文件 
+                xBook = xApp.Workbooks._Open(
+                    @"G:\Study\MySelfProject\Hanhua\Dino1\allJpText.xlsx",
+                    Missing.Value, Missing.Value, Missing.Value, Missing.Value
+                    , Missing.Value, Missing.Value, Missing.Value, Missing.Value
+                    , Missing.Value, Missing.Value, Missing.Value, Missing.Value);
+
+                int lineNum = 1;
+                int blankNum = 0;
+                Dictionary<string, string> halfFullMap = new Dictionary<string, string>();
+                Dictionary<string, List<string>> cnFontChar = new Dictionary<string, List<string>>();
+                List<string> comnCnFontChars = new List<string>();
+                cnFontChar["SLPS_021.80"] = comnCnFontChars;
+                
+                string halfStr = " 0123456789ABCDEFHIKLNOPRSVWm&/.";
+                string fullStr = "　０１２３４５６７８９ＡＢＣＤＥＦＨＩＫＬＮＯＰＲＳＶＷｍ＆／．";
+                for (int i = 0; i < fullStr.Length; i++)
+                {
+                    comnCnFontChars.Add(fullStr.Substring(i, 1));
+                    halfFullMap.Add(halfStr.Substring(i, 1), fullStr.Substring(i, 1));
+                }
+
+                List<KeyValuePair<string, int>> charCount = new List<KeyValuePair<string, int>>();
+                // 取得相应的Sheet
+                for (int i = 1; i <= xBook.Sheets.Count; i++)
+                {
+                    xSheet = (Microsoft.Office.Interop.Excel.Worksheet)xBook.Sheets[i];
+                    List<string> curCnFontChars = new List<string>();
+                    comnCnFontChars = cnFontChar["SLPS_021.80"];
+
+                    if (!xSheet.Name.Equals("SLPS_021.80"))
+                    {
+                        cnFontChar.Add(xSheet.Name, curCnFontChars);
+                    }
+                    else
+                    {
+                        curCnFontChars = comnCnFontChars;
+                    }
+
+                    lineNum = 1;
+                    blankNum = 0;
+                    while (blankNum < 5)
+                    {
+                        string cnTxtValue = xSheet.get_Range("J" + lineNum, Missing.Value).Value2 as string;
+
+                        if (string.IsNullOrEmpty(cnTxtValue))
+                        {
+                            blankNum++;
+                        }
+                        else
+                        {
+                            blankNum = 0;
+                            cnTxtValue = Regex.Replace(cnTxtValue, @"\^.*?\^", "");
+                            for (int j = 0; j < cnTxtValue.Length; j++)
+                            {
+                                string curChar = cnTxtValue.Substring(j, 1);
+                                if (halfFullMap.ContainsKey(curChar))
+                                {
+                                    curChar = halfFullMap[curChar];
+                                }
+
+                                if (!comnCnFontChars.Contains(curChar))
+                                {
+                                    if (!curCnFontChars.Contains(curChar))
+                                    {
+                                        curCnFontChars.Add(curChar);
+                                        //charCount.Add(new KeyValuePair<string, int>(curChar, 1));
+                                    }
+                                    //else
+                                    //{
+                                    //    KeyValuePair<string, int> charInfo = charCount.FirstOrDefault(p => p.Key.Equals(curChar));
+                                    //    int count = charInfo.Value + 1;
+                                    //    charCount.Remove(charInfo);
+                                    //    charCount.Add(new KeyValuePair<string, int>(curChar, count));
+                                    //}
+                                }
+                                //else
+                                //{
+                                //    KeyValuePair<string, int> charInfo = charCount.FirstOrDefault(p => p.Key.Equals(curChar));
+                                //    int count = charInfo.Value + 1;
+                                //    charCount.Remove(charInfo);
+                                //    charCount.Add(new KeyValuePair<string, int>(curChar, count));
+                                //}
+                            }
+                        }
+
+                        lineNum++;
+                    }
+                    //break;
+                }
+
+                StringBuilder sb = new StringBuilder();
+                //charCount.Sort(this.CharCountCompare);
+                //foreach (KeyValuePair<string, int> curST in charCount)
+                //{
+                //    sb.Append(curST.Key).Append(" ").Append(curST.Value).Append("\r\n");
+                //}
+
+
+                foreach (KeyValuePair<string, List<string>> curST in cnFontChar)
+                {
+                    sb.Append(curST.Key).Append("\r\n");
+                    List<string> curCnFontChars = curST.Value;
+                    if (!curST.Key.Equals("SLPS_021.80"))
+                    {
+                        curCnFontChars.Sort();
+                    }
+
+                    sb.Append(string.Join(",", curCnFontChars.ToArray())).Append("\r\n");
+                }
+
+                //comnCnFontChars = cnFontChar["SLPS_021.80"];
+                //comnCnFontChars.Sort();
+
+                File.WriteAllText(@"G:\Study\MySelfProject\Hanhua\Dino1\dino1FontChar_cn.txt", sb.ToString(), Encoding.UTF8);
+
+            }
+            catch (Exception me)
+            {
+                MessageBox.Show(me.Message + "\r\n" + me.StackTrace);
+            }
+            finally
+            {
+                //xSheet.SaveAs(
+                //    @"G:\Study\MySelfProject\Hanhua\Dino1\Dino1FontPic\DinoFontChk.xlsx",
+                //    Missing.Value, Missing.Value, Missing.Value, Missing.Value,
+                //    Missing.Value, Missing.Value, Missing.Value, Missing.Value, Missing.Value);
+
+                // 清空各种对象
+                xSheet = null;
+                xBook = null;
+                if (xApp != null)
+                {
+                    xApp.Quit();
+                    xApp = null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 对象比较
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        private int CharCountCompare(KeyValuePair<string, int> a, KeyValuePair<string, int> b)
+        {
+            return b.Value - a.Value;
+        }
+
+        private void btnCreateCnPic_Click(object sender, EventArgs e)
+        {
+            string[] allCnFontChar = File.ReadAllLines(@"G:\Study\MySelfProject\Hanhua\Dino1\dino1FontChar_cn.txt", Encoding.UTF8);
+            for (int i = 0; i < allCnFontChar.Length; i += 2)
+            {
+                string path = @"G:\Study\MySelfProject\Hanhua\Dino1\Dino1FontPic\FontPicCn\old";
+                string[] curPicChars = allCnFontChar[i + 1].Split(',');
+                int tmpCount = ((curPicChars.Length + 1) & 0xFFFE) / 2;
+                int imgRows = tmpCount / 16;
+                if ((tmpCount & 0xF) > 0)
+                {
+                    imgRows++;
+                }
+
+                ImgInfo imgInfo = new ImgInfo(256, imgRows * 16);
+                imgInfo.BlockImgH = 16;
+                imgInfo.BlockImgW = 16;
+                imgInfo.PosX = 0;
+                imgInfo.PosY = 1;
+                imgInfo.XPadding = 0;
+                imgInfo.YPadding = 1;
+                imgInfo.NeedBorder = false;
+                imgInfo.FontSize = 15;
+                imgInfo.FontName = "SimSun";
+                imgInfo.Brush = Brushes.White;
+                imgInfo.Sf.LineAlignment = StringAlignment.Center;
+                imgInfo.Grp.Clear(Color.Black);
+
+                List<string> txtList1 = new List<string>();
+                List<string> txtList2 = new List<string>();
+                for (int j = 0; j < curPicChars.Length; j += 2)
+                {
+                    txtList1.Add(curPicChars[j]);
+                    if (j < curPicChars.Length - 1)
+                    {
+                        txtList2.Add(curPicChars[j + 1]);
+                    }
+                }
+
+                Bitmap curImg = ImgUtil.WriteFontImg(imgInfo, txtList1);
+                curImg.Save(path + @"1\" + allCnFontChar[i].ToUpper() + @".png");
+
+                imgInfo.Grp.Clear(Color.Black);
+                curImg = ImgUtil.WriteFontImg(imgInfo, txtList2);
+                curImg.Save(path + @"2\" + allCnFontChar[i].ToUpper() + @".png");
+            }
+        }
+
+        private void btnImportImg_Click(object sender, EventArgs e)
+        {
+            List<string> palGreyscale4bp = new List<string>();
+            palGreyscale4bp.Add("00000000");
+            palGreyscale4bp.Add((0x0842 & 0x1F).ToString("X4") + "0000");
+            palGreyscale4bp.Add((0x318C & 0x1F).ToString("X4") + "0000");
+            palGreyscale4bp.Add((0x5AD6 & 0x1F).ToString("X4") + "0000");
+
+            palGreyscale4bp.Add("0000" + (0x0842 & 0x1F).ToString("X4"));
+            palGreyscale4bp.Add((0x0842 & 0x1F).ToString("X4") + (0x0842 & 0x1F).ToString("X4"));
+            palGreyscale4bp.Add((0x318C & 0x1F).ToString("X4") + (0x0842 & 0x1F).ToString("X4"));
+            palGreyscale4bp.Add((0x5AD6 & 0x1F).ToString("X4") + (0x0842 & 0x1F).ToString("X4"));
+
+            palGreyscale4bp.Add("0000" + (0x318C & 0x1F).ToString("X4"));
+            palGreyscale4bp.Add((0x0842 & 0x1F).ToString("X4") + (0x318C & 0x1F).ToString("X4"));
+            palGreyscale4bp.Add((0x318C & 0x1F).ToString("X4") + (0x318C & 0x1F).ToString("X4"));
+            palGreyscale4bp.Add((0x5AD6 & 0x1F).ToString("X4") + (0x318C & 0x1F).ToString("X4"));
+
+            palGreyscale4bp.Add("0000" + (0x5AD6 & 0x1F).ToString("X4"));
+            palGreyscale4bp.Add((0x0842 & 0x1F).ToString("X4") + (0x5AD6 & 0x1F).ToString("X4"));
+            palGreyscale4bp.Add((0x318C & 0x1F).ToString("X4") + (0x5AD6 & 0x1F).ToString("X4"));
+            palGreyscale4bp.Add((0x5AD6 & 0x1F).ToString("X4") + (0x5AD6 & 0x1F).ToString("X4"));
+
+            XmlDocument doc = new XmlDocument();
+            string[] impBinMap = File.ReadAllLines(@"G:\Study\MySelfProject\Hanhua\Dino1\fontImgInfo.txt", Encoding.UTF8);
+            for (int i = 0; i < impBinMap.Length; i += 2)
+            {
+                string imgName = impBinMap[i] + ".png";
+                if (imgName.StartsWith("CLEAR", StringComparison.OrdinalIgnoreCase))
+                {
+                    imgName = "ENDING.png";
+                }
+                else if (imgName.StartsWith("CORE", StringComparison.OrdinalIgnoreCase))
+                {
+                    imgName = "SLPS_021.80.png";
+                }
+
+                if (!File.Exists(@"G:\Study\MySelfProject\Hanhua\Dino1\Dino1FontPic\FontPicCn\reduceColor1\" + imgName))
+                {
+                    continue;
+                }
+                Bitmap image1 = (Bitmap)Bitmap.FromFile(@"G:\Study\MySelfProject\Hanhua\Dino1\Dino1FontPic\FontPicCn\reduceColor1\" + imgName);
+                Bitmap image2 = (Bitmap)Bitmap.FromFile(@"G:\Study\MySelfProject\Hanhua\Dino1\Dino1FontPic\FontPicCn\reduceColor2\" + imgName);
+                int newHeight = ((image1.Height + 0x1F) & (~0x1F));
+                byte[] by = new byte[Align(image1.Width * newHeight / 2, 2048)];
+                int byImgIdx = 0;
+                for (int y = 0; y < image1.Height; y++)
+                {
+                    for (int x = 0; x < image1.Width; x += 2)
+                    {
+                        int tmpL = palGreyscale4bp.IndexOf((image1.GetPixel(x, y).R >> 3).ToString("X4") + (image2.GetPixel(x, y).R >> 3).ToString("X4"));
+                        int tmpH = palGreyscale4bp.IndexOf((image1.GetPixel(x + 1, y).R >> 3).ToString("X4") + (image2.GetPixel(x + 1, y).R >> 3).ToString("X4"));
+
+                        by[byImgIdx++] = (byte)(tmpL | (tmpH << 4));
+                    }
+                }
+
+                
+                if (imgName.StartsWith("SLPS_021.80", StringComparison.OrdinalIgnoreCase))
+                {
+                    byte[] byAllImg = File.ReadAllBytes(impBinMap[i + 1]);
+                    for (int j = 0; j < 256; j++)
+                    {
+                        Array.Copy(by, j * 128, byAllImg, j * 512, 128);
+                    }
+                    File.WriteAllBytes(impBinMap[i + 1].Replace("PS_jp", "PS_cn"), byAllImg);
+                }
+                else
+                {
+                    File.WriteAllBytes(impBinMap[i + 1].Replace("PS_jp", "PS_cn"), by);
+
+                    string folder = impBinMap[i + 1].Substring(0, impBinMap[i + 1].IndexOf(impBinMap[i])).Replace("PS_jp", "PS_cn");
+                    string texName = Util.GetShortName(impBinMap[i + 1]);
+                    string xmlPath = Path.Combine(folder + impBinMap[i], "manifest.xml");
+                    doc.Load(xmlPath);
+                    XmlNodeList nodes = doc.SelectNodes("/DinoCrisisPackage/Entry");
+                    foreach (XmlNode node in nodes)
+                    {
+                        if (texName.Equals(node.InnerText.Trim()))
+                        {
+                            node.Attributes["h"].Value = image1.Height.ToString();
+                            doc.Save(xmlPath);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void btnTestFontPic_Click(object sender, EventArgs e)
+        {
+            List<int> palGreyscale4bp1 = new List<int>();
+            List<int> palGreyscale4bp2 = new List<int>();
+            palGreyscale4bp1.Add(0);
+            palGreyscale4bp2.Add(0);
+
+            palGreyscale4bp1.Add((0x0842 & 0x1F) << 3);
+            palGreyscale4bp2.Add(0);
+
+            palGreyscale4bp1.Add((0x318C & 0x1F) << 3);
+            palGreyscale4bp2.Add(0);
+
+            palGreyscale4bp1.Add((0x5AD6 & 0x1F) << 3);
+            palGreyscale4bp2.Add(0);
+
+            palGreyscale4bp1.Add(0);
+            palGreyscale4bp2.Add((0x0842 & 0x1F) << 3);
+
+            palGreyscale4bp1.Add((0x0842 & 0x1F) << 3);
+            palGreyscale4bp2.Add((0x0842 & 0x1F) << 3);
+
+            palGreyscale4bp1.Add((0x318C & 0x1F) << 3);
+            palGreyscale4bp2.Add((0x0842 & 0x1F) << 3);
+
+            palGreyscale4bp1.Add((0x5AD6 & 0x1F) << 3);
+            palGreyscale4bp2.Add((0x0842 & 0x1F) << 3);
+
+            palGreyscale4bp1.Add(0);
+            palGreyscale4bp2.Add((0x318C & 0x1F) << 3);
+
+            palGreyscale4bp1.Add((0x0842 & 0x1F) << 3);
+            palGreyscale4bp2.Add((0x318C & 0x1F) << 3);
+
+            palGreyscale4bp1.Add((0x318C & 0x1F) << 3);
+            palGreyscale4bp2.Add((0x318C & 0x1F) << 3);
+
+            palGreyscale4bp1.Add((0x5AD6 & 0x1F) << 3);
+            palGreyscale4bp2.Add((0x318C & 0x1F) << 3);
+
+            palGreyscale4bp1.Add(0);
+            palGreyscale4bp2.Add((0x5AD6 & 0x1F) << 3);
+
+            palGreyscale4bp1.Add((0x0842 & 0x1F) << 3);
+            palGreyscale4bp2.Add((0x5AD6 & 0x1F) << 3);
+
+            palGreyscale4bp1.Add((0x318C & 0x1F) << 3);
+            palGreyscale4bp2.Add((0x5AD6 & 0x1F) << 3);
+
+            palGreyscale4bp1.Add((0x5AD6 & 0x1F) << 3);
+            palGreyscale4bp2.Add((0x5AD6 & 0x1F) << 3);
+
+            XmlDocument doc = new XmlDocument();
+            string[] impBinMap = File.ReadAllLines(@"G:\Study\MySelfProject\Hanhua\Dino1\fontImgInfo.txt", Encoding.UTF8);
+            for (int i = 0; i < impBinMap.Length; i += 2)
+            {
+                if (!File.Exists(impBinMap[i + 1].Replace("PS_jp", "PS_cn")))
+                {
+                    continue;
+                }
+
+                Bitmap image1 = null;
+                Bitmap image2 = null;
+                string folder = impBinMap[i + 1].Substring(0, impBinMap[i + 1].IndexOf(impBinMap[i])).Replace("PS_jp", "PS_cn");
+                string texName = Util.GetShortName(impBinMap[i + 1]);
+                string xmlPath = Path.Combine(folder + impBinMap[i], "manifest.xml");
+                doc.Load(xmlPath);
+                XmlNodeList nodes = doc.SelectNodes("/DinoCrisisPackage/Entry");
+                foreach (XmlNode node in nodes)
+                {
+                    if (texName.Equals(node.InnerText.Trim()))
+                    {
+                        image1 = new Bitmap(Convert.ToInt32(node.Attributes["w"].Value) * 4, Convert.ToInt32(node.Attributes["h"].Value));
+                        image2 = new Bitmap(Convert.ToInt32(node.Attributes["w"].Value) * 4, Convert.ToInt32(node.Attributes["h"].Value));
+                        break;
+                    }
+                }
+
+                byte[] byImg = File.ReadAllBytes(impBinMap[i + 1].Replace("PS_jp", "PS_cn"));
+                int imgIdx = 0;
+                for (int y = 0; y < image1.Height; y++)
+                {
+                    for (int x = 0; x < image1.Width; x += 2)
+                    {
+                        int curData = byImg[imgIdx++];
+                        image1.SetPixel(x, y, Color.FromArgb(palGreyscale4bp1[curData & 0xF], palGreyscale4bp1[curData & 0xF], palGreyscale4bp1[curData & 0xF]));
+                        image1.SetPixel(x + 1, y, Color.FromArgb(palGreyscale4bp1[(curData >> 4) & 0xF], palGreyscale4bp1[(curData >> 4) & 0xF], palGreyscale4bp1[(curData >> 4) & 0xF]));
+
+                        image2.SetPixel(x, y, Color.FromArgb(palGreyscale4bp2[curData & 0xF], palGreyscale4bp2[curData & 0xF], palGreyscale4bp2[curData & 0xF]));
+                        image2.SetPixel(x + 1, y, Color.FromArgb(palGreyscale4bp2[(curData >> 4) & 0xF], palGreyscale4bp2[(curData >> 4) & 0xF], palGreyscale4bp2[(curData >> 4) & 0xF]));
+                    }
+                }
+                image1.Save(@"G:\Study\MySelfProject\Hanhua\Dino1\Dino1FontPic\FontPicCn\test1\" + impBinMap[i] + ".png");
+                image2.Save(@"G:\Study\MySelfProject\Hanhua\Dino1\Dino1FontPic\FontPicCn\test2\" + impBinMap[i] + ".png");
+            }
+        }
+
+        private void btnImpCnText_Click(object sender, EventArgs e)
+        {
+            Dictionary<string, List<string>> cnFontChar = new Dictionary<string, List<string>>();
+            string[] allCnFontChar = File.ReadAllLines(@"G:\Study\MySelfProject\Hanhua\Dino1\dino1FontChar_cn.txt", Encoding.UTF8);
+            for (int i = 0; i < allCnFontChar.Length; i += 2)
+            {
+                List<string> curCnChars = new List<string>();
+                curCnChars.AddRange(allCnFontChar[i + 1].Split(','));
+                cnFontChar.Add(allCnFontChar[i].ToUpper(), curCnChars);
+            }
+
+            List<string> comnCnFontChars = cnFontChar["SLPS_021.80"];
+            List<string> cnFont80 = new List<string>();
+            List<string> cnFont81 = new List<string>();
+            for (int j = 0; j < comnCnFontChars.Count; j += 2)
+            {
+                cnFont80.Add(comnCnFontChars[j]);
+                if (j < comnCnFontChars.Count - 1)
+                {
+                    cnFont81.Add(comnCnFontChars[j + 1]);
+                }
+            }
+
+            string[] allCnFileInfo = File.ReadAllLines(@"G:\Study\MySelfProject\Hanhua\Dino1\textAddr.txt", Encoding.UTF8);
+            Dictionary<string, string> cnFileInfo = new Dictionary<string, string>();
+            for (int i = 0; i < allCnFileInfo.Length; i += 2)
+            {
+                if (allCnFileInfo[i].EndsWith(".bin", StringComparison.OrdinalIgnoreCase))
+                {
+                    string keyName = Util.GetShortName(allCnFileInfo[i].Substring(0, allCnFileInfo[i].Length - 7));
+                    cnFileInfo.Add(keyName.ToUpper(), allCnFileInfo[i] + " " + allCnFileInfo[i + 1]);
+                }
+                else
+                {
+                    string keyName = "SLPS_021.80";
+                    cnFileInfo.Add(keyName, allCnFileInfo[i] + " " + allCnFileInfo[i + 1]);
+                }
+            }
+
+            Microsoft.Office.Interop.Excel.Application xApp = null;
+            Microsoft.Office.Interop.Excel.Workbook xBook = null;
+            Microsoft.Office.Interop.Excel.Worksheet xSheet = null;
+            StringBuilder textErr = new StringBuilder();
+
+            try
+            {
+                // 创建Application对象 
+                xApp = new Microsoft.Office.Interop.Excel.ApplicationClass();
+
+                // 得到WorkBook对象, 打开已有的文件 
+                xBook = xApp.Workbooks._Open(
+                    @"G:\Study\MySelfProject\Hanhua\Dino1\allJpText.xlsx",
+                    Missing.Value, Missing.Value, Missing.Value, Missing.Value
+                    , Missing.Value, Missing.Value, Missing.Value, Missing.Value
+                    , Missing.Value, Missing.Value, Missing.Value, Missing.Value);
+
+                int lineNum = 1;
+                int blankNum = 0;
+                Dictionary<string, string> halfFullMap = new Dictionary<string, string>();
+                string halfStr = " 0123456789ABCDEFHIKLNOPRSVWm&/.";
+                string fullStr = "　０１２３４５６７８９ＡＢＣＤＥＦＨＩＫＬＮＯＰＲＳＶＷｍ＆／．";
+                for (int i = 0; i < fullStr.Length; i++)
+                {
+                    comnCnFontChars.Add(fullStr.Substring(i, 1));
+                    halfFullMap.Add(halfStr.Substring(i, 1), fullStr.Substring(i, 1));
+                }
+
+                string nextChar;
+                string currentChar;
+                StringBuilder keyWordsSb = new StringBuilder();
+                List<byte> byComnEntryInfo = new List<byte>();
+
+                // 取得相应的Sheet
+                for (int i = 1; i <= xBook.Sheets.Count; i++)
+                {
+                    xSheet = (Microsoft.Office.Interop.Excel.Worksheet)xBook.Sheets[i];
+                    string sheetName = xSheet.Name.ToUpper();
+                    List<string> curCnFontChars;
+                    if (sheetName.Equals("SLPS_021.80"))
+                    {
+                        curCnFontChars = cnFont80;
+                        byComnEntryInfo.Add(0);
+                        byComnEntryInfo.Add(0);
+                        byComnEntryInfo.Add(0);
+                        byComnEntryInfo.Add(0);
+                    }
+                    else
+                    {
+                        curCnFontChars = cnFontChar[sheetName];
+                    }
+
+                    string[] cnToFiles = cnFileInfo[sheetName].Split(' ');
+                    string updateCnFile = cnToFiles[0];
+                    byte[] byOldCnFile = File.ReadAllBytes(updateCnFile);
+                    int startPos = Convert.ToInt32(cnToFiles[1], 16);
+                    int endPos = byOldCnFile.Length;
+                    if (cnToFiles.Length > 2)
+                    {
+                        endPos = Convert.ToInt32(cnToFiles[2], 16);
+                    }
+                    int startTextPos = startPos;
+                    int endTextPos = endPos;
+                    if (sheetName.Equals("SLPS_021.80"))
+                    {
+                        startTextPos = endPos;
+                        endTextPos = Convert.ToInt32(cnToFiles[3], 16);
+                    }
+
+                    List<byte> byNewCnFile = new List<byte>();
+                    lineNum = 1;
+                    blankNum = 0;
+                    while (blankNum < 5)
+                    {
+                        string cnTxtValue = xSheet.get_Range("J" + lineNum, Missing.Value).Value2 as string;
+
+                        if (string.IsNullOrEmpty(cnTxtValue))
+                        {
+                            blankNum++;
+                        }
+                        else
+                        {
+                            blankNum = 0;
+                            for (int j = 0; j < cnTxtValue.Length; j++)
+                            {
+                                currentChar = cnTxtValue.Substring(j, 1);
+                                if ("^" == currentChar)
+                                {
+                                    // 关键字的解码
+                                    keyWordsSb.Length = 0;
+                                    while ((nextChar = cnTxtValue.Substring(++j, 1)) != "^")
+                                    {
+                                        keyWordsSb.Append(nextChar);
+                                    }
+
+                                    string keyWords = keyWordsSb.ToString();
+                                    for (int k = 0; k < keyWords.Length; k += 2)
+                                    {
+                                        string keyWord = keyWords.Substring(k, 2);
+                                        byNewCnFile.Add(Convert.ToByte(keyWord, 16));
+                                    }
+
+                                    continue;
+                                }
+                                else
+                                {
+                                    if (halfFullMap.ContainsKey(currentChar))
+                                    {
+                                        currentChar = halfFullMap[currentChar];
+                                    }
+
+                                    if (cnFont80.Contains(currentChar))
+                                    {
+                                        byNewCnFile.Add((byte)(cnFont80.IndexOf(currentChar)));
+                                        byNewCnFile.Add(0x80);
+                                    }
+                                    else if (cnFont81.Contains(currentChar))
+                                    {
+                                        byNewCnFile.Add((byte)(cnFont81.IndexOf(currentChar)));
+                                        byNewCnFile.Add(0x81);
+                                    }
+                                    else if (curCnFontChars.Contains(currentChar))
+                                    {
+                                        byNewCnFile.Add((byte)(curCnFontChars.IndexOf(currentChar)));
+                                        byNewCnFile.Add(0x82);
+                                    }
+                                    else
+                                    {
+                                        textErr.Append(sheetName).Append(" ").Append(currentChar).Append("\r\n");
+                                    }
+                                }
+                            }
+
+                            if (sheetName.Equals("SLPS_021.80"))
+                            {
+                                int curCnTextLen = byNewCnFile.Count / 2;
+                                byComnEntryInfo.Add((byte)((curCnTextLen >> 0) & 0xFF));
+                                byComnEntryInfo.Add((byte)((curCnTextLen >> 8) & 0xFF));
+                                byComnEntryInfo.Add((byte)((curCnTextLen >> 16) & 0xFF));
+                                byComnEntryInfo.Add((byte)((curCnTextLen >> 24) & 0xFF));
+                            }
+                        }
+
+                        lineNum++;
+                    }
+
+                    if (sheetName.Equals("SLPS_021.80"))
+                    {
+                        byte[] byEnrtyInfo = byComnEntryInfo.ToArray();
+                        Array.Copy(byEnrtyInfo, 0, byOldCnFile, startPos, byEnrtyInfo.Length);
+                    }
+
+                    // 判断是否超长
+                    int minLen = Math.Min(byNewCnFile.Count, endTextPos - startTextPos);
+                    if (byNewCnFile.Count != (endTextPos - startTextPos))
+                    {
+                        textErr.Append(sheetName).Append(" 文字个数不一致：").Append(byNewCnFile.Count - (endTextPos - startTextPos)).Append("\r\n");
+                    }
+
+                    Array.Clear(byOldCnFile, startTextPos, endTextPos - startTextPos);
+                    byte[] byImpCnFile = byNewCnFile.ToArray();
+                    Array.Copy(byImpCnFile, 0, byOldCnFile, startTextPos, minLen);
+
+                    File.WriteAllBytes(updateCnFile.Replace("PS_jp", "PS_cn"), byOldCnFile);
+                }
+            }
+            catch (Exception me)
+            {
+                MessageBox.Show(me.Message + "\r\n" + me.StackTrace);
+            }
+            finally
+            {
+                // 清空各种对象
+                xSheet = null;
+                xBook = null;
+                if (xApp != null)
+                {
+                    xApp.Quit();
+                    xApp = null;
+                }
+            }
+
+            File.WriteAllText(@"G:\Study\MySelfProject\Hanhua\Dino1\cnTextImpResult.txt", textErr.ToString(), Encoding.UTF8);
+        }
+
+        private void btnChkCnCount_Click(object sender, EventArgs e)
+        {
+            Microsoft.Office.Interop.Excel.Application xApp = null;
+            Microsoft.Office.Interop.Excel.Workbook xBook = null;
+            Microsoft.Office.Interop.Excel.Worksheet xSheet = null;
+
+            try
+            {
+                // 创建Application对象 
+                xApp = new Microsoft.Office.Interop.Excel.ApplicationClass();
+
+                // 得到WorkBook对象, 打开已有的文件 
+                xBook = xApp.Workbooks._Open(
+                    @"G:\Study\MySelfProject\Hanhua\Dino1\allJpText.xlsx",
+                    Missing.Value, Missing.Value, Missing.Value, Missing.Value
+                    , Missing.Value, Missing.Value, Missing.Value, Missing.Value
+                    , Missing.Value, Missing.Value, Missing.Value, Missing.Value);
+
+                int lineNum = 1;
+                int blankNum = 0;
+                Regex regex = new Regex(@"\^(.*?)\^");
+                // 取得相应的Sheet
+                for (int i = 1; i <= xBook.Sheets.Count; i++)
+                {
+                    xSheet = (Microsoft.Office.Interop.Excel.Worksheet)xBook.Sheets[i];
+                    if (xSheet.Name.Equals("SLPS_021.80"))
+                    {
+                        continue;
+                    }
+
+                    lineNum = 1;
+                    blankNum = 0;
+                    while (blankNum < 5)
+                    {
+                        string oldJpTxtValue = xSheet.get_Range("A" + lineNum, Missing.Value).Value2 as string;
+                        string oldCnTxtValue = xSheet.get_Range("J" + lineNum, Missing.Value).Value2 as string;
+
+                        if (string.IsNullOrEmpty(oldCnTxtValue))
+                        {
+                            blankNum++;
+                        }
+                        else
+                        {
+                            blankNum = 0;
+                            string cnTxtValue = Regex.Replace(oldCnTxtValue, @"\^.*?\^", "");
+                            string jpTxtValue = Regex.Replace(oldJpTxtValue, @"\^.*?\^", "");
+
+                            if (cnTxtValue.Length != 18 && oldCnTxtValue.Length != oldJpTxtValue.Length)
+                            {
+                                // 检查长度
+                                xSheet.Tab.Color = ColorTranslator.ToOle(Color.LightBlue);
+                                xSheet.get_Range("J" + lineNum, Missing.Value).Interior.Color = ColorTranslator.ToOle(Color.LightBlue);
+                            }
+                            else
+                            {
+                                // 检查关键字
+                                StringBuilder result = new StringBuilder();
+                                MatchCollection matches = regex.Matches(oldCnTxtValue);
+                                foreach (Match match in matches)
+                                {
+                                    if (match.Groups[1].Success)
+                                    {
+                                        result.Append(match.Groups[1].Value);
+                                    }
+                                }
+
+                                string cnKey = result.ToString();
+
+                                result.Length = 0;
+                                matches = regex.Matches(oldJpTxtValue);
+                                foreach (Match match in matches)
+                                {
+                                    if (match.Groups[1].Success)
+                                    {
+                                        result.Append(match.Groups[1].Value);
+                                    }
+                                }
+                                if (!cnKey.Equals(result.ToString()))
+                                {
+                                    xSheet.Tab.Color = ColorTranslator.ToOle(Color.LightYellow);
+                                    xSheet.get_Range("J" + lineNum, Missing.Value).Interior.Color = ColorTranslator.ToOle(Color.LightYellow);
+                                }
+                            }
+                        }
+
+                        lineNum++;
+                    }
+                }
+
+            }
+            catch (Exception me)
+            {
+                MessageBox.Show(me.Message + "\r\n" + me.StackTrace);
+            }
+            finally
+            {
+                xSheet.SaveAs(
+                    @"G:\Study\MySelfProject\Hanhua\Dino1\allJpText_CnCountChk.xlsx",
+                    Missing.Value, Missing.Value, Missing.Value, Missing.Value,
+                    Missing.Value, Missing.Value, Missing.Value, Missing.Value, Missing.Value);
+
+                // 清空各种对象
+                xSheet = null;
+                xBook = null;
+                if (xApp != null)
+                {
+                    xApp.Quit();
+                    xApp = null;
+                }
+            }
+        }
+
+        private void btnCompressFiles_Click(object sender, EventArgs e)
+        {
+            string[] allCnFileInfo = File.ReadAllLines(@"G:\Study\MySelfProject\Hanhua\Dino1\textAddr.txt", Encoding.UTF8);
+            
+            for (int i = 0; i < allCnFileInfo.Length; i += 2)
+            {
+                if (allCnFileInfo[i].EndsWith(".bin", StringComparison.OrdinalIgnoreCase))
+                {
+                    string folder = allCnFileInfo[i].Substring(0, allCnFileInfo[i].Length - 7).Replace("PS_jp", "PS_cn").ToUpper();
+                    this.CompressDatFile(folder);
+                }
+            }
+
+            MessageBox.Show("打包完成");
         }
 
     }
