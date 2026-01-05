@@ -562,8 +562,6 @@ namespace Hanhua.Common.TextEditTools.Dino
         /// </summary>
         private void SwizzleGfx(byte[] buf, DC2_ENTRY_GENERIC entry)
         {
-            ushort x = (ushort)(entry.reserve[0] & 0xFFFF);
-            ushort y = (ushort)((entry.reserve[0] >> 16) & 0xFFFF);
             ushort w = (ushort)(entry.reserve[1] & 0xFFFF);
             ushort h = (ushort)((entry.reserve[1] >> 16) & 0xFFFF);
 
@@ -1629,12 +1627,15 @@ namespace Hanhua.Common.TextEditTools.Dino
             List<string> comnCnFontChars = cnFontChar["SLPS_021.80"];
             List<string> cnFont80 = new List<string>();
             List<string> cnFont81 = new List<string>();
-            for (int j = 0; j < comnCnFontChars.Count; j += 2)
+            for (int j = 0; j < comnCnFontChars.Count; j++)
             {
-                cnFont80.Add(comnCnFontChars[j]);
-                if (j < comnCnFontChars.Count - 1)
+                if (cnFont80.Count < 256)
                 {
-                    cnFont81.Add(comnCnFontChars[j + 1]);
+                    cnFont80.Add(comnCnFontChars[j]);
+                }
+                else
+                {
+                    cnFont81.Add(comnCnFontChars[j]);
                 }
             }
 
@@ -1658,6 +1659,7 @@ namespace Hanhua.Common.TextEditTools.Dino
             Microsoft.Office.Interop.Excel.Workbook xBook = null;
             Microsoft.Office.Interop.Excel.Worksheet xSheet = null;
             StringBuilder textErr = new StringBuilder();
+            string updateCnFile = string.Empty;
 
             try
             {
@@ -1707,7 +1709,8 @@ namespace Hanhua.Common.TextEditTools.Dino
                     }
 
                     string[] cnToFiles = cnFileInfo[sheetName].Split(' ');
-                    string updateCnFile = cnToFiles[0];
+                    updateCnFile = cnToFiles[0];
+
                     byte[] byOldCnFile = File.ReadAllBytes(updateCnFile);
                     int startPos = Convert.ToInt32(cnToFiles[1], 16);
                     int endPos = byOldCnFile.Length;
@@ -1807,22 +1810,30 @@ namespace Hanhua.Common.TextEditTools.Dino
                     }
 
                     // 判断是否超长
-                    int minLen = Math.Min(byNewCnFile.Count, endTextPos - startTextPos);
+                    //int minLen = Math.Min(byNewCnFile.Count, endTextPos - startTextPos);
                     if (byNewCnFile.Count != (endTextPos - startTextPos))
                     {
+                        if (byNewCnFile.Count > (endTextPos - startTextPos))
+                        {
+                            Array.Resize(ref byOldCnFile, byOldCnFile.Length + (byNewCnFile.Count - (endTextPos - startTextPos)));
+                        }
                         textErr.Append(sheetName).Append(" 文字个数不一致：").Append(byNewCnFile.Count - (endTextPos - startTextPos)).Append("\r\n");
                     }
 
                     Array.Clear(byOldCnFile, startTextPos, endTextPos - startTextPos);
                     byte[] byImpCnFile = byNewCnFile.ToArray();
-                    Array.Copy(byImpCnFile, 0, byOldCnFile, startTextPos, minLen);
+                    Array.Copy(byImpCnFile, 0, byOldCnFile, startTextPos, byNewCnFile.Count);
 
                     File.WriteAllBytes(updateCnFile.Replace("PS_jp", "PS_cn"), byOldCnFile);
+                    if (textErr.Length > 0)
+                    {
+                        File.WriteAllText(@"G:\Study\MySelfProject\Hanhua\Dino1\impCnTextErr.txt", textErr.ToString(), Encoding.UTF8);
+                    }
                 }
             }
             catch (Exception me)
             {
-                MessageBox.Show(me.Message + "\r\n" + me.StackTrace);
+                MessageBox.Show(updateCnFile + "\r\n" + me.Message + "\r\n" + me.StackTrace);
             }
             finally
             {
@@ -1869,6 +1880,7 @@ namespace Hanhua.Common.TextEditTools.Dino
                         continue;
                     }
 
+                    xSheet.Tab.Color = ColorTranslator.ToOle(Color.Transparent);
                     lineNum = 1;
                     blankNum = 0;
                     while (blankNum < 5)
@@ -1886,11 +1898,13 @@ namespace Hanhua.Common.TextEditTools.Dino
                             string cnTxtValue = Regex.Replace(oldCnTxtValue, @"\^.*?\^", "");
                             string jpTxtValue = Regex.Replace(oldJpTxtValue, @"\^.*?\^", "");
 
-                            if (cnTxtValue.Length != 18 && oldCnTxtValue.Length != oldJpTxtValue.Length)
+                            xSheet.get_Range("J" + lineNum, Missing.Value).Interior.Color = ColorTranslator.ToOle(Color.Transparent);
+                            if (oldCnTxtValue.Length != oldJpTxtValue.Length)
                             {
                                 // 检查长度
                                 xSheet.Tab.Color = ColorTranslator.ToOle(Color.LightBlue);
                                 xSheet.get_Range("J" + lineNum, Missing.Value).Interior.Color = ColorTranslator.ToOle(Color.LightBlue);
+                                xSheet.get_Range("Q" + lineNum, Missing.Value).Value2 = oldJpTxtValue.Length + " " + oldCnTxtValue.Length;
                             }
                             else
                             {
@@ -1936,7 +1950,7 @@ namespace Hanhua.Common.TextEditTools.Dino
             finally
             {
                 xSheet.SaveAs(
-                    @"G:\Study\MySelfProject\Hanhua\Dino1\allJpText_CnCountChk.xlsx",
+                    @"G:\Study\MySelfProject\Hanhua\Dino1\allJpText.xlsx",
                     Missing.Value, Missing.Value, Missing.Value, Missing.Value,
                     Missing.Value, Missing.Value, Missing.Value, Missing.Value, Missing.Value);
 
@@ -1954,15 +1968,19 @@ namespace Hanhua.Common.TextEditTools.Dino
         private void btnCompressFiles_Click(object sender, EventArgs e)
         {
             string[] allCnFileInfo = File.ReadAllLines(@"G:\Study\MySelfProject\Hanhua\Dino1\textAddr.txt", Encoding.UTF8);
-            
+            string folder = string.Empty;
+
             for (int i = 0; i < allCnFileInfo.Length; i += 2)
             {
                 if (allCnFileInfo[i].EndsWith(".bin", StringComparison.OrdinalIgnoreCase))
                 {
-                    string folder = allCnFileInfo[i].Substring(0, allCnFileInfo[i].Length - 7).Replace("PS_jp", "PS_cn").ToUpper();
+                    folder = allCnFileInfo[i].Substring(0, allCnFileInfo[i].Length - 7).Replace("PS_jp", "PS_cn").ToUpper();
                     this.CompressDatFile(folder);
                 }
             }
+
+            folder = @"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\CORE";
+            this.CompressDatFile(folder);
 
             MessageBox.Show("打包完成");
         }
