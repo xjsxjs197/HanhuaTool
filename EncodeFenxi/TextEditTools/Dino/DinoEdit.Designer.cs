@@ -44,6 +44,8 @@
             this.btnImpCnText = new System.Windows.Forms.Button();
             this.btnChkCnCount = new System.Windows.Forms.Button();
             this.btnCompressFiles = new System.Windows.Forms.Button();
+            this.btnAddrTest = new System.Windows.Forms.Button();
+            this.btnUpdLba = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnViewDat
@@ -202,11 +204,33 @@
             this.btnCompressFiles.UseVisualStyleBackColor = true;
             this.btnCompressFiles.Click += new System.EventHandler(this.btnCompressFiles_Click);
             // 
+            // btnAddrTest
+            // 
+            this.btnAddrTest.Location = new System.Drawing.Point(484, 139);
+            this.btnAddrTest.Name = "btnAddrTest";
+            this.btnAddrTest.Size = new System.Drawing.Size(132, 28);
+            this.btnAddrTest.TabIndex = 16;
+            this.btnAddrTest.Text = "地址测试";
+            this.btnAddrTest.UseVisualStyleBackColor = true;
+            this.btnAddrTest.Click += new System.EventHandler(this.btnAddrTest_Click);
+            // 
+            // btnUpdLba
+            // 
+            this.btnUpdLba.Location = new System.Drawing.Point(622, 139);
+            this.btnUpdLba.Name = "btnUpdLba";
+            this.btnUpdLba.Size = new System.Drawing.Size(132, 28);
+            this.btnUpdLba.TabIndex = 17;
+            this.btnUpdLba.Text = "修改LBA地址";
+            this.btnUpdLba.UseVisualStyleBackColor = true;
+            this.btnUpdLba.Click += new System.EventHandler(this.btnUpdLba_Click);
+            // 
             // DinoEdit
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(906, 594);
+            this.Controls.Add(this.btnUpdLba);
+            this.Controls.Add(this.btnAddrTest);
             this.Controls.Add(this.btnCompressFiles);
             this.Controls.Add(this.btnChkCnCount);
             this.Controls.Add(this.btnImpCnText);
@@ -248,5 +272,7 @@
         private System.Windows.Forms.Button btnImpCnText;
         private System.Windows.Forms.Button btnChkCnCount;
         private System.Windows.Forms.Button btnCompressFiles;
+        private System.Windows.Forms.Button btnAddrTest;
+        private System.Windows.Forms.Button btnUpdLba;
     }
 }

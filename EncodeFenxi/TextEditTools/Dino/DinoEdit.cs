@@ -1790,7 +1790,7 @@ namespace Hanhua.Common.TextEditTools.Dino
                                 }
                             }
 
-                            if (sheetName.Equals("SLPS_021.80"))
+                            if (sheetName.Equals("SLPS_021.80") && cnTxtValue.EndsWith("^00A0^"))
                             {
                                 int curCnTextLen = byNewCnFile.Count / 2;
                                 byComnEntryInfo.Add((byte)((curCnTextLen >> 0) & 0xFF));
@@ -1828,6 +1828,11 @@ namespace Hanhua.Common.TextEditTools.Dino
                     if (textErr.Length > 0)
                     {
                         File.WriteAllText(@"G:\Study\MySelfProject\Hanhua\Dino1\impCnTextErr.txt", textErr.ToString(), Encoding.UTF8);
+                    }
+
+                    if (sheetName.Equals("SLPS_021.80"))
+                    {
+                        break;
                     }
                 }
             }
@@ -1969,6 +1974,7 @@ namespace Hanhua.Common.TextEditTools.Dino
         {
             string[] allCnFileInfo = File.ReadAllLines(@"G:\Study\MySelfProject\Hanhua\Dino1\textAddr.txt", Encoding.UTF8);
             string folder = string.Empty;
+            string outputDat = string.Empty;
 
             for (int i = 0; i < allCnFileInfo.Length; i += 2)
             {
@@ -1976,15 +1982,152 @@ namespace Hanhua.Common.TextEditTools.Dino
                 {
                     folder = allCnFileInfo[i].Substring(0, allCnFileInfo[i].Length - 7).Replace("PS_jp", "PS_cn").ToUpper();
                     this.CompressDatFile(folder);
+
+                    outputDat = folder + ".dat";
+                    File.Copy(outputDat, outputDat.Replace("PS_CN", @"mkpsxiso-2.20-win64\Dino\PSX\DATA"), true);
                 }
             }
 
             folder = @"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\CORE";
             this.CompressDatFile(folder);
 
+            outputDat = folder.ToUpper() + ".dat";
+            File.Copy(outputDat, outputDat.Replace("PS_CN", @"mkpsxiso-2.20-win64\Dino\PSX\DATA"), true);
+
             MessageBox.Show("打包完成");
         }
 
+        private void btnAddrTest_Click(object sender, EventArgs e)
+        {
+            Util.IsGetAllFile = true;
+            List<FilePosInfo> allDatFiles = Util.GetAllFiles(@"G:\Study\MySelfProject\Hanhua\Dino1\Ps_IsoJpBak\PSX").Where(p => !p.IsFolder).ToList();
+            byte[] keyBytes = new byte[4];
+            StringBuilder sb = new StringBuilder();
+            byte[] byLbaFile = File.ReadAllBytes(@"G:\Study\MySelfProject\Hanhua\Dino1\Ps_IsoJpBak\SLPS_021.80");
+            int startPos = 0x8172C;
+            foreach (FilePosInfo fileInfo in allDatFiles)
+            {
+                string jpFile = fileInfo.File;
+                FileInfo fi = new FileInfo(jpFile);
+                int fileSize = (int)fi.Length;
+
+                keyBytes[0] = (byte)((fileSize >> 0) & 0xFF);
+                keyBytes[1] = (byte)((fileSize >> 8) & 0xFF);
+                keyBytes[2] = (byte)((fileSize >> 16) & 0xFF);
+                keyBytes[3] = (byte)((fileSize >> 24) & 0xFF);
+
+                sb.Append(jpFile).Append("\r\n");
+                sb.Append(keyBytes[0].ToString("X2")).Append(" ");
+                sb.Append(keyBytes[1].ToString("X2")).Append(" ");
+                sb.Append(keyBytes[2].ToString("X2")).Append(" ");
+                sb.Append(keyBytes[3].ToString("X2")).Append(" ");
+                Search(startPos, byLbaFile, keyBytes, sb);
+
+                startPos += 12;
+            }
+
+            File.WriteAllText(@"G:\Study\MySelfProject\Hanhua\Dino1\LBAChk.txt", sb.ToString(), Encoding.UTF8);
+        }
+
+        private bool Search(int startPos, byte[] byData, byte[] keyBytes, StringBuilder sb)
+        {
+            // 二进制检索
+            bool findedKey = true;
+            int maxLen = byData.Length - 12;
+
+            for (int j = startPos + 4; j < maxLen; j += 12)
+            {
+                if (byData[j] == keyBytes[0])
+                {
+                    findedKey = true;
+                    for (int i = 1; i < keyBytes.Length; i++)
+                    {
+                        if (byData[j + i] != keyBytes[i])
+                        {
+                            findedKey = false;
+                            break;
+                        }
+                    }
+
+                    if (findedKey)
+                    {
+                        if (j == (startPos + 4))
+                        {
+                            sb.Append(j.ToString("X")).Append(" OK");
+                        }
+                        else
+                        {
+                            sb.Append(j.ToString("X")).Append(" NG");
+                        }
+                        
+                        j += keyBytes.Length - 1;
+                        break;
+                    }
+                }
+            }
+            sb.Append("\r\n");
+
+            return true;
+        }
+
+        private void btnUpdLba_Click(object sender, EventArgs e)
+        {
+            List<FilePosInfo> allCnDat = Util.GetAllFiles(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn").Where(p => !p.IsFolder && p.File.EndsWith(".dat", StringComparison.OrdinalIgnoreCase)).ToList();
+
+            byte[] bySlps = File.ReadAllBytes(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\SLPS_021.80_Old");
+            string[] allAddrInfo = File.ReadAllLines(@"G:\Study\MySelfProject\Hanhua\Dino1\LBAChk.txt", Encoding.UTF8);
+            bool startChgPos = false;
+            int sectorDiff = 0;
+            int totalDiff = 0;
+            string[] allXmlLine = File.ReadAllLines(@"G:\Study\MySelfProject\Hanhua\Dino1\mkpsxiso-2.20-win64\NewDino1.xml", Encoding.UTF8);
+
+            for (int i = 0; i < allAddrInfo.Length; i += 2)
+            {
+                if (allAddrInfo[i].EndsWith(".dat", StringComparison.OrdinalIgnoreCase) || startChgPos)
+                {
+                    string datName = Util.GetShortName(allAddrInfo[i]);
+                    string[] allSizeInfo = allAddrInfo[i + 1].Split(' ');
+                    int oldSizePos = Convert.ToInt32(allSizeInfo[4], 16);
+                    int sizeInfo = (Convert.ToInt32(allSizeInfo[3], 16) << 24) +
+                        (Convert.ToInt32(allSizeInfo[2], 16) << 16) +
+                        (Convert.ToInt32(allSizeInfo[1], 16) << 8) +
+                        (Convert.ToInt32(allSizeInfo[0], 16) << 0);
+
+                    int startSector = (bySlps[oldSizePos - 4] << 0) + (bySlps[oldSizePos - 3] << 8) + (bySlps[oldSizePos - 2] << 16) + (bySlps[oldSizePos - 1] << 24);
+                    sectorDiff = 0;
+
+                    FilePosInfo curCnDat = allCnDat.FirstOrDefault(p => p.File.EndsWith(datName, StringComparison.OrdinalIgnoreCase));
+                    if (curCnDat != null)
+                    {
+                        FileInfo fi = new FileInfo(curCnDat.File);
+                        if (fi.Length != sizeInfo)
+                        {
+                            sectorDiff = (((int)fi.Length + 2047) / 2048) - ((sizeInfo + 2047) / 2048);
+                            startChgPos = true;
+                            sizeInfo = (int)fi.Length;
+                        }
+                    }
+
+                    if (startChgPos)
+                    {
+                        startSector += totalDiff;
+                        bySlps[oldSizePos - 4] = (byte)((startSector >> 0) & 0xFF);
+                        bySlps[oldSizePos - 3] = (byte)((startSector >> 8) & 0xFF);
+                        bySlps[oldSizePos - 2] = (byte)((startSector >> 16) & 0xFF);
+                        bySlps[oldSizePos - 1] = (byte)((startSector >> 24) & 0xFF);
+
+                        bySlps[oldSizePos + 0] = (byte)((sizeInfo >> 0) & 0xFF);
+                        bySlps[oldSizePos + 1] = (byte)((sizeInfo >> 8) & 0xFF);
+                        bySlps[oldSizePos + 2] = (byte)((sizeInfo >> 16) & 0xFF);
+                        bySlps[oldSizePos + 3] = (byte)((sizeInfo >> 24) & 0xFF);
+
+                        totalDiff += sectorDiff;
+                    }
+                }
+            }
+
+            File.WriteAllBytes(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\SLPS_021.80", bySlps);
+        }
     }
 
     public enum GEntryType
