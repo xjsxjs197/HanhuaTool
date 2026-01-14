@@ -88,6 +88,11 @@ namespace Hanhua.Common
         public int YPadding { get; set; }
 
         /// <summary>
+        /// 文字位置微调
+        /// </summary>
+        public float YMarging { get; set; }
+
+        /// <summary>
         /// 文字对齐信息
         /// </summary>
         public StringFormat Sf { get; set; }

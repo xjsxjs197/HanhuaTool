@@ -754,26 +754,26 @@ namespace Hanhua.Common.TextEditTools.RfoEdit
         /// <param name="e"></param>
         private void btnTest_Click(object sender, EventArgs e)
         {
-            byte[] by00529 = File.ReadAllBytes(this.baseFolder + @"00529Old.bin");
-            int tmpPos = 0xa;
-            StringBuilder sb = new StringBuilder();
+            //byte[] by00529 = File.ReadAllBytes(this.baseFolder + @"00529Old.bin");
+            //int tmpPos = 0xa;
+            //StringBuilder sb = new StringBuilder();
 
-            while (by00529[tmpPos + 2] == 0 && by00529[tmpPos + 3] == 0)
-            {
-                tmpPos += 12;
-                continue;
-            }
+            //while (by00529[tmpPos + 2] == 0 && by00529[tmpPos + 3] == 0)
+            //{
+            //    tmpPos += 12;
+            //    continue;
+            //}
 
-            for (int i = 0; i < 18; i++)
-            {
-                int tmp = ((by00529[tmpPos + 0] << 8) + by00529[tmpPos + 1]);
-                sb.Append(Encoding.BigEndianUnicode.GetString(by00529, tmpPos, 2)).Append(tmp.ToString("X")).Append(" ");
-                tmpPos += 12;
-            }
-            tmpPos = 0;
+            //for (int i = 0; i < 18; i++)
+            //{
+            //    int tmp = ((by00529[tmpPos + 0] << 8) + by00529[tmpPos + 1]);
+            //    sb.Append(Encoding.BigEndianUnicode.GetString(by00529, tmpPos, 2)).Append(tmp.ToString("X")).Append(" ");
+            //    tmpPos += 12;
+            //}
+            //tmpPos = 0;
 
-            //string[] allLines = File.ReadAllLines(this.baseFolder + @"CnTxtBak\cnTxt01718_All20240418.txt", Encoding.UTF8);
-            //string[] allLinesJp = File.ReadAllLines(this.baseFolder + @"jpTxt01718ImpChk3.txt", Encoding.UTF8);
+            //string[] allLines = File.ReadAllLines(this.baseFolder + @"cnTxt00905.txt", Encoding.UTF8);
+            //string[] allLinesJp = File.ReadAllLines(this.baseFolder + @"jpTxt00905_20250604.txt", Encoding.UTF8);
             //StringBuilder sbCn = new StringBuilder();
             //StringBuilder sbJp = new StringBuilder();
             //for (int i = 0; i < allLines.Length; i += 2)
@@ -782,7 +782,7 @@ namespace Hanhua.Common.TextEditTools.RfoEdit
             //    string curLineJp = allLinesJp[i].Trim();
             //    if (string.IsNullOrEmpty(curLine))
             //    {
-            //        MessageBox.Show("当前行未空！" + (i + 1));
+            //        MessageBox.Show("当前行为空！" + (i + 1));
             //        break;
             //    }
 
@@ -791,70 +791,72 @@ namespace Hanhua.Common.TextEditTools.RfoEdit
 
             //    if (lines[0] != linesJp[0] || lines[1] != linesJp[1])
             //    {
-            //        MessageBox.Show("地址不一致 " + lines[0]);
+            //        //MessageBox.Show("地址不一致 " + lines[0]);
+            //        sbCn.Append(curLine).Append("\r\n");
+            //        sbCn.Append(curLineJp).Append("\r\n\r\n");
             //    }
 
-            //    int curLineLen = Convert.ToInt32(lines[1]);
-            //    int curLineLenJp = Convert.ToInt32(linesJp[1]);
+            //    //int curLineLen = Convert.ToInt32(lines[1]);
+            //    //int curLineLenJp = Convert.ToInt32(linesJp[1]);
 
-            //    if (curLineLen > curLineLenJp)
-            //    {
-            //        sbCn.Append("============").Append("\r\n");
-            //        sbJp.Append("============").Append("\r\n");
-            //    }
-            //    sbCn.Append(curLine).Append("\r\n\r\n");
-            //    sbJp.Append(curLineJp).Append("\r\n\r\n");
+            //    //if (curLineLen > curLineLenJp)
+            //    //{
+            //    //    sbCn.Append("============").Append("\r\n");
+            //    //    sbJp.Append("============").Append("\r\n");
+            //    //}
+            //    //sbCn.Append(curLine).Append("\r\n\r\n");
+            //    //sbJp.Append(curLineJp).Append("\r\n\r\n");
             //}
 
-            //File.WriteAllText(this.baseFolder + @"cnTxt01718ImpChk2.txt", sbCn.ToString(), Encoding.UTF8);
+            //File.WriteAllText(this.baseFolder + @"cnTxt00905ImpChk2016.txt", sbCn.ToString(), Encoding.UTF8);
             //File.WriteAllText(this.baseFolder + @"jpTxt01718ImpChk2.txt", sbJp.ToString(), Encoding.UTF8);
 
             //MessageBox.Show("OK");
             //File.WriteAllText(this.baseFolder + @"cnTxt01718LenChk.txt", sb.ToString(), Encoding.UTF8);
 
-            //byte[] byCnTxt = File.ReadAllBytes(this.baseFolder + @"01718.bin");
-            //byte[] byJpTxt = File.ReadAllBytes(this.baseFolder + @"01718Old.bin");
-            //StringBuilder sb = new StringBuilder();
+            byte[] byCnTxt = File.ReadAllBytes(this.baseFolder + @"01718.bin");
+            byte[] byJpTxt = File.ReadAllBytes(this.baseFolder + @"01718Old.bin");
+            StringBuilder sb = new StringBuilder();
 
 
             // 先取得所有区域文本映射表信息
-            //for (int i = 0x18; i < 0xE8; i += 8)
-            //{
-            //    int txtAreaStartPos = Util.GetOffset(byCnTxt, i, i + 3) + 0xE8;
-            //    int txtAreaSizePos = txtAreaStartPos + Util.GetOffset(byCnTxt, txtAreaStartPos + 4, txtAreaStartPos + 4 + 3);
+            for (int i = 0x18; i < 0xE8; i += 8)
+            {
+                int txtAreaStartPos = Util.GetOffset(byCnTxt, i, i + 3) + 0xE8;
+                int txtAreaSizePos = txtAreaStartPos + Util.GetOffset(byCnTxt, txtAreaStartPos + 4, txtAreaStartPos + 4 + 3);
 
-            //    int txtAreaStrCount = Util.GetOffset(byCnTxt, txtAreaSizePos - 16, txtAreaSizePos - 16 + 3);
-            //    int txtAresMinPos = txtAreaStartPos + Util.GetOffset(byCnTxt, txtAreaSizePos, txtAreaSizePos + 3);
+                int txtAreaStrCount = Util.GetOffset(byCnTxt, txtAreaSizePos - 16, txtAreaSizePos - 16 + 3);
+                int txtAresMinPos = txtAreaStartPos + Util.GetOffset(byCnTxt, txtAreaSizePos, txtAreaSizePos + 3);
 
-            //    this.DecodeCnTxt(byCnTxt, txtAresMinPos, sb);
-            //    this.DecodeCnTxt(byCnTxt, txtAreaStartPos + Util.GetOffset(byCnTxt, txtAreaSizePos + 4, txtAreaSizePos + 7), sb);
-            //    this.DecodeCnTxt(byCnTxt, txtAreaStartPos + Util.GetOffset(byCnTxt, txtAreaSizePos + 8, txtAreaSizePos + 11), sb);
-            //    this.DecodeCnTxt(byCnTxt, txtAreaStartPos + Util.GetOffset(byCnTxt, txtAreaSizePos + 12, txtAreaSizePos + 15), sb);
-            //    for (int j = 4; j < txtAreaStrCount; j++)
-            //    {
-            //        //if ((txtAreaStartPos + j * 4 + 3) < byCnTxt.Length)
-            //        //{
-            //        //    this.DecodeCnTxt(byCnTxt, txtAreaStartPos + Util.GetOffset(byCnTxt, txtAreaStartPos + j * 4, txtAreaStartPos + j * 4 + 3), sb);
-            //        //}
-            //        //else
-            //        //{
-            //        //    sb.Append("发生错误\r\n\r\n");
-            //        //}
-            //        try
-            //        {
-            //            this.DecodeCnTxt(byCnTxt, txtAreaStartPos + Util.GetOffset(byCnTxt, txtAreaStartPos + j * 4, txtAreaStartPos + j * 4 + 3), sb);
-            //        }
-            //        catch (Exception exp)
-            //        {
-            //            sb.Append("发生错误 ").Append(txtAreaStartPos.ToString("X").ToUpper().PadLeft(8, '0')).Append("\r\n\r\n");
-            //            break;
-            //        }
-            //    }
+                this.DecodeCnTxt(byCnTxt, txtAresMinPos, sb);
+                this.DecodeCnTxt(byCnTxt, txtAreaStartPos + Util.GetOffset(byCnTxt, txtAreaSizePos + 4, txtAreaSizePos + 7), sb);
+                this.DecodeCnTxt(byCnTxt, txtAreaStartPos + Util.GetOffset(byCnTxt, txtAreaSizePos + 8, txtAreaSizePos + 11), sb);
+                this.DecodeCnTxt(byCnTxt, txtAreaStartPos + Util.GetOffset(byCnTxt, txtAreaSizePos + 12, txtAreaSizePos + 15), sb);
+                for (int j = 4; j < txtAreaStrCount; j++)
+                {
+                    //if ((txtAreaStartPos + j * 4 + 3) < byCnTxt.Length)
+                    //{
+                    //    this.DecodeCnTxt(byCnTxt, txtAreaStartPos + Util.GetOffset(byCnTxt, txtAreaStartPos + j * 4, txtAreaStartPos + j * 4 + 3), sb);
+                    //}
+                    //else
+                    //{
+                    //    sb.Append("发生错误\r\n\r\n");
+                    //}
+                    try
+                    {
+                        this.DecodeCnTxt(byCnTxt, txtAreaStartPos + Util.GetOffset(byCnTxt, txtAreaStartPos + j * 4, txtAreaStartPos + j * 4 + 3), sb);
+                    }
+                    catch (Exception exp)
+                    {
+                        sb.Append("发生错误 ").Append(txtAreaStartPos.ToString("X").ToUpper().PadLeft(8, '0')).Append("\r\n\r\n");
+                        break;
+                    }
+                }
 
-            //    //sb.Append("==============================\r\n\r\n");
-            //}
+                sb.Append("==============================\r\n\r\n");
+            }
 
-            //File.WriteAllText(this.baseFolder + @"cnTxt01718ImpChk.txt", sb.ToString(), Encoding.UTF8);
+            File.WriteAllText(this.baseFolder + @"cnTxt01718ImpChk2016.txt", sb.ToString(), Encoding.UTF8);
 
             //byte[] by00530 = File.ReadAllBytes(this.baseFolder + @"00530Old.bin");
 
@@ -913,6 +915,20 @@ namespace Hanhua.Common.TextEditTools.RfoEdit
             testBmp = Util.PaletteImageDecode(testBmp, byImg, "C8_CI8", byPalette, 2);
 
             testBmp.Save(this.baseFolder + @"rfo\rfo\PicHanhua\Special\SpecialOldChk\" + fileName + "_" + imgIdx + ".png");
+        }
+
+        private void CheckTmpPic2(int idx, byte[] byTmp, int width, int height, string fileName)
+        {
+            byte[] byImg = new byte[width * height];
+            Array.Copy(byTmp, idx, byImg, 0, byImg.Length);
+
+            byte[] byPalette = new byte[512];
+            Array.Copy(byTmp, idx + width * height, byPalette, 0, byPalette.Length);
+
+            Bitmap testBmp = new Bitmap(width, height);
+            testBmp = Util.PaletteImageDecode(testBmp, byImg, "C8_CI8", byPalette, 2);
+
+            testBmp.Save(this.baseFolder + @"Font\1410PicCnChk\" + fileName + ".png");
         }
 
         private void CheckTmpPicI4(int startPos, byte[] byTmp, int maxImgIdx, int width, int height, string fileName)
@@ -1032,6 +1048,13 @@ namespace Hanhua.Common.TextEditTools.RfoEdit
         private void btnExpSpecialImg_Click(object sender, EventArgs e)
         {
             byte[] byTmp;
+            for (int i = 01391; i <= 01455; i++)
+            {
+                string fileName = i.ToString().PadLeft(5, '0');
+                byTmp = File.ReadAllBytes(this.baseFolder + @"Font\1410Cn\" + fileName + ".bin");
+                this.CheckTmpPic2(0x60, byTmp, 432, 136, fileName);
+            }
+
             //byTmp = File.ReadAllBytes(this.baseFolder + @"rfo\rfo\PicHanhua\OKBin\01467.bin"); // OK
             //this.CheckTmpPic(0x2A0, byTmp, 0, 0xB0, 0x20, "01467");
             //this.CheckTmpPic(0x1AA0, byTmp, 1, 0xB0, 0x20, "01467");
@@ -1125,11 +1148,11 @@ namespace Hanhua.Common.TextEditTools.RfoEdit
             //byTmp = File.ReadAllBytes(this.baseFolder + @"rfo\rfo\RUNEFACTORY\01610.bin");
             //this.CheckTmpPic(0x7E0, byTmp, 0, 0x28, 0x28, "01610");
 
-            byTmp = File.ReadAllBytes(this.baseFolder + @"rfo\rfo\PicHanhua\OKBin\01582.bin");
-            this.CheckTmpC4CI4_2(0x120, byTmp, 0, 0x68, 0x18, "01582");
-            this.CheckTmpC4CI4_2(0x620, byTmp, 1, 0x68, 0x18, "01582");
-            this.CheckTmpC4CI4_2(0xB20, byTmp, 2, 0x68, 0x18, "01582");
-            this.CheckTmpC4CI4_2(0x1020, byTmp, 3, 0x68, 0x18, "01582");
+            //byTmp = File.ReadAllBytes(this.baseFolder + @"rfo\rfo\PicHanhua\OKBin\01582.bin");
+            //this.CheckTmpC4CI4_2(0x120, byTmp, 0, 0x68, 0x18, "01582");
+            //this.CheckTmpC4CI4_2(0x620, byTmp, 1, 0x68, 0x18, "01582");
+            //this.CheckTmpC4CI4_2(0xB20, byTmp, 2, 0x68, 0x18, "01582");
+            //this.CheckTmpC4CI4_2(0x1020, byTmp, 3, 0x68, 0x18, "01582");
         }
 
         /// <summary>
@@ -1139,7 +1162,25 @@ namespace Hanhua.Common.TextEditTools.RfoEdit
         /// <param name="e"></param>
         private void btnImpSpecialImg_Click(object sender, EventArgs e)
         {
-            byte[] byTmp;
+            byte[] byBin;
+            List<byte> byPalette = new List<byte>();
+            for (int i = 01391; i <= 01455; i++)
+            {
+                string fileName = i.ToString().PadLeft(5, '0');
+                byBin = File.ReadAllBytes(this.baseFolder + @"Font\1410Jp\" + fileName + ".bin");
+
+                Bitmap testBmp = (Bitmap)Bitmap.FromFile(this.baseFolder + @"Font\1410PicCnReduce\" + fileName.Substring(1) + ".png");
+                byPalette.Clear();
+                byte[] byImg = Util.PaletteImageEncode(testBmp, "C8_CI8", byPalette, 2);
+
+                Array.Copy(byImg, 0, byBin, 0x60, byImg.Length);
+
+                byte[] impPalette = byPalette.ToArray();
+                Array.Copy(impPalette, 0, byBin, 0xe5e0, impPalette.Length);
+
+                File.WriteAllBytes(this.baseFolder + @"Font\1410Cn\" + fileName + ".bin", byBin);
+            }
+
             //byTmp = File.ReadAllBytes(this.baseFolder + @"rfo\rfo\RUNEFACTORY\01367.bin");
             //this.ImportTmpPicI4(0x120, byTmp, 5, "01367");
 

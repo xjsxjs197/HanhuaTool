@@ -14,6 +14,11 @@ namespace Hanhua.Common
     public class ImgUtil
     {
         /// <summary>
+        /// 是否需要取得所有文件
+        /// </summary>
+        public static int DrawImgType = 0;
+
+        /// <summary>
         /// 取得字库列表
         /// </summary>
         /// <returns>字库列表</returns>
@@ -67,6 +72,19 @@ namespace Hanhua.Common
         }
 
         /// <summary>
+        /// 将文字写入小块图片
+        /// </summary>
+        /// <param name="imgInfo">写文字需要的信息</param>
+        public static void WriteTextBlockImgF(ImgInfo imgInfo)
+        {
+            imgInfo.Grp.DrawString(imgInfo.CharTxt, new Font(new FontFamily(imgInfo.FontName), imgInfo.FontSize, imgInfo.FontStyle), imgInfo.Brush,
+                new RectangleF(imgInfo.PosX + imgInfo.XPadding,
+                    imgInfo.PosY + imgInfo.YPadding + imgInfo.YMarging,
+                    imgInfo.BlockImgW - imgInfo.XPadding,
+                    imgInfo.BlockImgH - imgInfo.YPadding));
+        }
+
+        /// <summary>
         /// 写字库图片
         /// </summary>
         /// <param name="imgInfo">图片信息</param>
@@ -103,7 +121,18 @@ namespace Hanhua.Common
                 imgInfo.PosY = (i / xNum) * imgInfo.BlockImgH;
 
                 // 生成当前块图片
-                ImgUtil.WriteBlockImg(imgInfo);
+                if (ImgUtil.DrawImgType == 0)
+                {
+                    ImgUtil.WriteBlockImg(imgInfo);
+                }
+                else if (ImgUtil.DrawImgType == 1)
+                {
+                    ImgUtil.WriteTextBlockImg(imgInfo);
+                }
+                else
+                {
+                    ImgUtil.WriteTextBlockImgF(imgInfo);
+                }
             }
 
             return imgInfo.Bmp;

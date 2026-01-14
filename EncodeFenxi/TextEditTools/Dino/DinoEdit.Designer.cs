@@ -46,6 +46,7 @@
             this.btnCompressFiles = new System.Windows.Forms.Button();
             this.btnAddrTest = new System.Windows.Forms.Button();
             this.btnUpdLba = new System.Windows.Forms.Button();
+            this.btnTestOtherPic = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnViewDat
@@ -224,11 +225,22 @@
             this.btnUpdLba.UseVisualStyleBackColor = true;
             this.btnUpdLba.Click += new System.EventHandler(this.btnUpdLba_Click);
             // 
+            // btnTestOtherPic
+            // 
+            this.btnTestOtherPic.Location = new System.Drawing.Point(762, 139);
+            this.btnTestOtherPic.Name = "btnTestOtherPic";
+            this.btnTestOtherPic.Size = new System.Drawing.Size(132, 28);
+            this.btnTestOtherPic.TabIndex = 18;
+            this.btnTestOtherPic.Text = "测试其他图片";
+            this.btnTestOtherPic.UseVisualStyleBackColor = true;
+            this.btnTestOtherPic.Click += new System.EventHandler(this.btnTestOtherPic_Click);
+            // 
             // DinoEdit
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(906, 594);
+            this.Controls.Add(this.btnTestOtherPic);
             this.Controls.Add(this.btnUpdLba);
             this.Controls.Add(this.btnAddrTest);
             this.Controls.Add(this.btnCompressFiles);
@@ -274,5 +286,6 @@
         private System.Windows.Forms.Button btnCompressFiles;
         private System.Windows.Forms.Button btnAddrTest;
         private System.Windows.Forms.Button btnUpdLba;
+        private System.Windows.Forms.Button btnTestOtherPic;
     }
 }
