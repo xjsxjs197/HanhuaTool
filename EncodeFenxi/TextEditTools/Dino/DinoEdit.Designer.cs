@@ -47,6 +47,8 @@
             this.btnAddrTest = new System.Windows.Forms.Button();
             this.btnUpdLba = new System.Windows.Forms.Button();
             this.btnTestOtherPic = new System.Windows.Forms.Button();
+            this.btnMyTest = new System.Windows.Forms.Button();
+            this.chkOnlyComn = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // btnViewDat
@@ -235,11 +237,33 @@
             this.btnTestOtherPic.UseVisualStyleBackColor = true;
             this.btnTestOtherPic.Click += new System.EventHandler(this.btnTestOtherPic_Click);
             // 
+            // btnMyTest
+            // 
+            this.btnMyTest.Location = new System.Drawing.Point(307, 22);
+            this.btnMyTest.Name = "btnMyTest";
+            this.btnMyTest.Size = new System.Drawing.Size(132, 28);
+            this.btnMyTest.TabIndex = 19;
+            this.btnMyTest.Text = "测试";
+            this.btnMyTest.UseVisualStyleBackColor = true;
+            this.btnMyTest.Click += new System.EventHandler(this.btnMyTest_Click);
+            // 
+            // chkOnlyComn
+            // 
+            this.chkOnlyComn.AutoSize = true;
+            this.chkOnlyComn.Location = new System.Drawing.Point(784, 29);
+            this.chkOnlyComn.Name = "chkOnlyComn";
+            this.chkOnlyComn.Size = new System.Drawing.Size(84, 16);
+            this.chkOnlyComn.TabIndex = 20;
+            this.chkOnlyComn.Text = "只导入共通";
+            this.chkOnlyComn.UseVisualStyleBackColor = true;
+            // 
             // DinoEdit
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(906, 594);
+            this.Controls.Add(this.chkOnlyComn);
+            this.Controls.Add(this.btnMyTest);
             this.Controls.Add(this.btnTestOtherPic);
             this.Controls.Add(this.btnUpdLba);
             this.Controls.Add(this.btnAddrTest);
@@ -287,5 +311,7 @@
         private System.Windows.Forms.Button btnAddrTest;
         private System.Windows.Forms.Button btnUpdLba;
         private System.Windows.Forms.Button btnTestOtherPic;
+        private System.Windows.Forms.Button btnMyTest;
+        private System.Windows.Forms.CheckBox chkOnlyComn;
     }
 }

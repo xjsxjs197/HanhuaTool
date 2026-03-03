@@ -1007,7 +1007,7 @@ namespace Hanhua.Common
                     intRed = imageByte[blockStartNum + (blockPosIdx * 2) + 1];
                     intGreen = imageByte[blockStartNum + (blockPosIdx * 2) + 32];
                     intBlue = imageByte[blockStartNum + (blockPosIdx * 2) + 33];
-                    return Color.FromArgb(intAlpha, intBlue, intGreen, intRed);
+                    return Color.FromArgb(intAlpha, intRed, intGreen, intBlue);
 
                 case "C4_CI4":
                     if (pixelNum % 2 == 0)

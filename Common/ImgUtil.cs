@@ -18,6 +18,8 @@ namespace Hanhua.Common
         /// </summary>
         public static int DrawImgType = 0;
 
+        private static int AddXMarggin = 0;
+
         /// <summary>
         /// 取得字库列表
         /// </summary>
@@ -46,16 +48,23 @@ namespace Hanhua.Common
                 new FontFamily(imgInfo.FontName),
                 (int)imgInfo.FontStyle, 
                 imgInfo.FontSize,
-                new Rectangle(imgInfo.PosX + imgInfo.XPadding, 
-                    imgInfo.PosY + imgInfo.YPadding,
+                new Rectangle(imgInfo.PosX + imgInfo.XPadding,
+                    imgInfo.PosY + imgInfo.YPadding + (int)imgInfo.YMarging,
                     imgInfo.BlockImgW - imgInfo.XPadding, 
                     imgInfo.BlockImgH - imgInfo.YPadding), 
                 imgInfo.Sf);
-            imgInfo.Grp.FillPath(imgInfo.Brush, graphPath);
+            //imgInfo.Grp.FillPath(imgInfo.Brush, graphPath);
             if (imgInfo.NeedBorder)
             {
                 imgInfo.Grp.DrawPath(imgInfo.Pen, graphPath);
             }
+            imgInfo.Grp.FillPath(imgInfo.Brush, graphPath);
+
+            //GraphicsPath outline = (GraphicsPath)graphPath.Clone();
+            //outline.Widen(imgInfo.Pen);
+
+            //imgInfo.Grp.FillPath(Brushes.Gray, outline);
+            //imgInfo.Grp.FillPath(imgInfo.Brush, graphPath);
         }
 
         /// <summary>
@@ -64,7 +73,7 @@ namespace Hanhua.Common
         /// <param name="imgInfo">写文字需要的信息</param>
         public static void WriteTextBlockImg(ImgInfo imgInfo)
         {
-            imgInfo.Grp.DrawString(imgInfo.CharTxt, new Font(new FontFamily(imgInfo.FontName), imgInfo.FontSize, imgInfo.FontStyle), imgInfo.Brush, 
+            imgInfo.Grp.DrawString(imgInfo.CharTxt, new Font(new FontFamily(imgInfo.FontName), imgInfo.FontSize, imgInfo.FontStyle, GraphicsUnit.Pixel), imgInfo.Brush, 
                 new Rectangle(imgInfo.PosX + imgInfo.XPadding,
                     imgInfo.PosY + imgInfo.YPadding,
                     imgInfo.BlockImgW - imgInfo.XPadding,
@@ -77,11 +86,18 @@ namespace Hanhua.Common
         /// <param name="imgInfo">写文字需要的信息</param>
         public static void WriteTextBlockImgF(ImgInfo imgInfo)
         {
-            imgInfo.Grp.DrawString(imgInfo.CharTxt, new Font(new FontFamily(imgInfo.FontName), imgInfo.FontSize, imgInfo.FontStyle), imgInfo.Brush,
-                new RectangleF(imgInfo.PosX + imgInfo.XPadding,
+            //imgInfo.Grp.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceOver;
+            imgInfo.Grp.DrawString(imgInfo.CharTxt, new Font(new FontFamily(imgInfo.FontName), imgInfo.FontSize, imgInfo.FontStyle, GraphicsUnit.Pixel), imgInfo.OutPathBrush,
+                new RectangleF(imgInfo.PosX + imgInfo.XPadding + ImgUtil.AddXMarggin,
                     imgInfo.PosY + imgInfo.YPadding + imgInfo.YMarging,
                     imgInfo.BlockImgW - imgInfo.XPadding,
                     imgInfo.BlockImgH - imgInfo.YPadding));
+
+            //imgInfo.Grp.DrawString(imgInfo.CharTxt, new Font(new FontFamily(imgInfo.FontName), imgInfo.FontSize, FontStyle.Regular, GraphicsUnit.Pixel), imgInfo.Brush,
+            //    new RectangleF(imgInfo.PosX + imgInfo.XPadding + ImgUtil.AddXMarggin,
+            //        imgInfo.PosY + imgInfo.YPadding + imgInfo.YMarging,
+            //        imgInfo.BlockImgW - imgInfo.XPadding,
+            //        imgInfo.BlockImgH - imgInfo.YPadding));
         }
 
         /// <summary>
@@ -120,6 +136,12 @@ namespace Hanhua.Common
                 imgInfo.PosX = (i % xNum) * imgInfo.BlockImgW;
                 imgInfo.PosY = (i / xNum) * imgInfo.BlockImgH;
 
+                ImgUtil.AddXMarggin = 0;
+                if (imgInfo.CharTxt.Equals("・"))
+                {
+                    ImgUtil.AddXMarggin = 5;
+                }
+                
                 // 生成当前块图片
                 if (ImgUtil.DrawImgType == 0)
                 {

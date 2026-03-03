@@ -1048,12 +1048,50 @@ namespace Hanhua.Common.TextEditTools.RfoEdit
         private void btnExpSpecialImg_Click(object sender, EventArgs e)
         {
             byte[] byTmp;
-            for (int i = 01391; i <= 01455; i++)
-            {
-                string fileName = i.ToString().PadLeft(5, '0');
-                byTmp = File.ReadAllBytes(this.baseFolder + @"Font\1410Cn\" + fileName + ".bin");
-                this.CheckTmpPic2(0x60, byTmp, 432, 136, fileName);
-            }
+            //for (int i = 01391; i <= 01455; i++)
+            //{
+            //    string fileName = i.ToString().PadLeft(5, '0');
+            //    byTmp = File.ReadAllBytes(this.baseFolder + @"Font\1410Cn\" + fileName + ".bin");
+            //    this.CheckTmpPic2(0x60, byTmp, 432, 136, fileName);
+            //}
+
+            //byTmp = File.ReadAllBytes(this.baseFolder + @"rfo\rfo\PicHanhua\OKBin\\01629.bin");
+            //this.CheckTmpPic(0xA0, byTmp, 0, 0x40, 0x40, "01629");
+            //this.CheckTmpPic(0x12A0, byTmp, 1, 0x58, 0x28, "01629");
+
+            byTmp = File.ReadAllBytes(this.baseFolder + @"20260131\00890.bin");
+            int width = 640;
+            int height = 480;
+            int bufSize = width * height * 4;
+            byte[] byImg = new byte[bufSize];
+            Array.Copy(byTmp, 0x80, byImg, 0, byImg.Length);
+            Bitmap testBmp = new Bitmap(width, height);
+            testBmp = Util.ImageDecode(testBmp, byImg, "RGBA32_RGBA8");
+
+            testBmp.Save(this.baseFolder + @"20260131\00890jp_1.png");
+
+            Array.Copy(byTmp, 0x12c080, byImg, 0, byImg.Length);
+            testBmp = new Bitmap(width, height);
+            testBmp = Util.ImageDecode(testBmp, byImg, "RGBA32_RGBA8");
+
+            testBmp.Save(this.baseFolder + @"20260131\00890jp_2.png");
+
+            byTmp = File.ReadAllBytes(this.baseFolder + @"20260131\00891.bin");
+            width = 832;
+            height = 456;
+            bufSize = width * height * 4;
+            byImg = new byte[bufSize];
+            Array.Copy(byTmp, 0x80, byImg, 0, byImg.Length);
+            testBmp = new Bitmap(width, height);
+            testBmp = Util.ImageDecode(testBmp, byImg, "RGBA32_RGBA8");
+
+            testBmp.Save(this.baseFolder + @"20260131\00891jp_1.png");
+
+            Array.Copy(byTmp, 0x172880, byImg, 0, byImg.Length);
+            testBmp = new Bitmap(width, height);
+            testBmp = Util.ImageDecode(testBmp, byImg, "RGBA32_RGBA8");
+
+            testBmp.Save(this.baseFolder + @"20260131\00891jp_2.png");
 
             //byTmp = File.ReadAllBytes(this.baseFolder + @"rfo\rfo\PicHanhua\OKBin\01467.bin"); // OK
             //this.CheckTmpPic(0x2A0, byTmp, 0, 0xB0, 0x20, "01467");
@@ -1162,24 +1200,53 @@ namespace Hanhua.Common.TextEditTools.RfoEdit
         /// <param name="e"></param>
         private void btnImpSpecialImg_Click(object sender, EventArgs e)
         {
-            byte[] byBin;
-            List<byte> byPalette = new List<byte>();
-            for (int i = 01391; i <= 01455; i++)
-            {
-                string fileName = i.ToString().PadLeft(5, '0');
-                byBin = File.ReadAllBytes(this.baseFolder + @"Font\1410Jp\" + fileName + ".bin");
+            byte[] byTmp = File.ReadAllBytes(this.baseFolder + @"20260131\00890.bin");
+            Bitmap testBmp = (Bitmap)Bitmap.FromFile(this.baseFolder + @"20260131\Desktop\00890cn_1.png");
+            byte[] byImg = Util.ImageEncode(testBmp, "RGBA32_RGBA8");
 
-                Bitmap testBmp = (Bitmap)Bitmap.FromFile(this.baseFolder + @"Font\1410PicCnReduce\" + fileName.Substring(1) + ".png");
-                byPalette.Clear();
-                byte[] byImg = Util.PaletteImageEncode(testBmp, "C8_CI8", byPalette, 2);
+            Array.Copy(byImg, 0, byTmp, 0x80, byImg.Length);
 
-                Array.Copy(byImg, 0, byBin, 0x60, byImg.Length);
+            testBmp = (Bitmap)Bitmap.FromFile(this.baseFolder + @"20260131\Desktop\00890cn_2.png");
+            byImg = Util.ImageEncode(testBmp, "RGBA32_RGBA8");
 
-                byte[] impPalette = byPalette.ToArray();
-                Array.Copy(impPalette, 0, byBin, 0xe5e0, impPalette.Length);
+            Array.Copy(byImg, 0, byTmp, 0x12c080, byImg.Length);
+            File.WriteAllBytes(this.baseFolder + @"20260131\00890.bin", byTmp);
 
-                File.WriteAllBytes(this.baseFolder + @"Font\1410Cn\" + fileName + ".bin", byBin);
-            }
+
+            byTmp = File.ReadAllBytes(this.baseFolder + @"20260131\00891.bin");
+            testBmp = (Bitmap)Bitmap.FromFile(this.baseFolder + @"20260131\Desktop\00891cn_1.png");
+            byImg = Util.ImageEncode(testBmp, "RGBA32_RGBA8");
+
+            Array.Copy(byImg, 0, byTmp, 0x80, byImg.Length);
+
+            testBmp = (Bitmap)Bitmap.FromFile(this.baseFolder + @"20260131\Desktop\00891cn_2.png");
+            byImg = Util.ImageEncode(testBmp, "RGBA32_RGBA8");
+
+            Array.Copy(byImg, 0, byTmp, 0x172880, byImg.Length);
+            File.WriteAllBytes(this.baseFolder + @"20260131\00891.bin", byTmp);
+
+            //byte[] byBin;
+            //List<byte> byPalette = new List<byte>();
+            //for (int i = 01391; i <= 01455; i++)
+            //{
+            //    string fileName = i.ToString().PadLeft(5, '0');
+            //    byBin = File.ReadAllBytes(this.baseFolder + @"Font\1410Jp\" + fileName + ".bin");
+
+            //    Bitmap testBmp = (Bitmap)Bitmap.FromFile(this.baseFolder + @"Font\1410PicCnReduce\" + fileName.Substring(1) + ".png");
+            //    byPalette.Clear();
+            //    byte[] byImg = Util.PaletteImageEncode(testBmp, "C8_CI8", byPalette, 2);
+
+            //    Array.Copy(byImg, 0, byBin, 0x60, byImg.Length);
+
+            //    byte[] impPalette = byPalette.ToArray();
+            //    Array.Copy(impPalette, 0, byBin, 0xe5e0, impPalette.Length);
+
+            //    File.WriteAllBytes(this.baseFolder + @"Font\1410Cn\" + fileName + ".bin", byBin);
+            //}
+
+            //byte[] byTmp = File.ReadAllBytes(this.baseFolder + @"\Font\1629cn\01629.bin");
+            //this.ImportTmpPicC4_C8(0xA0, byTmp, 2, "01629", "C8_CI8");
+            //this.ImportTmpPicC4_C8(0x12A0, byTmp, 1, "01629", "C8_CI8");
 
             //byTmp = File.ReadAllBytes(this.baseFolder + @"rfo\rfo\RUNEFACTORY\01367.bin");
             //this.ImportTmpPicI4(0x120, byTmp, 5, "01367");
@@ -1237,6 +1304,7 @@ namespace Hanhua.Common.TextEditTools.RfoEdit
             int lastImgLen = 0;
             for (int i = 0; i < maxImgIdx; i++)
             {
+                byPalette.Clear();
                 Bitmap testBmp = (Bitmap)Bitmap.FromFile(this.baseFolder + @"rfo\rfo\PicHanhua\Special\SpecialNew\Aft\" + fileName + "_" + i + ".png");
                 byte[] byImg = Util.PaletteImageEncode(testBmp, imgFormat, byPalette, 2);
 

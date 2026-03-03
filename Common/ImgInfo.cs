@@ -123,6 +123,11 @@ namespace Hanhua.Common
         public Brush Brush { get; set; }
 
         /// <summary>
+        /// 当前笔刷
+        /// </summary>
+        public Brush OutPathBrush { get; set; }
+
+        /// <summary>
         /// 块图片的宽
         /// </summary>
         public int BlockImgW { get; set; }

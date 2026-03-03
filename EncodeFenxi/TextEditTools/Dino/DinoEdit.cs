@@ -10,6 +10,9 @@ using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Threading;
+using System.Drawing.Imaging;
+using System.Drawing.Text;
 
 namespace Hanhua.Common.TextEditTools.Dino
 {
@@ -128,7 +131,8 @@ namespace Hanhua.Common.TextEditTools.Dino
             this.Open(baseFile);
 
             string fileName = Util.GetShortNameWithoutType(baseFile);
-            this.ExtractRaw(@"G:\Study\MySelfProject\Hanhua\Dino1\Ps_IsoCn\PSX\DATA_Test\" + fileName);
+            //this.ExtractRaw(@"G:\Study\MySelfProject\Hanhua\Dino1\Ps_IsoCn\PSX\DATA_Test\" + fileName);
+            this.ExtractRaw(@"G:\Study\MySelfProject\Hanhua\Dino1\Pc\" + fileName);
         }
 
         public void Reset()
@@ -386,7 +390,7 @@ namespace Hanhua.Common.TextEditTools.Dino
             // 选择已解压文件的目录
             string folder = Util.OpenFolder(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn");
 
-            this.CompressDatFile(folder);
+            this.CompressDatFile(folder.ToUpper());
 
             MessageBox.Show("打包完成");
         }
@@ -492,6 +496,28 @@ namespace Hanhua.Common.TextEditTools.Dino
                     bw.Write(entry.reserve[1]);
                 }
             }
+
+            byte[] byJpDat = File.ReadAllBytes(outputDat.Replace("PS_CN", @"mkpsxiso-2.20-win64\DinoJpBak\PSX\DATA"));
+            byte[] byCnDat = File.ReadAllBytes(outputDat);
+
+            for (int i = 0; i < 2048; i += 16)
+            {
+                if (byCnDat[i] == 0x64 && byCnDat[i + 1] == 0x75 && byCnDat[i + 2] == 0x6D && byCnDat[i + 3] == 0x6D)
+                {
+                    break;
+                }
+
+                GEntryType type = (GEntryType)byJpDat[i];
+                if (!(type == GEntryType.GET_LZSS1 || type == GEntryType.GET_TEXTURE || type == GEntryType.GET_PALETTE))
+                {
+                    byCnDat[i + 15] = byJpDat[i + 15];
+                    byCnDat[i + 14] = byJpDat[i + 14];
+                    byCnDat[i + 13] = byJpDat[i + 13];
+                    byCnDat[i + 12] = byJpDat[i + 12];
+                }
+            }
+
+            File.WriteAllBytes(outputDat, byCnDat);
         }
 
         /// <summary>
@@ -607,25 +633,48 @@ namespace Hanhua.Common.TextEditTools.Dino
                 return;
             }
 
+            //List<string> char80 = new List<string>();
+            //List<string> char81 = new List<string>();
+            //int charIdx = 0;
+            //int charIdx1 = 0;
+            //while (charIdx1 < (coreFontChar1.Length + coreFontChar2.Length))
+            //{
+            //    if (charIdx1 < 255)
+            //    {
+            //        char80.Add(coreFontChar1[charIdx]);
+            //        char80.Add(coreFontChar2[charIdx]);
+            //        charIdx1 += 2;
+            //        charIdx++;
+            //    }
+            //    else
+            //    {
+            //        char81.Add(coreFontChar1[charIdx]);
+            //        char81.Add(coreFontChar2[charIdx]);
+            //        charIdx1 += 2;
+            //        charIdx++;
+            //    }
+            //}
+            Dictionary<string, List<string>> cnFontChar = new Dictionary<string, List<string>>();
+            string[] allCnFontChar = File.ReadAllLines(@"G:\Study\MySelfProject\Hanhua\Dino1\dino1FontChar_cn.txt", Encoding.UTF8);
+            for (int i = 0; i < allCnFontChar.Length; i += 2)
+            {
+                List<string> curCnChars = new List<string>();
+                curCnChars.AddRange(allCnFontChar[i + 1].Split(','));
+                cnFontChar.Add(allCnFontChar[i].ToUpper(), curCnChars);
+            }
+
+            List<string> comnCnFontChars = cnFontChar["SLPS_021.80"];
             List<string> char80 = new List<string>();
             List<string> char81 = new List<string>();
-            int charIdx = 0;
-            int charIdx1 = 0;
-            while (charIdx1 < (coreFontChar1.Length + coreFontChar2.Length))
+            for (int j = 0; j < comnCnFontChars.Count; j++)
             {
-                if (charIdx1 < 255)
+                if (char80.Count < 256)
                 {
-                    char80.Add(coreFontChar1[charIdx]);
-                    char80.Add(coreFontChar2[charIdx]);
-                    charIdx1 += 2;
-                    charIdx++;
+                    char80.Add(comnCnFontChars[j]);
                 }
                 else
                 {
-                    char81.Add(coreFontChar1[charIdx]);
-                    char81.Add(coreFontChar2[charIdx]);
-                    charIdx1 += 2;
-                    charIdx++;
+                    char81.Add(comnCnFontChars[j]);
                 }
             }
 
@@ -748,13 +797,35 @@ namespace Hanhua.Common.TextEditTools.Dino
             //File.WriteAllText(@"G:\Study\MySelfProject\Hanhua\Dino1\fontImgInfo.txt", sb.ToString(), Encoding.UTF8);
 
             Dictionary<string, List<string>> cnFontChar = new Dictionary<string, List<string>>();
+
+            List<string> char10a = new List<string>();
+            List<string> char10b = new List<string>();
+            char10a.AddRange(st8210AChar);
+            char10b.AddRange(st8210BChar);
+            cnFontChar.Add("st10a_00", char10a);
+            cnFontChar.Add("st10b_00", char10b);
+            cnFontChar.Add("ST1", char10b);
+
             //string[] allCnFontChar = File.ReadAllLines(@"G:\Study\MySelfProject\Hanhua\Dino1\dino1FontChar_cn.txt", Encoding.UTF8);
             string[] allCnFontChar = File.ReadAllLines(@"G:\Study\MySelfProject\Hanhua\Dino1\dino1FontChar.txt", Encoding.UTF8);
             for (int i = 0; i < allCnFontChar.Length; i += 2)
             {
                 List<string> curCnChars = new List<string>();
                 curCnChars.AddRange(allCnFontChar[i + 1].Split(','));
-                cnFontChar.Add(allCnFontChar[i].ToUpper(), curCnChars);
+                string key = allCnFontChar[i].ToUpper();
+                cnFontChar.Add(key, curCnChars);
+                if (key.StartsWith("ST10B"))
+                {
+                    cnFontChar.Add("ST1", curCnChars);
+                }
+                else if (key.StartsWith("ST506"))
+                {
+                    cnFontChar.Add("ST5", curCnChars);
+                }
+                else if (key.StartsWith("ST806"))
+                {
+                    cnFontChar.Add("ST8", curCnChars);
+                }
             }
 
             //List<string> comnCnFontChars = cnFontChar["SLPS_021.80"];
@@ -819,10 +890,14 @@ namespace Hanhua.Common.TextEditTools.Dino
                         endPos = Convert.ToInt32(posInfos[1], 16);
                     }
 
-                    if (allJpTxtFiles[i].EndsWith("SLPS_021.80", StringComparison.OrdinalIgnoreCase))
+                    //if (allJpTxtFiles[i].EndsWith("SLPS_021.80", StringComparison.OrdinalIgnoreCase))
+                    if (posInfos.Length > 2)
                     {
+                        string[] fileNames = allJpTxtFiles[i].Split('\\');
+                        string shortName = fileNames[fileNames.Length - 2];
+
                         xSheet = (Microsoft.Office.Interop.Excel.Worksheet)xBook.Sheets.Add(Missing.Value, Missing.Value, Missing.Value, Missing.Value);
-                        xSheet.Name = "SLPS_021.80";
+                        xSheet.Name = shortName;
                         int lineIdx = 1;
                         List<string> allComText = new List<string>();
 
@@ -830,12 +905,12 @@ namespace Hanhua.Common.TextEditTools.Dino
                         {
                             int txtStartPos = endPos + ((byTxt[j] << 0) | (byTxt[j + 1] << 8) | (byTxt[j + 2] << 16) | (byTxt[j + 3] << 24)) * 2;
                             int txtEndPos = endPos + ((byTxt[j + 4] << 0) | (byTxt[j + 5] << 8) | (byTxt[j + 6] << 16) | (byTxt[j + 7] << 24)) * 2;
-                            allComText.AddRange(this.DecodeDinoText(byTxt, txtStartPos, txtEndPos, cnFont80, cnFont81, cnFont80, sb).Split('\n'));
+                            allComText.AddRange(this.DecodeDinoText(byTxt, txtStartPos, txtEndPos, cnFont80, cnFont81, cnFontChar[shortName.ToUpper()], sb).Split('\n'));
                         }
 
                         int txtStartPos1 = endPos + ((byTxt[endPos - 4] << 0) | (byTxt[endPos - 3] << 8) | (byTxt[endPos - 2] << 16) | (byTxt[endPos - 1] << 24)) * 2;
                         int txtEndPos1 = Convert.ToInt32(posInfos[2], 16);
-                        allComText.AddRange(this.DecodeDinoText(byTxt, txtStartPos1, txtEndPos1, cnFont80, cnFont81, cnFont80, sb).Split('\n'));
+                        allComText.AddRange(this.DecodeDinoText(byTxt, txtStartPos1, txtEndPos1, cnFont80, cnFont81, cnFontChar[shortName.ToUpper()], sb).Split('\n'));
 
                         for (int j = 0; j < allComText.Count; j++)
                         {
@@ -876,7 +951,7 @@ namespace Hanhua.Common.TextEditTools.Dino
 
                 // 保存
                 xSheet.SaveAs(
-                    @"G:\Study\MySelfProject\Hanhua\Dino1\allCnText3.xlsx",
+                    @"G:\Study\MySelfProject\Hanhua\Dino1\allCnText4.xlsx",
                     Missing.Value, Missing.Value, Missing.Value, Missing.Value,
                     Missing.Value, Missing.Value, Missing.Value, Missing.Value, Missing.Value);
 
@@ -1408,6 +1483,16 @@ namespace Hanhua.Common.TextEditTools.Dino
         private void btnCreateCnPic_Click(object sender, EventArgs e)
         {
             ImgUtil.DrawImgType = 2;
+            SolidBrush customBrush = new SolidBrush(Color.FromArgb(255, (0x5AD6 & 0x1F) << 3, (0x5AD6 & 0x1F) << 3, (0x5AD6 & 0x1F) << 3));
+            SolidBrush outBrush = new SolidBrush(Color.FromArgb(255, (0x318C & 0x1F) << 3, (0x318C & 0x1F) << 3, (0x318C & 0x1F) << 3));
+            Pen newPen = new Pen(Color.FromArgb(255, (0x318C & 0x1F) << 3, (0x318C & 0x1F) << 3, (0x318C & 0x1F) << 3), 0.5F);
+            //Pen newPen = new Pen(Color.FromArgb(255, (0x0842 & 0x1F) << 3, (0x0842 & 0x1F) << 3, (0x0842 & 0x1F) << 3), 1F);
+
+            Font boldFont = new Font("SimSun", 14f, FontStyle.Bold, GraphicsUnit.Pixel);
+            Font font = new Font("SimSun", 13.5f, FontStyle.Regular, GraphicsUnit.Pixel);
+            Color fillColor = Color.FromArgb(255, (0x5AD6 & 0x1F) << 3, (0x5AD6 & 0x1F) << 3, (0x5AD6 & 0x1F) << 3);
+            Color outlineColor = Color.FromArgb(255, (0x318C & 0x1F) << 3, (0x318C & 0x1F) << 3, (0x318C & 0x1F) << 3);
+
             string[] allCnFontChar = File.ReadAllLines(@"G:\Study\MySelfProject\Hanhua\Dino1\dino1FontChar_cn.txt", Encoding.UTF8);
             for (int i = 0; i < allCnFontChar.Length; i += 2)
             {
@@ -1427,18 +1512,33 @@ namespace Hanhua.Common.TextEditTools.Dino
                 imgInfo.PosY = 0;
                 imgInfo.XPadding = -1;
                 imgInfo.YPadding = 0;
-                imgInfo.YMarging = 0f;
-                imgInfo.NeedBorder = false;
-                //imgInfo.FontSize = 15;
-                imgInfo.FontSize = 10.1f;
-                imgInfo.FontStyle = FontStyle.Regular;
-                //imgInfo.FontName = "SimSun";
+                imgInfo.YMarging = 1f;
+                //imgInfo.NeedBorder = false;
+                imgInfo.NeedBorder = true;
+                //imgInfo.FontSize = 16;
+                imgInfo.FontSize = 13.5f;
+                //imgInfo.FontStyle = FontStyle.Regular;
+                //imgInfo.FontName = "WenQuanYi Bitmap Song 16px";
+                imgInfo.FontStyle = FontStyle.Bold;
                 imgInfo.FontName = "SimSun";
-                imgInfo.Brush = Brushes.White;
+                //imgInfo.FontName = "迷你简美黑";
+                //imgInfo.FontName = "JetLink BoldMauKai";
+                imgInfo.Brush = customBrush; // Brushes.White;
+                imgInfo.OutPathBrush = customBrush; // Brushes.White;
+                imgInfo.Pen = newPen;
+                imgInfo.Pen.LineJoin = LineJoin.Round;
+                imgInfo.Pen.Alignment = PenAlignment.Outset;
+                imgInfo.Pen.MiterLimit = 0.5f;
                 imgInfo.Sf.LineAlignment = StringAlignment.Center;
+                imgInfo.Sf.FormatFlags = StringFormatFlags.NoClip;
                 imgInfo.Grp.Clear(Color.Black);
-                imgInfo.Grp.SmoothingMode = SmoothingMode.AntiAlias;
-                imgInfo.Grp.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
+                //imgInfo.Grp.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceOver;
+                //imgInfo.Grp.SmoothingMode = SmoothingMode.None;
+                imgInfo.Grp.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                //imgInfo.Grp.PixelOffsetMode = PixelOffsetMode.None;
+                imgInfo.Grp.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                //imgInfo.Grp.SmoothingMode = SmoothingMode.AntiAlias;
+                //imgInfo.Grp.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SingleBitPerPixelGridFit;
 
                 List<string> txtList1 = new List<string>();
                 List<string> txtList2 = new List<string>();
@@ -1451,14 +1551,266 @@ namespace Hanhua.Common.TextEditTools.Dino
                     }
                 }
 
-                Bitmap curImg = ImgUtil.WriteFontImg(imgInfo, txtList1);
+                //Bitmap curImg = ImgUtil.WriteFontImg(imgInfo, txtList1);
+                Bitmap curImg = DrawOutlinedTextAtlas(string.Join("", txtList1.ToArray()), 16, font, outlineColor, fillColor);
+                //Bitmap curImg = RenderStringToFontAtlas(string.Join("", txtList1.ToArray()), "SimSun", FontStyle.Regular);
                 curImg.Save(path + @"1\" + allCnFontChar[i].ToUpper() + @".png");
 
-                imgInfo.Grp.Clear(Color.Black);
-                curImg = ImgUtil.WriteFontImg(imgInfo, txtList2);
+                //imgInfo.Grp.Clear(Color.Black);
+                //curImg = ImgUtil.WriteFontImg(imgInfo, txtList2);
+                curImg = DrawOutlinedTextAtlas(string.Join("", txtList2.ToArray()), 16, font, outlineColor, fillColor);
+                //curImg = RenderStringToFontAtlas(string.Join("", txtList1.ToArray()), "SimSun", FontStyle.Regular);
                 curImg.Save(path + @"2\" + allCnFontChar[i].ToUpper() + @".png");
             }
         }
+
+        private Bitmap DrawOutlinedTextAtlas(
+            string text,
+            int charSize,
+            Font font,
+            Color outlineColor,
+            Color fillColor)
+        {
+            const int ATLAS_WIDTH = 256;
+
+            int charsPerRow = ATLAS_WIDTH / charSize;
+            int rows = (int)Math.Ceiling(text.Length / (float)charsPerRow);
+
+            int width = ATLAS_WIDTH;
+            int height = rows * charSize;
+
+            Font boldFont = new Font("SimSun", font.Size, FontStyle.Bold, GraphicsUnit.Pixel);
+            Bitmap bmp = new Bitmap(width, height, PixelFormat.Format32bppArgb);
+
+            using (Graphics g = Graphics.FromImage(bmp))
+            {
+                // 背景
+                g.Clear(Color.Black);
+
+                // 关键设置
+                g.SmoothingMode = SmoothingMode.HighQuality;
+                g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
+                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                //g.SmoothingMode = SmoothingMode.None;
+                //g.TextRenderingHint = TextRenderingHint.SingleBitPerPixelGridFit;
+                //g.InterpolationMode = InterpolationMode.NearestNeighbor;
+                //g.PixelOffsetMode = PixelOffsetMode.Half;
+
+                using (Brush outlineBrush = new SolidBrush(outlineColor))
+                using (Brush fillBrush = new SolidBrush(fillColor))
+                {
+                    StringFormat sf = new StringFormat
+                    {
+                        Alignment = StringAlignment.Center,
+                        LineAlignment = StringAlignment.Center,
+                        FormatFlags = StringFormatFlags.NoClip
+                    };
+
+                    for (int i = 0; i < text.Length; i++)
+                    {
+                        int col = i % charsPerRow;
+                        int row = i / charsPerRow;
+
+                        int x = col * charSize;
+                        int y = row * charSize;
+
+                        Rectangle rect = new Rectangle(x, y, charSize, charSize);
+
+                        // ---- 描边：上下左右 ----
+                        //DrawChar(g, text[i].ToString(), font, outlineBrush, rect, sf, -1f, 0);
+                        DrawChar(g, text[i].ToString(), font, outlineBrush, rect, sf, 0.5f, 0);
+                        //DrawChar(g, text[i].ToString(), font, outlineBrush, rect, sf, 0, -1f);
+                        DrawChar(g, text[i].ToString(), font, outlineBrush, rect, sf, 0, 0.5f);
+
+                        //DrawChar(g, text[i].ToString(), boldFont, outlineBrush, rect, sf, 0, 0);
+                        
+
+                        // ---- 正文 ----
+                        DrawChar(g, text[i].ToString(), font, fillBrush, rect, sf, 0, 0);
+                    }
+                }
+            }
+
+            return bmp;
+        }
+
+        private void DrawChar(
+            Graphics g,
+            string ch,
+            Font font,
+            Brush brush,
+            Rectangle rect,
+            StringFormat sf,
+            float offsetX,
+            float offsetY)
+        {
+            RectangleF r = new RectangleF(
+                rect.X + offsetX,
+                rect.Y + offsetY + 1,
+                rect.Width,
+                rect.Height);
+
+            g.DrawString(ch, font, brush, r, sf);
+        }
+
+        private Bitmap RenderStringToFontAtlas(
+            string text,
+            string fontName,
+            FontStyle style)
+        {
+            const int CELL_SIZE = 16;
+            const int ATLAS_WIDTH = 256;
+            const int COLS = ATLAS_WIDTH / CELL_SIZE;
+
+            int charCount = text.Length;
+            int rows = (charCount + COLS - 1) / COLS;
+            int atlasHeight = rows * CELL_SIZE;
+
+            Bitmap atlas = new Bitmap(
+                ATLAS_WIDTH,
+                atlasHeight,
+                PixelFormat.Format32bppArgb
+            );
+
+            using (Graphics g = Graphics.FromImage(atlas))
+            {
+                g.Clear(Color.Black);
+            }
+
+            for (int i = 0; i < charCount; i++)
+            {
+                int col = i % COLS;
+                int row = i / COLS;
+
+                int x = col * CELL_SIZE;
+                int y = row * CELL_SIZE;
+
+                Bitmap ch = RenderOutlinedCharTo4Color(
+                    text[i].ToString(),
+                    fontName,
+                    style
+                );
+
+                using (Graphics g = Graphics.FromImage(atlas))
+                {
+                    g.DrawImage(ch, x, y);
+                }
+            }
+
+            return atlas;
+        }
+
+        private Bitmap RenderOutlinedCharTo4Color(
+            string text,
+            string fontName,
+            FontStyle style)
+        {
+            const int SRC_SIZE = 64;
+            const int DST_SIZE = 16;
+            SolidBrush customBrush = new SolidBrush(Color.FromArgb(255, (0x5AD6 & 0x1F) << 3, (0x5AD6 & 0x1F) << 3, (0x5AD6 & 0x1F) << 3));
+
+            // ===== Step 1：64×64 黑底 + 描边 =====
+            Bitmap src = new Bitmap(SRC_SIZE, SRC_SIZE, PixelFormat.Format32bppArgb);
+            using (Graphics g = Graphics.FromImage(src))
+            {
+                g.Clear(Color.Black);
+                g.SmoothingMode = SmoothingMode.HighQuality;
+                g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
+                g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+
+                using (GraphicsPath path = new GraphicsPath())
+                using (Font font = new Font(fontName, 56, style, GraphicsUnit.Pixel))
+                {
+                    StringFormat sf = new StringFormat
+                    {
+                        Alignment = StringAlignment.Center,
+                        LineAlignment = StringAlignment.Center
+                    };
+
+                    path.AddString(
+                        text,
+                        font.FontFamily,
+                        (int)style,
+                        font.Size,
+                        new Rectangle(0, 4, SRC_SIZE, SRC_SIZE),
+                        sf
+                    );
+
+                    //using (Pen pen = new Pen(Color.FromArgb(255, (0x0842 & 0x1F) << 3, (0x0842 & 0x1F) << 3, (0x0842 & 0x1F) << 3), 4F))
+                    using (Pen pen = new Pen(Color.FromArgb(160, 160, 160), 8f))
+                    {
+                        pen.LineJoin = LineJoin.Round;
+                        pen.Alignment = PenAlignment.Outset;
+                        pen.MiterLimit = 0.5f;
+                        g.DrawPath(pen, path);
+                    }
+
+                    using (Brush brush = new SolidBrush(Color.White))
+                    {
+                        g.FillPath(brush, path);
+                    }
+                    //g.FillPath(customBrush, path);
+                }
+            }
+
+            // ===== Step 2：缩放到 16×16 =====
+            Bitmap scaled = new Bitmap(DST_SIZE, DST_SIZE, PixelFormat.Format32bppArgb);
+            using (Graphics g = Graphics.FromImage(scaled))
+            {
+                g.Clear(Color.Black);
+                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                g.DrawImage(src, 0, 0, DST_SIZE, DST_SIZE);
+            }
+
+            // ===== Step 3：4 色量化 =====
+            //Bitmap result = new Bitmap(DST_SIZE, DST_SIZE, PixelFormat.Format32bppArgb);
+
+            //Color[] palette =
+            //{
+            //    Color.Black,
+            //    Color.FromArgb((0x0842 & 0x1F) << 3,(0x0842 & 0x1F) << 3,(0x0842 & 0x1F) << 3),
+            //    Color.FromArgb((0x318C & 0x1F) << 3,(0x318C & 0x1F) << 3,(0x318C & 0x1F) << 3),
+            //    Color.FromArgb((0x5AD6 & 0x1F) << 3,(0x5AD6 & 0x1F) << 3,(0x5AD6 & 0x1F) << 3)
+            //};
+
+            //for (int y = 0; y < DST_SIZE; y++)
+            //{
+            //    for (int x = 0; x < DST_SIZE; x++)
+            //    {
+            //        Color c = scaled.GetPixel(x, y);
+
+            //        // 灰度（0~1）
+            //        float gray =
+            //            (0.299f * c.R +
+            //             0.587f * c.G +
+            //             0.114f * c.B) / 255f;
+
+            //        // Alpha（0~1）
+            //        float alpha = c.A / 255f;
+
+            //        // ★ 实际笔画强度（关键）
+            //        float intensity = gray * alpha;
+
+            //        Color dst;
+            //        if (intensity < 0.20f)
+            //            dst = palette[0];
+            //        else if (intensity < 0.45f)
+            //            dst = palette[1];
+            //        else if (intensity < 0.75f)
+            //            dst = palette[2];
+            //        else
+            //            dst = palette[3];
+
+            //        result.SetPixel(x, y, dst);
+            //    }
+            //}
+
+
+            return scaled;
+        }
+
 
         private void btnImportImg_Click(object sender, EventArgs e)
         {
@@ -1503,7 +1855,8 @@ namespace Hanhua.Common.TextEditTools.Dino
                 }
                 Bitmap image1 = (Bitmap)Bitmap.FromFile(@"G:\Study\MySelfProject\Hanhua\Dino1\Dino1FontPic\FontPicCn\reduceColor1\" + imgName);
                 Bitmap image2 = (Bitmap)Bitmap.FromFile(@"G:\Study\MySelfProject\Hanhua\Dino1\Dino1FontPic\FontPicCn\reduceColor2\" + imgName);
-                int newHeight = Math.Max(3, 1 + image1.Height / 16) * 16; 
+                //int newHeight = Math.Max(3, 1 + image1.Height / 16) * 16; 
+                int newHeight = ((image1.Height + 0x1F) & (~0x1F));
                 byte[] by = new byte[Align(image1.Width * newHeight / 2, 2048)];
                 int byImgIdx = 0;
                 for (int y = 0; y < image1.Height; y++)
@@ -1654,7 +2007,21 @@ namespace Hanhua.Common.TextEditTools.Dino
             {
                 List<string> curCnChars = new List<string>();
                 curCnChars.AddRange(allCnFontChar[i + 1].Split(','));
-                cnFontChar.Add(allCnFontChar[i].ToUpper(), curCnChars);
+                string key = allCnFontChar[i].ToUpper();
+                cnFontChar.Add(key, curCnChars);
+
+                if (key.StartsWith("ST10B"))
+                {
+                    cnFontChar.Add("ST1", curCnChars);
+                }
+                else if (key.StartsWith("ST506"))
+                {
+                    cnFontChar.Add("ST5", curCnChars);
+                }
+                else if (key.StartsWith("ST806"))
+                {
+                    cnFontChar.Add("ST8", curCnChars);
+                }
             }
 
             List<string> comnCnFontChars = cnFontChar["SLPS_021.80"];
@@ -1739,12 +2106,15 @@ namespace Hanhua.Common.TextEditTools.Dino
                     xSheet = (Microsoft.Office.Interop.Excel.Worksheet)xBook.Sheets[i];
                     string sheetName = xSheet.Name.ToUpper();
 
-                    //if (!sheetName.Equals("OPENING"))
-                    //{
-                    //    continue;
-                    //}
+                    if (chkOnlyComn.Checked)
+                    {
+                        if (!sheetName.StartsWith("SLPS_021"))
+                        {
+                            continue;
+                        }
+                    }
 
-                    //if (sheetName.IndexOf("SLPS_021") < 0)
+                    //if (sheetName.IndexOf("ST60A") < 0)
                     //{
                     //    continue;
                     //}
@@ -1754,11 +2124,6 @@ namespace Hanhua.Common.TextEditTools.Dino
                     if (sheetName.IndexOf("SLPS_021") >= 0)
                     {
                         curCnFontChars = cnFont80;
-                        byComnEntryInfo.Clear();
-                        byComnEntryInfo.Add(0);
-                        byComnEntryInfo.Add(0);
-                        byComnEntryInfo.Add(0);
-                        byComnEntryInfo.Add(0);
                     }
                     else
                     {
@@ -1781,10 +2146,16 @@ namespace Hanhua.Common.TextEditTools.Dino
                     }
                     int startTextPos = startPos;
                     int endTextPos = endPos;
-                    if (sheetName.IndexOf("SLPS_021") >= 0)
+                    if (cnToFiles.Length > 3)
                     {
                         startTextPos = endPos;
                         endTextPos = Convert.ToInt32(cnToFiles[3], 16);
+
+                        byComnEntryInfo.Clear();
+                        byComnEntryInfo.Add(0);
+                        byComnEntryInfo.Add(0);
+                        byComnEntryInfo.Add(0);
+                        byComnEntryInfo.Add(0);
                     }
 
                     List<byte> byNewCnFile = new List<byte>();
@@ -1851,7 +2222,7 @@ namespace Hanhua.Common.TextEditTools.Dino
                                 }
                             }
 
-                            if (sheetName.IndexOf("SLPS_021") >= 0 && cnTxtValue.EndsWith("^00A0^"))
+                            if (cnToFiles.Length > 3 && cnTxtValue.EndsWith("^00A0^"))
                             {
                                 int curCnTextLen = byNewCnFile.Count / 2;
                                 byComnEntryInfo.Add((byte)((curCnTextLen >> 0) & 0xFF));
@@ -1864,7 +2235,7 @@ namespace Hanhua.Common.TextEditTools.Dino
                         lineNum++;
                     }
 
-                    if (sheetName.IndexOf("SLPS_021") >= 0)
+                    if (cnToFiles.Length > 3)
                     {
                         byte[] byEnrtyInfo = byComnEntryInfo.ToArray();
                         Array.Copy(byEnrtyInfo, 0, byOldCnFile, startPos, byEnrtyInfo.Length);
@@ -1965,6 +2336,7 @@ namespace Hanhua.Common.TextEditTools.Dino
                             string jpTxtValue = Regex.Replace(oldJpTxtValue, @"\^.*?\^", "");
 
                             xSheet.get_Range("J" + lineNum, Missing.Value).Interior.Color = ColorTranslator.ToOle(Color.Transparent);
+                            xSheet.get_Range("Q" + lineNum, Missing.Value).Value2 = string.Empty;
                             if (oldCnTxtValue.Length != oldJpTxtValue.Length)
                             {
                                 // 检查长度
@@ -2034,35 +2406,157 @@ namespace Hanhua.Common.TextEditTools.Dino
         private void btnCompressFiles_Click(object sender, EventArgs e)
         {
             string[] allCnFileInfo = File.ReadAllLines(@"G:\Study\MySelfProject\Hanhua\Dino1\textAddr.txt", Encoding.UTF8);
-            string folder = string.Empty;
-            string outputDat = string.Empty;
 
+            // 使用Queue和lock替代ConcurrentQueue
+            Queue<string> fileQueue = new Queue<string>();
+            object queueLock = new object();
+
+            // 线程计数器
+            int activeThreads = 0;
+
+            // 使用ManualResetEvent等待所有线程完成
+            ManualResetEvent allThreadsDone = new ManualResetEvent(false);
+
+            // 1. 准备需要多线程处理的任务
             for (int i = 0; i < allCnFileInfo.Length; i += 2)
             {
                 if (allCnFileInfo[i].EndsWith(".bin", StringComparison.OrdinalIgnoreCase))
                 {
-                    folder = allCnFileInfo[i].Substring(0, allCnFileInfo[i].Length - 7).Replace("PS_jp", "PS_cn").ToUpper();
-                    this.CompressDatFile(folder);
-
-                    outputDat = folder + ".dat";
-                    File.Copy(outputDat, outputDat.Replace("PS_CN", @"mkpsxiso-2.20-win64\NewDino\PSX\DATA"), true);
+                    string folder = allCnFileInfo[i].Substring(0, allCnFileInfo[i].Length - 7).Replace("PS_jp", "PS_cn").ToUpper();
+                    fileQueue.Enqueue(folder);
                 }
             }
 
-            folder = @"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\CORE";
-            this.CompressDatFile(folder);
+            // 其他需要处理的目录
+            fileQueue.Enqueue(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\CLEAR".ToUpper());
+            fileQueue.Enqueue(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\CORE".ToUpper());
+            fileQueue.Enqueue(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\C_CHANGE".ToUpper());
+            fileQueue.Enqueue(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\TITLE".ToUpper());
+            fileQueue.Enqueue(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\OMAKE1".ToUpper());
+            fileQueue.Enqueue(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\OMAKE2".ToUpper());
+            fileQueue.Enqueue(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\OMAKE3".ToUpper());
+            fileQueue.Enqueue(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\OMAKE5".ToUpper());
+            fileQueue.Enqueue(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\WARNING".ToUpper());
+            fileQueue.Enqueue(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\WIPE".ToUpper());
+            fileQueue.Enqueue(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\WIPE1".ToUpper());
+            fileQueue.Enqueue(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\WIPE2".ToUpper());
+            fileQueue.Enqueue(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\WIPE3".ToUpper());
 
-            outputDat = folder.ToUpper() + ".dat";
-            File.Copy(outputDat, outputDat.Replace("PS_CN", @"mkpsxiso-2.20-win64\NewDino\PSX\DATA"), true);
+            fileQueue.Enqueue(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\ST40D".ToUpper());
 
+            // 2. 启动工作线程（最多maxThreads个）
+            int threadCount = 5;
+            for (int i = 0; i < threadCount; i++)
+            {
+                Thread thread = new Thread(() =>
+                {
+                    Interlocked.Increment(ref activeThreads);
+
+                    while (true)
+                    {
+                        string folder = null;
+                        lock (queueLock)
+                        {
+                            if (fileQueue.Count > 0)
+                            {
+                                folder = fileQueue.Dequeue();
+                            }
+                        }
+
+                        if (folder == null)
+                        {
+                            break;
+                        }
+
+                        try
+                        {
+                            string outputDat = folder + ".dat";
+                            string destPath = outputDat.Replace("PS_CN", @"mkpsxiso-2.20-win64\NewDino\PSX\DATA");
+
+                            this.CompressDatFile(folder);
+                            File.Copy(outputDat, destPath, true);
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show(ex.Message);
+                        }
+                    }
+
+                    if (Interlocked.Decrement(ref activeThreads) == 0)
+                    {
+                        allThreadsDone.Set();
+                    }
+                });
+
+                thread.Start();
+            }
+
+            // 3. 等待所有多线程任务完成
+            allThreadsDone.WaitOne();
+        
+            //string lastFolder = @"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\CORE".ToUpper();
+            //this.CompressDatFile(lastFolder);
+
+            //string lastOutputDat = lastFolder.ToUpper() + ".dat";
+            //File.Copy(lastOutputDat, lastOutputDat.Replace("PS_CN", @"mkpsxiso-2.20-win64\NewDino\PSX\DATA"), true);
+
+            //lastFolder = @"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\C_CHANGE".ToUpper();
+            //this.CompressDatFile(lastFolder);
+
+            //lastOutputDat = lastFolder.ToUpper() + ".dat";
+            //File.Copy(lastOutputDat, lastOutputDat.Replace("PS_CN", @"mkpsxiso-2.20-win64\NewDino\PSX\DATA"), true);
+
+            //lastFolder = @"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\TITLE".ToUpper();
+            //this.CompressDatFile(lastFolder);
+
+            //lastOutputDat = lastFolder.ToUpper() + ".dat";
+            //File.Copy(lastOutputDat, lastOutputDat.Replace("PS_CN", @"mkpsxiso-2.20-win64\NewDino\PSX\DATA"), true);
+
+            // 修正LBA地址
+            this.btnUpdLba_Click(sender, e);
+            
             MessageBox.Show("打包完成");
         }
 
         private void btnAddrTest_Click(object sender, EventArgs e)
         {
-            byte[] byTemp = File.ReadAllBytes(@"G:\Study\MySelfProject\Hanhua\Dino1\Patch\CORE.dat");
-            Array.Resize(ref byTemp, byTemp.Length + 2048 * 6);
-            File.WriteAllBytes(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\CORE.dat", byTemp);
+            List<FilePosInfo> allCnDat = Util.GetAllFiles(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn").Where(p => !p.IsFolder && p.File.EndsWith(".dat", StringComparison.OrdinalIgnoreCase)).ToList();
+
+            foreach (FilePosInfo fileInfo in allCnDat)
+            {
+                byte[] byJpDat = File.ReadAllBytes(fileInfo.File.Replace("PS_cn", @"mkpsxiso-2.20-win64\DinoJpBak\PSX\DATA"));
+                byte[] byCnDat = File.ReadAllBytes(fileInfo.File);
+                byte[] byTmpCnDat = File.ReadAllBytes(fileInfo.File.Replace("PS_cn", @"Patch0111"));
+
+                for (int i = 0; i < 2048; i += 16)
+                {
+                    if (byCnDat[i] == 0x64 && byCnDat[i + 1] == 0x75 && byCnDat[i + 2] == 0x6D && byCnDat[i + 3] == 0x6D)
+                    {
+                        break;
+                    }
+
+                    byCnDat[i + 15] = byTmpCnDat[i + 15];
+                    byCnDat[i + 14] = byTmpCnDat[i + 14];
+                    byCnDat[i + 13] = byTmpCnDat[i + 13];
+                    byCnDat[i + 12] = byTmpCnDat[i + 12];
+
+                    GEntryType type = (GEntryType)byJpDat[i];
+                    if (!(type == GEntryType.GET_LZSS1 || type == GEntryType.GET_TEXTURE || type == GEntryType.GET_PALETTE))
+                    {
+                        byCnDat[i + 15] = byJpDat[i + 15];
+                        byCnDat[i + 14] = byJpDat[i + 14];
+                        byCnDat[i + 13] = byJpDat[i + 13];
+                        byCnDat[i + 12] = byJpDat[i + 12];
+                    }
+                }
+
+                File.WriteAllBytes(fileInfo.File, byCnDat);
+            }
+
+
+            //byte[] byTemp = File.ReadAllBytes(@"G:\Study\MySelfProject\Hanhua\Dino1\Patch\CORE.dat");
+            //Array.Resize(ref byTemp, byTemp.Length + 2048 * 6);
+            //File.WriteAllBytes(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\CORE.dat", byTemp);
 
             //byTemp = File.ReadAllBytes(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\OPENING.dat");
             //Array.Resize(ref byTemp, byTemp.Length + 2048);
@@ -2277,7 +2771,9 @@ namespace Hanhua.Common.TextEditTools.Dino
 
         private void btnUpdLba_Click(object sender, EventArgs e)
         {
-            List<FilePosInfo> allCnDat = Util.GetAllFiles(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn").Where(p => !p.IsFolder && p.File.EndsWith(".dat", StringComparison.OrdinalIgnoreCase)).ToList();
+            Util.IsGetAllFile = true;
+            List<FilePosInfo> allCnDat = Util.GetAllFiles(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn").Where(p => !p.IsFolder && 
+                (p.File.EndsWith(".dat", StringComparison.OrdinalIgnoreCase) || p.File.EndsWith(".str", StringComparison.OrdinalIgnoreCase))).ToList();
 
             string cnExe = @"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\SLPS_021.80";
             byte[] bySlps = File.ReadAllBytes(cnExe);
@@ -2294,14 +2790,14 @@ namespace Hanhua.Common.TextEditTools.Dino
 
             for (int i = 0; i < allAddrInfo.Length; i += 2)
             {
-                if (allAddrInfo[i].EndsWith(".dat", StringComparison.OrdinalIgnoreCase) || startChgPos)
+                if (allAddrInfo[i].EndsWith(".dat", StringComparison.OrdinalIgnoreCase) || allAddrInfo[i].EndsWith(".str", StringComparison.OrdinalIgnoreCase) || startChgPos)
                 {
                     if (allAddrInfo[i].EndsWith(".XAS", StringComparison.OrdinalIgnoreCase) && firstXs)
                     {
                         //totalDiff += 2;
                         firstXs = false;
                     }
-                    else if (allAddrInfo[i].EndsWith(".STR", StringComparison.OrdinalIgnoreCase) && firstMov)
+                    else if (allAddrInfo[i].EndsWith(".STR", StringComparison.OrdinalIgnoreCase))
                     {
                         //totalDiff += 2;
                         firstMov = false;
@@ -2378,65 +2874,856 @@ namespace Hanhua.Common.TextEditTools.Dino
 
         private void btnTestOtherPic_Click(object sender, EventArgs e)
         {
-            string pointStr = "要前往的目的地";
-            List<string> txtList = pointStr.ToCharArray().Select(c => c.ToString()).ToList();
-            ImgInfo imgInfo = new ImgInfo(56, 8);
-            imgInfo.BlockImgH = 8;
-            imgInfo.BlockImgW = 8;
-            imgInfo.PosX = 0;
-            imgInfo.PosY = 0;
-            imgInfo.XPadding = 0;
-            imgInfo.YPadding = 0;
-            imgInfo.NeedBorder = false;
-            imgInfo.FontSize = 7f;
-            imgInfo.FontStyle = FontStyle.Regular;
-            imgInfo.FontName = "SimSun";
-            imgInfo.Brush = Brushes.White;
-            imgInfo.Sf.LineAlignment = StringAlignment.Center;
-            imgInfo.Grp.Clear(Color.Black);
-            imgInfo.Grp.SmoothingMode = SmoothingMode.None;
-            imgInfo.Grp.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
+            ////string pointStr = "前往的目的地";
+            ////string pointStr = "现在位置";
+            //string pointStr = "记录点";
+            //List<string> txtList = pointStr.ToCharArray().Select(c => c.ToString()).ToList();
+            //ImgInfo imgInfo = new ImgInfo(64, 8);
+            //imgInfo.BlockImgH = 8;
+            //imgInfo.BlockImgW = 8;
+            //imgInfo.PosX = 0;
+            //imgInfo.PosY = 0;
+            //imgInfo.XPadding = 0;
+            //imgInfo.YPadding = 0;
+            //imgInfo.NeedBorder = false;
+            //imgInfo.FontSize = 6f;
+            //imgInfo.FontStyle = FontStyle.Regular;
+            //imgInfo.FontName = "GuanZhi 8px";
+            //imgInfo.Brush = Brushes.White;
+            //imgInfo.Sf.LineAlignment = StringAlignment.Center;
+            //imgInfo.Grp.Clear(Color.Black);
+            //imgInfo.Grp.SmoothingMode = SmoothingMode.None;
+            //imgInfo.Grp.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
 
-            imgInfo.Grp.DrawString("Target room", new Font(new FontFamily(imgInfo.FontName), imgInfo.FontSize, imgInfo.FontStyle), imgInfo.Brush,
-                new Rectangle(0,
-                    0,
-                    56,
-                    8));
+            //imgInfo.Grp.DrawString(pointStr, new Font(new FontFamily(imgInfo.FontName), imgInfo.FontSize, imgInfo.FontStyle), imgInfo.Brush,
+            //    new Rectangle(0,
+            //        0,
+            //        64,
+            //        8));
 
-            imgInfo.Bmp.Save(@"G:\Study\MySelfProject\Hanhua\Dino1\CmnPicTest\point1.png");
-            
+            //imgInfo.Bmp.Save(@"G:\Study\MySelfProject\Hanhua\Dino1\CmnPicTest\point3.png");
 
+            List<Color> pciPal = new List<Color>();
+            byte[] byPal = File.ReadAllBytes(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\CORE\05.pal");
+            for (int i = 0x220; i < 0x240; i += 2)
+            {
+                int pixelColor = byPal[i] + (byPal[i + 1] << 8);
+                int colorR = ((byte)(pixelColor & 0x1F)) << 3;
+                int colorG = ((byte)((pixelColor >> 5) & 0x1F)) << 3;
+                int colorB = ((byte)((pixelColor >> 10) & 0x1F)) << 3;
+                pciPal.Add(Color.FromArgb(colorR, colorG, colorB));
+            }
+
+            byte[] byCore = File.ReadAllBytes(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\CORE\06.tex");
+            Bitmap menuImg = (Bitmap)Image.FromFile(@"G:\Study\MySelfProject\Hanhua\Dino1\CmnPicTest2\menuNew\point1.png");
+            int coreIdx = 176 / 2;
+            for (int y = 0; y < 8; y++)
+            {
+                for (int x = 0; x < 56; x += 2)
+                {
+                    byCore[coreIdx++] = (byte)(pciPal.IndexOf(menuImg.GetPixel(x, y)) | (pciPal.IndexOf(menuImg.GetPixel(x + 1, y)) << 4));
+                }
+                coreIdx += 100;
+            }
+
+            menuImg = (Bitmap)Image.FromFile(@"G:\Study\MySelfProject\Hanhua\Dino1\CmnPicTest2\menuNew\point2.png");
+            coreIdx = 176 / 2 + (8 * 128);
+            for (int y = 0; y < 8; y++)
+            {
+                for (int x = 0; x < 56; x += 2)
+                {
+                    byCore[coreIdx++] = (byte)(pciPal.IndexOf(menuImg.GetPixel(x, y)) | (pciPal.IndexOf(menuImg.GetPixel(x + 1, y)) << 4));
+                }
+                coreIdx += 100;
+            }
+
+            menuImg = (Bitmap)Image.FromFile(@"G:\Study\MySelfProject\Hanhua\Dino1\CmnPicTest2\menuNew\point3.png");
+            coreIdx = 160 / 2 + (112 * 128);
+            for (int y = 0; y < 16; y++)
+            {
+                for (int x = 0; x < 40; x += 2)
+                {
+                    if (y >= 8)
+                    {
+                        byCore[coreIdx++] = 0;
+                    }
+                    else
+                    {
+                        byCore[coreIdx++] = (byte)(pciPal.IndexOf(menuImg.GetPixel(x, y)) | (pciPal.IndexOf(menuImg.GetPixel(x + 1, y)) << 4));
+                    }
+                }
+                coreIdx += 108;
+            }
+
+            File.WriteAllBytes(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\CORE\06.tex", byCore);
+        }
+
+        private void MakeMovieSubTitle()
+        {
+            int idx = 0;
+            List<string> cnImg = new List<string>();
+            while (idx <= 11)
+            {
+                cnImg.Add(@"G:\Study\MySelfProject\Hanhua\Dino1\TempChk\Ps_subTitle\CN\ENDING" + idx.ToString().PadLeft(2, '0') + ".png");
+                idx++;
+            }
+            this.CompressSubTitle(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\ENDING\02.bin", 0x0, 0, cnImg, "ENDING", "0 8d8 1300 1c2c 2494 2650 2868 30f0 36b0 3ec0 45d0 4b94");
+
+            cnImg.Clear();
+            idx = 0;
+            while (idx <= 9)
+            {
+                cnImg.Add(@"G:\Study\MySelfProject\Hanhua\Dino1\TempChk\Ps_subTitle\CN\OPENING" + idx.ToString().PadLeft(2, '0') + ".png");
+                idx++;
+            }
+            this.CompressSubTitle(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\OPENING\16.bin", 0x3fd8, 0, cnImg, "OPENING", "3fd8 45ac 4d74 5744 592c 5dc8 62e8 662c 698c 6f98");
+
+            cnImg.Clear();
+            idx = 0;
+            while (idx <= 8)
+            {
+                cnImg.Add(@"G:\Study\MySelfProject\Hanhua\Dino1\TempChk\Ps_subTitle\CN\ST40D" + idx.ToString().PadLeft(2, '0') + ".png");
+                idx++;
+            }
+            this.CompressSubTitle(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\ST40D\00.bin", 0x1c, 0x3008, cnImg, "ST40D", "1c 45c 758 1154 1af0 20a4 224c 2820 2cf0");
+
+            this.DecompressSubTitle(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\ENDING\02.bin", 0x0, "ENDING", "0 8d8 1300 1c2c 2494 2650 2868 30f0 36b0 3ec0 45d0 4b94");
+            //this.DecompressSubTitle(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_jp\ENDING\02.bin", 0x0, "ENDING_JP");
+            this.DecompressSubTitle(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\OPENING\16.bin", 0x3fd8, "OPENING", "3fd8 45ac 4d74 5744 592c 5dc8 62e8 662c 698c 6f98");
+            //this.DecompressSubTitle(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_jp\OPENING\16.bin", 0x3fd8, "OPENING_JP");
+            this.DecompressSubTitle(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\ST40D\00.bin", 0x1c, "ST40D", "1c 45c 758 1154 1af0 20a4 224c 2820 2cf0");
+            //this.DecompressSubTitle(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_jp\ST40D\00.bin", 0x1c, "ST40D_JP");
+
+            //Font boldFont = new Font("SimSun", 13, FontStyle.Bold, GraphicsUnit.Pixel);
+            //StringFormat sf = new StringFormat
+            //{
+            //    Alignment = StringAlignment.Near,
+            //    LineAlignment = StringAlignment.Center,
+            //    FormatFlags = StringFormatFlags.NoClip
+            //};
+
+            //string[] titles = File.ReadAllLines(@"G:\Study\MySelfProject\Hanhua\Dino1\TempChk\Ps_subTitle\subTitle.txt");
+            //for (int i = 0; i < titles.Length; i += 3)
+            //{
+            //    string imgPath = @"G:\Study\MySelfProject\Hanhua\Dino1\TempChk\Ps_subTitle\" + titles[i];
+            //    Bitmap oldImg = (Bitmap)Image.FromFile(imgPath + ".png");
+
+            //    Bitmap newImg = new Bitmap(oldImg.Width, oldImg.Height, PixelFormat.Format32bppArgb);
+                
+
+            //    using (Graphics g = Graphics.FromImage(newImg))
+            //    {
+            //        // 背景
+            //        g.Clear(Color.Black);
+
+            //        // 关键设置
+            //        g.SmoothingMode = SmoothingMode.HighQuality;
+            //        g.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
+            //        g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            //        g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+            //        //g.SmoothingMode = SmoothingMode.None;
+            //        //g.TextRenderingHint = TextRenderingHint.SingleBitPerPixelGridFit;
+            //        //g.InterpolationMode = InterpolationMode.NearestNeighbor;
+            //        //g.PixelOffsetMode = PixelOffsetMode.Half;
+
+            //        Graphics graphics = this.CreateGraphics();
+            //        SizeF sizeF = graphics.MeasureString(titles[i + 1], boldFont);
+            //        float width1 = sizeF.Width;
+            //        float width2 = 0f;
+            //        if (!string.IsNullOrEmpty(titles[i + 2]))
+            //        {
+            //            sizeF = graphics.MeasureString(titles[i + 2], boldFont);
+            //            width2 = sizeF.Width;
+            //        }
+            //        float startPos = 0f;
+            //        float totalWidth = 0f;
+            //        if (width1 >= width2)
+            //        {
+            //            startPos = (oldImg.Width - width1) / 2;
+            //            totalWidth = width1;
+            //        }
+            //        else
+            //        {
+            //            startPos = (oldImg.Width - width2) / 2;
+            //            totalWidth = width2;
+            //        }
+
+            //        if (startPos < 0)
+            //        {
+            //            startPos = 0;
+            //        }
+            //        RectangleF rectangle = new RectangleF(startPos, 2, totalWidth, 14);
+            //        g.DrawString(titles[i + 1], boldFont, Brushes.White, rectangle, sf);
+            //        if (!string.IsNullOrEmpty(titles[i + 2]))
+            //        {
+            //            rectangle = new RectangleF(startPos, 16, totalWidth, 14);
+            //            g.DrawString(titles[i + 2], boldFont, Brushes.White, rectangle, sf);
+            //        }
+
+            //        newImg.Save(imgPath.Replace("Ps_subTitle", @"Ps_subTitle\CN") + ".png");
+            //    }
+            //}
+        }
+
+        private void CompressSubTitle(string path, int startPos, int endPos, List<string> cnImg, string outName, string addInfo)
+        {
+            byte[] byTitle = File.ReadAllBytes(path);
+            if (endPos == 0)
+            {
+                endPos = byTitle.Length;
+            }
+            Array.Clear(byTitle, startPos, endPos - startPos);
+
+            string[] adds = addInfo.Split(' ');
+            bool chkFirstColor = true;
+            byte lastData = 0;
+            byte dataCnt = 0;
+            List<byte> byImg = new List<byte>();
+            List<byte> byOldImg = new List<byte>();
+            int imgIdx = 0;
+            for (int i = 0; i < cnImg.Count; i++)
+            {
+                byImg.Clear();
+                byOldImg.Clear();
+                Bitmap img = (Bitmap)Image.FromFile(cnImg[i]);
+                Color color;
+                bool lastColorAdded = false;
+                chkFirstColor = true;
+                dataCnt = 0;
+                lastData = 0;
+                for (int y = 0; y < img.Height; y++)
+                {
+                    for (int x = 0; x < img.Width; x++)
+                    {
+                        lastColorAdded = false;
+                        color = img.GetPixel(x, y);
+                        byOldImg.Add(color.R);
+                        byOldImg.Add(color.G);
+                        byOldImg.Add(color.B);
+
+                        if (color.R != lastData && chkFirstColor == false)
+                        {
+                            byImg.Add(lastData);
+                            byImg.Add(dataCnt);
+
+                            lastData = color.R;
+                            dataCnt = 3;
+                            lastColorAdded = false;
+                        }
+                        else
+                        {
+                            chkFirstColor = false;
+                            lastData = color.R;
+                            dataCnt += 3;
+
+                            if (dataCnt == 255)
+                            {
+                                byImg.Add(lastData);
+                                byImg.Add(dataCnt);
+
+                                lastData = color.R;
+                                dataCnt = 0;
+                                chkFirstColor = true;
+                                lastColorAdded = true;
+                            }
+                        }
+                    }
+                }
+
+                if (!lastColorAdded)
+                {
+                    byImg.Add(lastData);
+                    byImg.Add(dataCnt);
+                }
+
+                startPos = Convert.ToInt16(adds[i], 16);
+                int curImgLen = byImg.Count();
+                byTitle[startPos] = (byte)((curImgLen >> 0) & 0xFF);
+                byTitle[startPos + 1] = (byte)((curImgLen >> 8) & 0xFF);
+                byTitle[startPos + 2] = 0;
+                byTitle[startPos + 3] = 0;
+                Array.Copy(byImg.ToArray(), 0, byTitle, startPos + 4, curImgLen);
+
+                //File.WriteAllBytes(@"G:\Study\MySelfProject\Hanhua\Dino1\TempChk\Ps_subTitle\" + outName + "_" + (imgIdx++) + "_CN" + (startPos.ToString("x")) + ".bin", byOldImg.ToArray());
+
+                //startPos = startPos + 4 + curImgLen;
+                //if ((startPos & 2) > 0)
+                //{
+                //    byTitle[startPos] = 0;
+                //    byTitle[startPos + 1] = 0;
+                //    startPos += 2;
+                //}
+            }
+
+            //if (startPos < endPos)
+            //{
+            //    Array.Clear(byTitle, startPos, endPos - startPos);
+            //}
+            //else
+            //{
+            //}
+
+            File.WriteAllBytes(path, byTitle);
+        }
+
+        private void DecompressSubTitle(string path, int startPos, string outName, string addInfo)
+        {
+            string subTitle = path;
+            byte[] byTitle = File.ReadAllBytes(subTitle);
+            List<byte> listImg = new List<byte>();
+            int imgIdx = 0;
+            string[] adds = addInfo.Split(' ');
+            StringBuilder sb = new StringBuilder();
+            //for (int i = startPos; i < byTitle.Length; )
+            for (int i = 0; i < adds.Length; i++)
+            {
+                startPos = Convert.ToInt16(adds[i], 16);
+                listImg.Clear();
+                if (byTitle[startPos] == 0 && byTitle[startPos + 1] == 0)
+                {
+                    break;
+                }
+
+                int sectorImgSize = byTitle[startPos] + (byTitle[startPos + 1] << 8) + (byTitle[startPos + 2] << 16) + (byTitle[startPos + 3] << 24);
+                int endSector = startPos + 4 + sectorImgSize;
+                for (int j = startPos + 4; j < endSector; j += 2)
+                {
+                    int loopCount = byTitle[j + 1];
+                    while (loopCount-- > 0)
+                    {
+                        listImg.Add(byTitle[j]);
+                    }
+                }
+
+                //File.WriteAllBytes(@"G:\Study\MySelfProject\Hanhua\Dino1\TempChk\Ps_subTitle\" + outName + "_" + (imgIdx++) + "_" + (i.ToString("x")) + ".bin", listImg.ToArray());
+                //sb.Append(i.ToString("x")).Append(" ");
+
+                //i = ((endSector + 3) / 4) * 4;
+
+                int imgHeight = 28;
+                int imgWidth = listImg.Count / 3 / imgHeight;
+
+                Bitmap img = new Bitmap(imgWidth, imgHeight);
+                int pixIdx = 0;
+                for (int y = 0; y < imgHeight; y++)
+                {
+                    for (int x = 0; x < imgWidth; x++)
+                    {
+                        if ((pixIdx + 2) < listImg.Count)
+                        {
+                            img.SetPixel(x, y, Color.FromArgb(listImg[pixIdx], listImg[pixIdx + 1], listImg[pixIdx + 2]));
+                            pixIdx += 3;
+                        }
+                    }
+                }
+                
+                img.Save(@"G:\Study\MySelfProject\Hanhua\Dino1\TempChk\Ps_subTitle\" + outName + (imgIdx++) + ".png");
+            }
+            //File.WriteAllText(@"G:\Study\MySelfProject\Hanhua\Dino1\TempChk\Ps_subTitle\" + outName + "Addr.txt", sb.ToString());
+        }
+
+
+        private void btnMyTest_Click(object sender, EventArgs e)
+        {
+            Util.IsGetAllFile = true;
+            //Directory.CreateDirectory(@"D:\OneDrive-SYSHD\OneDrive - 株式会社SYSホールディングス\龙雪蓉D盘\2.西安裕日\公司財務\ひみつ\工资\2026\1月\");
+            //List<FilePosInfo> allDatFiles = Util.GetAllFiles(@"G:\Study\MySelfProject\Hanhua\Dino1\TempChk").Where(p => !p.IsFolder).ToList();
+            //StringBuilder sb = new StringBuilder();
+            //foreach (FilePosInfo fileInfo in allDatFiles)
+            //{
+            //    FileInfo fi = new FileInfo(fileInfo.File);
+            //    if (fi.Length >= 50 * 1024 && (fileInfo.File.EndsWith(".bin", StringComparison.OrdinalIgnoreCase) || fileInfo.File.EndsWith(".tex", StringComparison.OrdinalIgnoreCase)))
+            //    {
+            //        sb.Append(fileInfo.File).Append("\r\n");
+            //    }
+            //}
+
+            this.MakeMovieSubTitle();
+
+            //// 写WARNING图片文字 Start
+            //Bitmap wipe = (Bitmap)Image.FromFile(@"G:\Study\MySelfProject\Hanhua\Dino1\CmnPicTest2\blank\WARNING.png");
+            //Color fillColor = Color.FromArgb(255, 248, 248, 248);
+            ////Color fillColor = Color.FromArgb(255, (0x5AD6 & 0x1F) << 3, (0x5AD6 & 0x1F) << 3, (0x5AD6 & 0x1F) << 3);
+            //Color outlineColor = Color.FromArgb(255, 128, 128, 128);
+
+            //Bitmap dst = new Bitmap(
+            //    wipe.Width,
+            //    wipe.Height,
+            //    PixelFormat.Format32bppArgb);
+
+            //using (Graphics g = Graphics.FromImage(dst))
+            //using (Brush outlineBrush = new SolidBrush(outlineColor))
+            //using (Brush fillBrush = new SolidBrush(fillColor))
+            //{
+            //    g.DrawImage(wipe, 0, 0, wipe.Width, wipe.Height);
+
+            //    g.SmoothingMode = SmoothingMode.HighQuality;
+            //    g.TextRenderingHint = System.Drawing.Text.TextRenderingHint.ClearTypeGridFit;
+            //    g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            //    g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+
+            //    Rectangle r = new Rectangle(98, 100, 134, 16);
+            //    StringFormat sf = new StringFormat
+            //    {
+            //        Alignment = StringAlignment.Center,
+            //        LineAlignment = StringAlignment.Center,
+            //        FormatFlags = StringFormatFlags.NoClip
+            //    };
+            //    Font font = new Font("SimSun", 13.5f, FontStyle.Regular, GraphicsUnit.Pixel);
+
+
+            //    //g.DrawString("夺回柯克博士！", font, fillBrush, r, sf);
+
+            //    string title1 = "本游戏包含暴力场景";
+
+            //    DrawChar(g, title1, font, outlineBrush, r, sf, -1f, 0);
+            //    DrawChar(g, title1, font, outlineBrush, r, sf, 1f, 0);
+            //    DrawChar(g, title1, font, outlineBrush, r, sf, 0, 1f);
+            //    DrawChar(g, title1, font, fillBrush, r, sf, 0, 0);
+
+            //    Rectangle r2 = new Rectangle(98, 118, 134, 16);
+            //    string title2 = "以及血腥、猎奇内容";
+
+            //    DrawChar(g, title2, font, outlineBrush, r2, sf, -1f, 0);
+            //    DrawChar(g, title2, font, outlineBrush, r2, sf, 1f, 0);
+            //    DrawChar(g, title2, font, outlineBrush, r2, sf, 0, 1f);
+            //    DrawChar(g, title2, font, fillBrush, r2, sf, 0, 0);
+            //}
+            //dst.Save(@"G:\Study\MySelfProject\Hanhua\Dino1\CmnPicTest2\Old\WARNING.png");
+            //// 写WARNING图片文字 End
+
+            //byte[] compressed = File.ReadAllBytes(@"G:\Study\MySelfProject\Hanhua\Dino1\TempChk\TITLE\05.bin");
+            //List<byte> allData = new List<byte>();
+            //int curVal = 0;
+            //for (int i = 0x2d70; i < compressed.Length; i += 8)
+            //{
+            //    if (compressed[i + 4] > 0)
+            //    {
+            //        curVal = compressed[i + 4];
+            //        while (curVal-- > 0)
+            //        {
+            //            allData.Add(0);
+            //            allData.Add(compressed[i + 5]);
+            //        }
+            //    }
+            //    else
+            //    {
+            //        allData.Add(0);
+            //        allData.Add(compressed[i + 5]);
+            //    }
+
+            //    if (compressed[i + 6] > 0)
+            //    {
+            //        curVal = compressed[i + 6];
+            //        while (curVal-- > 0)
+            //        {
+            //            allData.Add(0);
+            //            allData.Add(compressed[i + 7]);
+            //        }
+            //    }
+            //    else
+            //    {
+            //        allData.Add(0);
+            //        allData.Add(compressed[i + 7]);
+            //    }
+            //}
+            //File.WriteAllBytes(@"G:\Study\MySelfProject\Hanhua\Dino1\TempChk\testMovie2.bin", allData.ToArray());
+
+            //sb.Length = 0;
+            //byte[] compressed = File.ReadAllBytes(@"G:\Study\MySelfProject\Hanhua\Dino1\TempChk\ST701\10.bin");
+            //var output = new List<byte>();
+
+            //int pos = 0;
+            //while (pos < compressed.Length)
+            //{
+            //    byte control = compressed[pos++];
+            //    if (pos >= compressed.Length)
+            //    {
+            //        output.Add(control);
+            //    }
+                    
+
+            //    int count = control & 0x7F;
+            //    bool isRle = (control & 0x80) != 0;
+
+            //    byte value = compressed[pos++];
+
+            //    if (isRle)
+            //    {
+            //        for (int i = 0; i < count; i++)
+            //        {
+            //            output.Add(value);
+            //            output.Add(0x80);
+            //        }
+            //    }
+            //    else
+            //    {
+            //        // 理论上的 literal（你这个文件里可能没用）
+            //        output.Add(value);
+            //        output.Add(0x80);
+            //    }
+            //}
+            //File.WriteAllBytes(@"G:\Study\MySelfProject\Hanhua\Dino1\TempChk\ST701\10d.bin", output.ToArray());
+
+
+            //byte[] keyBytes = new byte[16];
+            //StringBuilder sb = new StringBuilder();
+            //byte[] byMsgFile = File.ReadAllBytes(@"G:\Study\MySelfProject\Hanhua\Dino Crisis (Japan)_DC\Jp\OP_MSG.DAT");
+            //Array.Copy(byMsgFile, 0x0, keyBytes, 0, keyBytes.Length);
+
+            //foreach (FilePosInfo fileInfo in allDatFiles)
+            //{
+            //    // 二进制检索
+            //    bool findedKey = true;
+            //    byte[] byData = File.ReadAllBytes(fileInfo.File);
+            //    //if (byData.Length < 1024 * 100)
+            //    //{
+            //    //    continue;
+            //    //}
+            //    int maxLen = byData.Length - keyBytes.Length;
+
+            //    for (int j = 0; j < maxLen; j += 4)
+            //    {
+            //        if (byData[j] == keyBytes[0])
+            //        {
+            //            findedKey = true;
+            //            for (int i = 1; i < keyBytes.Length; i++)
+            //            {
+            //                if (byData[j + i] != keyBytes[i])
+            //                {
+            //                    findedKey = false;
+            //                    break;
+            //                }
+            //            }
+
+            //            if (findedKey)
+            //            {
+            //                sb.Append(fileInfo.File).Append("  ");
+            //                sb.Append(j.ToString("X")).Append("\r\n");
+            //                break;
+            //            }
+            //        }
+            //    }
+            //}
+
+            //return;
+            //List<FilePosInfo> allCnPic1 = Util.GetAllFiles(@"G:\Study\MySelfProject\Hanhua\Dino1\Dino1FontPic\FontPicCn\old1Out\");
+            //foreach (FilePosInfo file in allCnPic1)
+            //{
+            //    if (file.IsFolder)
+            //    {
+            //        continue;
+            //    }
+            //    Bitmap impOut = (Bitmap)Image.FromFile(file.File);
+            //    Bitmap impIn = (Bitmap)Image.FromFile(file.File.Replace("old1Out", "old1"));
+            //    for (int y = 0; y < impIn.Height; y++)
+            //    {
+            //        for (int x = 0; x < impIn.Width; x++)
+            //        {
+            //            if (impIn.GetPixel(x, y).R > 0)
+            //            {
+            //                impOut.SetPixel(x, y, impIn.GetPixel(x, y));
+            //            }
+            //        }
+            //    }
+
+            //    impOut.Save(file.File.Replace("old1Out", "reduceColor1"));
+            //}
+
+            //allCnPic1 = Util.GetAllFiles(@"G:\Study\MySelfProject\Hanhua\Dino1\Dino1FontPic\FontPicCn\old2Out\");
+            //foreach (FilePosInfo file in allCnPic1)
+            //{
+            //    if (file.IsFolder)
+            //    {
+            //        continue;
+            //    }
+            //    Bitmap impOut = (Bitmap)Image.FromFile(file.File);
+            //    Bitmap impIn = (Bitmap)Image.FromFile(file.File.Replace("old2Out", "old2"));
+            //    for (int y = 0; y < impIn.Height; y++)
+            //    {
+            //        for (int x = 0; x < impIn.Width; x++)
+            //        {
+            //            if (impIn.GetPixel(x, y).R > 0)
+            //            {
+            //                impOut.SetPixel(x, y, impIn.GetPixel(x, y));
+            //            }
+            //        }
+            //    }
+
+            //    impOut.Save(file.File.Replace("old2Out", "reduceColor2"));
+            //}
+
+            //byte[] byBap = File.ReadAllBytes(@"G:\Study\MySelfProject\Hanhua\Dino1\Dino1FontPic\FontPicCn\fixPal80.bap");
+            //int bapIdx = 0;
             //List<Color> pciPal = new List<Color>();
             //byte[] byPal = File.ReadAllBytes(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\CORE\05.pal");
-            //for (int i = 0x200; i < 0x460; i += 2 )
+            //for (int i = 0x200; i < 0x460; i += 2)
+            ////for (int i = 0x220; i < 0x240; i += 2)
             //{
             //    int pixelColor = byPal[i] + (byPal[i + 1] << 8);
             //    int colorR = ((byte)(pixelColor & 0x1F)) << 3;
             //    int colorG = ((byte)((pixelColor >> 5) & 0x1F)) << 3;
             //    int colorB = ((byte)((pixelColor >> 10) & 0x1F)) << 3;
             //    pciPal.Add(Color.FromArgb(colorR, colorG, colorB));
+
+            //    //if (bapIdx < 16)
+            //    //{
+            //    //byBap[0x10 + bapIdx + 0] = (byte)colorR;
+            //    //byBap[0x10 + bapIdx + 1] = (byte)colorG;
+            //    //byBap[0x10 + bapIdx + 2] = (byte)colorB;
+            //    //byBap[0x10 + bapIdx + 3] = 0xFF;
+            //    //bapIdx += 4;
+            //    //}
             //}
+            //File.WriteAllBytes(@"G:\Study\MySelfProject\Hanhua\Dino1\Dino1FontPic\FontPicCn\fixPalMenu.bap", byBap);
+            //pciPal.Add(Color.FromArgb(0, 0, 0));
+            //pciPal.Add(Color.FromArgb(0, 0, 0));
+            //pciPal.Add(Color.FromArgb(0, 0, 0));
+            //pciPal.Add(Color.FromArgb(0, 0, 0));
 
-            //byte[] byImg = File.ReadAllBytes(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\CORE\06.tex");
+            //int pixelColor;
+            //int colorR;
+            //int colorG;
+            //int colorB;
+            //pixelColor = 0x0842;
+            //colorR = ((byte)(pixelColor & 0x1F)) << 3;
+            //colorG = ((byte)((pixelColor >> 5) & 0x1F)) << 3;
+            //colorB = ((byte)((pixelColor >> 10) & 0x1F)) << 3;
+            //pciPal.Add(Color.FromArgb(colorR, colorG, colorB));
+            //pciPal.Add(Color.FromArgb(colorR, colorG, colorB));
+            //pciPal.Add(Color.FromArgb(colorR, colorG, colorB));
+            //pciPal.Add(Color.FromArgb(colorR, colorG, colorB));
 
-            //for (int i = 0; i < 19; i++)
+            //pixelColor = 0x318C;
+            //colorR = ((byte)(pixelColor & 0x1F)) << 3;
+            //colorG = ((byte)((pixelColor >> 5) & 0x1F)) << 3;
+            //colorB = ((byte)((pixelColor >> 10) & 0x1F)) << 3;
+            //pciPal.Add(Color.FromArgb(colorR, colorG, colorB));
+            //pciPal.Add(Color.FromArgb(colorR, colorG, colorB));
+            //pciPal.Add(Color.FromArgb(colorR, colorG, colorB));
+            //pciPal.Add(Color.FromArgb(colorR, colorG, colorB));
+
+            //pixelColor = 0x5AD6;
+            //colorR = ((byte)(pixelColor & 0x1F)) << 3;
+            //colorG = ((byte)((pixelColor >> 5) & 0x1F)) << 3;
+            //colorB = ((byte)((pixelColor >> 10) & 0x1F)) << 3;
+            //pciPal.Add(Color.FromArgb(colorR, colorG, colorB));
+            //pciPal.Add(Color.FromArgb(colorR, colorG, colorB));
+            //pciPal.Add(Color.FromArgb(colorR, colorG, colorB));
+            //pciPal.Add(Color.FromArgb(colorR, colorG, colorB));
+
+            byte[] byImg = File.ReadAllBytes(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\CORE\06.tex");
+            ////////byte[] byImg = File.ReadAllBytes(@"G:\Study\MySelfProject\Hanhua\Dino1\CmnPicTest\TITLE_Cn2.png");
+            ////////Bitmap img = (Bitmap)Image.FromFile(@"G:\Study\MySelfProject\Hanhua\Dino1\CmnPicTest\TITLE_Cn2.png");
+            //////byte[] byImg = File.ReadAllBytes(@"G:\Study\MySelfProject\Hanhua\Dino1\TempChk\OP_MSG.DAT");
+
+            //int imgWidth = 256;
+            //int imgHeight = 432;
+            ////Bitmap img = new Bitmap(imgWidth, imgHeight);
+            ////int imgIdx = 0;
+            ////for (int y = 0; y < imgHeight; y++)
+            ////{
+            ////    //for (int x = 0; x < imgWidth; x += 2)
+            ////    for (int x = 0; x < imgWidth; )
+            ////    {
+            ////        img.SetPixel(x++, y, pciPal[byImg[imgIdx++]]);
+            ////        //img.SetPixel(x++, y, pciPal[byImg[imgIdx] & 0xF]);
+            ////        //img.SetPixel(x++, y, pciPal[(byImg[imgIdx++] >> 4) & 0xF]);
+            ////        //byImg[imgIdx++] = (byte)(pciPal.IndexOf(img.GetPixel(x, y)) | (pciPal.IndexOf(img.GetPixel(x + 1, y)) << 4));
+            ////    }
+            ////}
+            //////File.WriteAllBytes(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\TITLE\00.tex", byImg);
+            ////img.Save(@"G:\Study\MySelfProject\Hanhua\Dino1\CmnPicTest\CnTest\WIPE_Test.png");
+
+            //int imgIdx = 0;
+            //for (int i = 0; i < 10; i++)
             //{
-            //    Bitmap img = new Bitmap(256, 432);
-            //    int imgIdx = 0;
-            //    for (int y = 0; y < 432; y++)
+            //    Bitmap img = new Bitmap(imgWidth, imgHeight);
+            //    imgIdx = 0;
+            //    for (int y = 0; y < imgHeight; y++)
             //    {
-            //        for (int x = 0; x < 256; x += 2)
+            //        for (int x = 0; x < imgWidth; x += 2)
             //        {
             //            if (imgIdx < byImg.Length)
             //            {
             //                int palIdx = byImg[imgIdx++];
-            //                img.SetPixel(x, y, pciPal[i * 16 + (palIdx & 0xF)]);
-            //                img.SetPixel(x + 1, y, pciPal[i * 16 + ((palIdx >> 4) & 0xF)]);
+            //                img.SetPixel(x, y, pciPal[(palIdx & 0xF) + i * 16]);
+            //                img.SetPixel(x + 1, y, pciPal[((palIdx >> 4) & 0xF) + i * 16]);
+            //                //int pixelColor = byImg[imgIdx] + (byImg[imgIdx + 1] << 8);
+            //                //int colorR = ((byte)(pixelColor & 0x1F)) << 3;
+            //                //int colorG = ((byte)((pixelColor >> 5) & 0x1F)) << 3;
+            //                //int colorB = ((byte)((pixelColor >> 10) & 0x1F)) << 3;
+            //                //img.SetPixel(x, y, Color.FromArgb(colorR, colorG, colorB));
+            //                //imgIdx += 1;
+
+            //                //img.SetPixel(x, y, Color.FromArgb(byImg[imgIdx + 2], byImg[imgIdx + 1], byImg[imgIdx]));
+            //                //imgIdx += 3;
             //            }
             //        }
             //    }
-            //    img.Save(@"G:\Study\MySelfProject\Hanhua\Dino1\CmnPicTest\PicTest" + i + ".png");
+            //    //img.Save(@"G:\Study\MySelfProject\Hanhua\Dino1\CmnPicTest\STUFF" + i + ".png");
+            //    img.Save(@"G:\Study\MySelfProject\Hanhua\Dino1\CmnPicTest2\menuChk\Core" + i + ".png");
             //}
+
+            //Bitmap msgImg = (Bitmap)Image.FromFile(@"G:\Study\MySelfProject\Hanhua\Dino1\TempChk\OP_MSG0.png");
+            //List<int> colorList = new List<int>();
+            //for (int y = 0; y < msgImg.Height; y++)
+            //{
+            //    for (int x = 0; x < msgImg.Width; x++)
+            //    {
+            //        int color = msgImg.GetPixel(x, y).ToArgb();
+            //        if (!colorList.Contains(color))
+            //        {
+            //            colorList.Add(color);
+            //        }
+            //    }
+            //}
+            //colorList.Sort();
+            //StringBuilder sb = new StringBuilder();
+            //StringBuilder sb2 = new StringBuilder();
+            //for (int i = 0; i < colorList.Count; i++)
+            //{
+            //    int colorR = ((colorList[i] >> 16) & 0xFF) >> 3;
+            //    int colorG = (((colorList[i] >> 8) & 0xFF) >> 3) << 5;
+            //    int colorB = (((colorList[i] >> 0) & 0xFF) >> 3) << 10;
+            //    int pixel = colorR | colorG | colorB;
+            //    sb.Append(pixel.ToString("X")).Append("\r\n");
+
+            //    colorR = (((colorList[i] >> 16) & 0xFF) >> 3) << 10;
+            //    colorG = (((colorList[i] >> 8) & 0xFF) >> 3) << 5;
+            //    colorB = (((colorList[i] >> 0) & 0xFF) >> 3) << 0;
+            //    pixel = colorR | colorG | colorB;
+            //    sb2.Append(pixel.ToString("X")).Append("\r\n");
+            //}
+            //sb.Length = 0;
+            //sb2.Length = 0;
+
+            //List<FilePosInfo> allCnPic1 = Util.GetAllFiles(@"G:\Study\MySelfProject\Hanhua\Dino1\CmnPicTest2\new\").Where(p => !p.IsFolder).ToList();
+            //foreach (FilePosInfo file in allCnPic1)
+            //{
+            //    if (file.File.EndsWith("WIPE.png", StringComparison.OrdinalIgnoreCase))
+            //    {
+            //        //List<int> pciPal = new List<int>();
+            //        //byte[] byPal = File.ReadAllBytes(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\WIPE\01.pal");
+            //        //for (int i = 0x0; i < byPal.Length; i += 2)
+            //        //{
+            //        //    int pixelColor = byPal[i] + (byPal[i + 1] << 8);
+            //        //    //int colorR = ((byte)(pixelColor & 0x1F)) << 3;
+            //        //    //int colorG = ((byte)((pixelColor >> 5) & 0x1F)) << 3;
+            //        //    //int colorB = ((byte)((pixelColor >> 10) & 0x1F)) << 3;
+            //        //    pciPal.Add(pixelColor);
+            //        //}
+
+            //        //Bitmap img = (Bitmap)Image.FromFile(file.File);
+            //        //string name = Util.GetShortNameWithoutType(file.File);
+            //        //string binFile = file.File.Replace(@"CmnPicTest\CnNew", "PS_cn").Replace(".png", "") + @"\00.tex";
+            //        //byte[] byImp = File.ReadAllBytes(binFile);
+            //        //int imgIdx = 0;
+            //        //for (int y = 0; y < img.Height; y++)
+            //        //{
+            //        //    for (int x = 0; x < img.Width; x++)
+            //        //    {
+            //        //        Color pixelColor = img.GetPixel(x, y);
+
+            //        //        int colorR = (pixelColor.R >> 3);
+            //        //        int colorG = (pixelColor.G >> 3) << 5;
+            //        //        int colorB = (pixelColor.B >> 3) << 10;
+            //        //        int pixel = colorR | colorG | colorB;
+            //        //        int pixIdx = pciPal.IndexOf(pixel);
+
+            //        //        byImp[imgIdx++] = (byte)(pixIdx & 0xFF);
+            //        //        //byImp[imgIdx + 1] = (byte)((pixIdx >> 8) & 0xFF);
+
+            //        //        //imgIdx += 2;
+            //        //    }
+            //        //}
+            //        //File.WriteAllBytes(binFile, byImp);
+            //    }
+            //    //else if (file.File.EndsWith("WARNING.png"))
+            //    else
+            //    {
+            //        Bitmap img = (Bitmap)Image.FromFile(file.File);
+            //        string name = Util.GetShortNameWithoutType(file.File);
+            //        string binFile = file.File.Replace(@"CmnPicTest2\new", "PS_cn").Replace(".png", "") + @"\00.bin";
+            //        byte[] byImp = File.ReadAllBytes(binFile);
+            //        int imgIdx = 0;
+            //        for (int y = 0; y < img.Height; y++)
+            //        {
+            //            for (int x = 0; x < img.Width; x++)
+            //            {
+            //                Color pixelColor = img.GetPixel(x, y);
+
+            //                int colorR = (pixelColor.R >> 3);
+            //                int colorG = (pixelColor.G >> 3) << 5;
+            //                int colorB = (pixelColor.B >> 3) << 10;
+            //                int pixel = colorR | colorG | colorB;
+
+            //                byImp[imgIdx] = (byte)(pixel & 0xFF);
+            //                byImp[imgIdx + 1] = (byte)((pixel >> 8) & 0xFF);
+
+            //                imgIdx += 2;
+            //            }
+            //        }
+            //        File.WriteAllBytes(binFile, byImp);
+            //    }
+            //}
+
+            //int imgWidth = 160;
+            //int imgHeight = 320;
+            //Bitmap img = new Bitmap(imgWidth, imgHeight);
+            //int imgIdx = 0;
+            //byte[] byImp = File.ReadAllBytes(@"G:\Study\MySelfProject\Hanhua\Dino1\TempChk\testMovie2.bin");
+            //for (int y = 0; y < imgHeight; y++)
+            //{
+            //    for (int x = 0; x < imgWidth; x++)
+            //    {
+            //        int pixelColor = byImp[imgIdx] + (byImp[imgIdx + 1] << 8);
+            //        int colorR = ((byte)(pixelColor & 0x1F)) << 3;
+            //        int colorG = ((byte)((pixelColor >> 5) & 0x1F)) << 3;
+            //        int colorB = ((byte)((pixelColor >> 10) & 0x1F)) << 3;
+            //        img.SetPixel(x, y, Color.FromArgb(colorR, colorG, colorB));
+            //        imgIdx += 2;
+            //    }
+            //}
+            //img.Save(@"G:\Study\MySelfProject\Hanhua\Dino1\TempChk\testMovie2.png");
+
+            //int imgWidth = 320;
+            //int imgHeight = 240;
+            //Bitmap img = new Bitmap(imgWidth, imgHeight);
+            //int imgIdx = 0;
+            //byte[] byImp = File.ReadAllBytes(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\omake1\00.bin");
+            //for (int y = 0; y < imgHeight; y++)
+            //{
+            //    for (int x = 0; x < imgWidth; x++)
+            //    {
+            //        int pixelColor = byImp[imgIdx] + (byImp[imgIdx + 1] << 8);
+            //        int colorR = ((byte)(pixelColor & 0x1F)) << 3;
+            //        int colorG = ((byte)((pixelColor >> 5) & 0x1F)) << 3;
+            //        int colorB = ((byte)((pixelColor >> 10) & 0x1F)) << 3;
+            //        img.SetPixel(x, y, Color.FromArgb(colorR, colorG, colorB));
+            //        imgIdx += 2;
+            //    }
+            //}
+            //img.Save(@"G:\Study\MySelfProject\Hanhua\Dino1\CmnPicTest\CnTest\omake1.png");
+            //Bitmap img = (Bitmap)Image.FromFile(@"G:\Study\MySelfProject\Hanhua\Dino1\CmnPicTest\TITLE06_cnImp2.png");
+            //for (int y = 0; y < imgHeight; y++)
+            //{
+            //    for (int x = 0; x < imgWidth; x++)
+            //    {
+            //        Color pixelColor = img.GetPixel(x, y);
+
+            //        int colorR = (pixelColor.R >> 3);
+            //        int colorG = (pixelColor.G >> 3) << 5;
+            //        int colorB = (pixelColor.B >> 3) << 10;
+            //        int pixel = colorR | colorG | colorB;
+
+            //        byImp[imgIdx] = (byte)(pixel & 0xFF);
+            //        byImp[imgIdx + 1] = (byte)((pixel >> 8) & 0xFF);
+
+            //        imgIdx += 2;
+            //    }
+            //}
+            //File.WriteAllBytes(@"G:\Study\MySelfProject\Hanhua\Dino1\PS_cn\TITLE\06.bin", byImp);
         }
     }
 
